@@ -1,0 +1,50 @@
+@import 'tailwindcss';
+
+/* Habilita la estrategia de selector de clase para modo oscuro en Tailwind CSS v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --color-castilla-50: #f0fdf4;
+    --color-castilla-100: #dcfce7;
+    --color-castilla-200: #bbf7d0;
+    --color-castilla-500: #10b981;
+    --color-castilla-600: #059669;
+    --color-castilla-700: #046A38;
+    --color-castilla-800: #065f46;
+    --color-castilla-900: #064e3b;
+    --color-castilla-950: #022c22;
+    --color-boxdark: #1e293b;
+    --color-boxdark-2: #0f172a;
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+body {
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar discreto */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+}

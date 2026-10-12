@@ -1,0 +1,157 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Database\Seeders;
+
+use App\Models\Office;
+use App\Models\Sede;
+use Illuminate\Database\Seeder;
+
+class OfficeSeeder extends Seeder
+{
+    private const SEDES = [
+        'PRINCIPAL' => 'PALACIO MUNICIPAL (SEDE PRINCIPAL)',
+        'SERENAZGO' => 'BASE DE SERENAZGO - CASTILLA',
+        'MAESTRANZA' => 'GERENCIA DE SERVICIOS PÚBLICOS (MAESTRANZA)',
+        'DEPOSITO' => 'DEPÓSITO MUNICIPAL DE VEHÍCULOS',
+        'MINILICHI' => 'COMPLEJO DEPORTIVO MINILICHI',
+        'BIBLIOTECA' => 'BIBLIOTECA MUNICIPAL',
+        'EL_INDIO' => 'LOCAL COMUNAL EL INDIO',
+        'CHICLAYITO' => 'CENTRO DE SALUD MATERNO CHICLAYITO',
+        'TACALA' => 'OFICINA DESCONCENTRADA TACALÁ',
+        'VIVERO' => 'VIVERO MUNICIPAL Y RELLENO SANITARIO',
+    ];
+
+    private const SEED_OFFICES = [
+        ['code' => '01', 'acronym' => 'OR', 'name' => 'OFICINA DE REGIDORES', 'parent' => null, 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '02', 'acronym' => 'ALC', 'name' => 'ALCALDÍA', 'parent' => null, 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '02.01', 'acronym' => 'OSALC', 'name' => 'OFICINA SECRETARIA DE ALCALDIA', 'parent' => 'ALCALDÍA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03', 'acronym' => 'GM', 'name' => 'GERENCIA MUNICIPAL', 'parent' => 'ALCALDÍA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.01', 'acronym' => 'SG', 'name' => 'SECRETARÍA GENERAL', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.01.01', 'acronym' => 'OGDAC', 'name' => 'OFICINA DE GESTIÓN DOCUMENTARIA Y ATENCIÓN AL CIUDADANO', 'parent' => 'SECRETARÍA GENERAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.01.01.01', 'acronym' => 'OAC', 'name' => 'OFICINA DE ARCHIVO CENTRAL', 'parent' => 'OFICINA DE GESTIÓN DOCUMENTARIA Y ATENCIÓN AL CIUDADANO', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.01.02', 'acronym' => 'OCSRP', 'name' => 'OFICINA DE COMUNICACIÓN SOCIAL Y RELACIONES PÚBLICAS', 'parent' => 'SECRETARÍA GENERAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02', 'acronym' => 'OGAF', 'name' => 'OFICINA GENERAL DE ADMINISTRACIÓN Y FINANZAS', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.01', 'acronym' => 'ORH', 'name' => 'OFICINA DE RECURSOS HUMANOS', 'parent' => 'OFICINA GENERAL DE ADMINISTRACIÓN Y FINANZAS', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.01.01', 'acronym' => 'OCP', 'name' => 'OFICINA DE CONTROL DE PERSONAL', 'parent' => 'OFICINA DE RECURSOS HUMANOS', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.01.02', 'acronym' => 'OEA', 'name' => 'OFICINA DE ESCALAFON Y ARCHIVO', 'parent' => 'OFICINA DE RECURSOS HUMANOS', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.01.03', 'acronym' => 'OLRH', 'name' => 'OFICINA DE LEGAL DE RECURSOS HUMANOS', 'parent' => 'OFICINA DE RECURSOS HUMANOS', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.02', 'acronym' => 'OACP', 'name' => 'OFICINA DE ABASTECIMIENTOS Y CONTROL PATRIMONIAL', 'parent' => 'OFICINA GENERAL DE ADMINISTRACIÓN Y FINANZAS', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.02.01', 'acronym' => 'OACG', 'name' => 'OFICINA DE ALMACEN CENTRAL GENERAL', 'parent' => 'OFICINA DE ABASTECIMIENTOS Y CONTROL PATRIMONIAL', 'sede' => self::SEDES['MAESTRANZA']],
+        ['code' => '03.02.02.02', 'acronym' => 'OAC', 'name' => 'OFICINA DE ALMACEN CENTRAL (G. SERVICIOS PUBLICOS)', 'parent' => 'OFICINA DE ABASTECIMIENTOS Y CONTROL PATRIMONIAL', 'sede' => self::SEDES['MAESTRANZA']],
+        ['code' => '03.02.03', 'acronym' => 'OCC', 'name' => 'OFICINA DE CONTABILIDAD Y COSTOS', 'parent' => 'OFICINA GENERAL DE ADMINISTRACIÓN Y FINANZAS', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.04', 'acronym' => 'OT', 'name' => 'OFICINA DE TESORERÍA', 'parent' => 'OFICINA GENERAL DE ADMINISTRACIÓN Y FINANZAS', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.05', 'acronym' => 'ODT', 'name' => 'OFICINA DE DESARROLLO TECNOLÓGICO', 'parent' => 'OFICINA GENERAL DE ADMINISTRACIÓN Y FINANZAS', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.02.05.01', 'acronym' => 'OSTR', 'name' => 'OFICINA DE SOPORTE TECNICO Y REDES', 'parent' => 'OFICINA DE DESARROLLO TECNOLÓGICO', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.03', 'acronym' => 'OGAJ', 'name' => 'OFICINA GENERAL DE ASESORÍA JURÍDICA', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.04', 'acronym' => 'OGPP', 'name' => 'OFICINA GENERAL DE PLANEAMIENTO Y PRESUPUESTO', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.04.01', 'acronym' => 'OP', 'name' => 'OFICINA DE PRESUPUESTO', 'parent' => 'OFICINA GENERAL DE PLANEAMIENTO Y PRESUPUESTO', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.04.02', 'acronym' => 'OMIE', 'name' => 'OFICINA DE MODERNIZACIÓN INSTITUCIONAL Y ESTADÍSTICA', 'parent' => 'OFICINA GENERAL DE PLANEAMIENTO Y PRESUPUESTO', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '03.05', 'acronym' => 'OHC', 'name' => 'OFICINA DE HITOS DE CONTROL', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '04', 'acronym' => 'GAT', 'name' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '04.01', 'acronym' => 'SGT', 'name' => 'SUBGERENCIA DE TRIBUTACIÓN', 'parent' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '04.02', 'acronym' => 'SGR', 'name' => 'SUBGERENCIA DE RECAUDACIÓN', 'parent' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '04.03', 'acronym' => 'EC', 'name' => 'EJECUTORÍA COACTIVA', 'parent' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '04.04', 'acronym' => 'SGLA', 'name' => 'SUBGERENCIA DE LICENCIAS Y AUTORIZACIONES', 'parent' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '04.05', 'acronym' => 'SGF', 'name' => 'SUBGERENCIA DE FISCALIZACIÓN', 'parent' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '04.05.01', 'acronym' => 'UFAPM', 'name' => 'UNIDAD DE FISCALIZACIÓN ADMINISTRATIVA Y POLICÍA MUNICIPAL', 'parent' => 'SUBGERENCIA DE FISCALIZACIÓN', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '04.05.01.01', 'acronym' => 'OPM', 'name' => 'OFICINA DE POLICIA MUNICIPAL', 'parent' => 'UNIDAD DE FISCALIZACIÓN ADMINISTRATIVA Y POLICÍA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '05', 'acronym' => 'GDURI', 'name' => 'GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '05.01', 'acronym' => 'SFPIP', 'name' => 'SUBGERENCIA DE FORMULACIÓN DE PROYECTOS DE INVERSIÓN PÚBLICA', 'parent' => 'GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '05.02', 'acronym' => 'SEPIP', 'name' => 'SUBGERENCIA DE ESTUDIOS Y PROYECTOS DE INVERSIÓN PÚBLICA', 'parent' => 'GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '05.03', 'acronym' => 'SGO', 'name' => 'SUBGERENCIA DE OBRAS', 'parent' => 'GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '05.04', 'acronym' => 'SGLO', 'name' => 'SUBGERENCIA DE LIQUIDACIÓN DE OBRAS', 'parent' => 'GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '05.05', 'acronym' => 'SGC', 'name' => 'SUBGERENCIA DE CATASTRO', 'parent' => 'GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '05.06', 'acronym' => 'SGSFL', 'name' => 'SUBGERENCIA DE SANEAMIENTO FÍSICO LEGAL', 'parent' => 'GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '05.07', 'acronym' => 'SGGRD', 'name' => 'SUBGERENCIA DE GESTIÓN DEL RIESGO DE DESASTRES', 'parent' => 'GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '06', 'acronym' => 'GDEL', 'name' => 'GERENCIA DE DESARROLLO ECONÓMICO LOCAL', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '06.01', 'acronym' => 'SGC', 'name' => 'SUBGERENCIA DE COMERCIALIZACIÓN', 'parent' => 'GERENCIA DE DESARROLLO ECONÓMICO LOCAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '06.01.01', 'acronym' => 'OAM', 'name' => 'OFICINA DE ADMINISTRACION DE MERCADO', 'parent' => 'SUBGERENCIA DE COMERCIALIZACIÓN', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '06.02', 'acronym' => 'SGPTEI', 'name' => 'SUBGERENCIA DE PROMOCIÓN TURÍSTICA, EMPRESARIAL E INVERSIONES', 'parent' => 'GERENCIA DE DESARROLLO ECONÓMICO LOCAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '07', 'acronym' => 'GDH', 'name' => 'GERENCIA DE DESARROLLO HUMANO', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '07.01', 'acronym' => 'SECDR', 'name' => 'SUBGERENCIA DE EDUCACIÓN, CULTURA, DEPORTE Y RECREACIÓN', 'parent' => 'GERENCIA DE DESARROLLO HUMANO', 'sede' => self::SEDES['BIBLIOTECA']],
+        ['code' => '07.02', 'acronym' => 'SGPC', 'name' => 'SUBGERENCIA DE PARTICIPACIÓN CIUDADANA', 'parent' => 'GERENCIA DE DESARROLLO HUMANO', 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '07.03', 'acronym' => 'SGIS', 'name' => 'SUBGERENCIA DE INCLUSIÓN SOCIAL', 'parent' => 'GERENCIA DE DESARROLLO HUMANO', 'sede' => self::SEDES['EL_INDIO']],
+        ['code' => '07.03.01', 'acronym' => 'CIAM', 'name' => 'CENTRO INTEGRAL DE ATENCIÓN AL ADULTO MAYOR', 'parent' => 'SUBGERENCIA DE INCLUSIÓN SOCIAL', 'sede' => self::SEDES['EL_INDIO']],
+        ['code' => '07.03.02', 'acronym' => 'DEMUNA', 'name' => 'DEFENSORÍA MUNICIPAL DEL NIÑO Y DEL ADOLESCENTE', 'parent' => 'SUBGERENCIA DE INCLUSIÓN SOCIAL', 'sede' => self::SEDES['EL_INDIO']],
+        ['code' => '07.03.03', 'acronym' => 'OMAPED', 'name' => 'OFICINA MUNICIPAL DE ATENCIÓN A LA PERSONA CON DISCAPACIDAD', 'parent' => 'SUBGERENCIA DE INCLUSIÓN SOCIAL', 'sede' => self::SEDES['EL_INDIO']],
+        ['code' => '07.03.04', 'acronym' => 'PVL', 'name' => 'OFICINA DEL PROGRAMA DEL VASO DE LECHE', 'parent' => 'SUBGERENCIA DE INCLUSIÓN SOCIAL', 'sede' => self::SEDES['EL_INDIO']],
+        ['code' => '07.04', 'acronym' => 'SRCPPS', 'name' => 'SUBGERENCIA DE REGISTRO CIVIL, POBLACIÓN Y PROMOCIÓN DE LA SALUD', 'parent' => 'GERENCIA DE DESARROLLO HUMANO', 'sede' => self::SEDES['CHICLAYITO']],
+        ['code' => '07.04.01', 'acronym' => 'ULE', 'name' => 'OFICINA DE LA UNIDAD LOCAL DE EMPADRONAMIENTO', 'parent' => 'SUBGERENCIA DE REGISTRO CIVIL, POBLACIÓN Y PROMOCIÓN DE LA SALUD', 'sede' => self::SEDES['CHICLAYITO']],
+        ['code' => '08', 'acronym' => 'GSP', 'name' => 'GERENCIA DE SERVICIOS PÚBLICOS', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['MAESTRANZA']],
+        ['code' => '08.01', 'acronym' => 'SGGA', 'name' => 'SUBGERENCIA DE GESTIÓN AMBIENTAL', 'parent' => 'GERENCIA DE SERVICIOS PÚBLICOS', 'sede' => self::SEDES['MAESTRANZA']],
+        ['code' => '08.01.01', 'acronym' => 'ULP', 'name' => 'UNIDAD DE LIMPIEZA PÚBLICA', 'parent' => 'SUBGERENCIA DE GESTIÓN AMBIENTAL', 'sede' => self::SEDES['MAESTRANZA']],
+        ['code' => '08.01.02', 'acronym' => 'UPJ', 'name' => 'UNIDAD DE PARQUES Y JARDINES', 'parent' => 'SUBGERENCIA DE GESTIÓN AMBIENTAL', 'sede' => self::SEDES['VIVERO']],
+        ['code' => '08.02', 'acronym' => 'SGSG', 'name' => 'SUBGERENCIA DE SERVICIOS GENERALES', 'parent' => 'GERENCIA DE SERVICIOS PÚBLICOS', 'sede' => self::SEDES['MAESTRANZA']],
+        ['code' => '08.02.01', 'acronym' => 'UTMM', 'name' => 'UNIDAD DE TALLER DE MECÁNICA Y MAESTRANZA', 'parent' => 'SUBGERENCIA DE SERVICIOS GENERALES', 'sede' => self::SEDES['MAESTRANZA']],
+        ['code' => '08.03', 'acronym' => 'STTV', 'name' => 'SUBGERENCIA DE TRANSPORTE, TRÁNSITO Y VIALIDAD', 'parent' => 'GERENCIA DE SERVICIOS PÚBLICOS', 'sede' => self::SEDES['DEPOSITO']],
+        ['code' => '09', 'acronym' => 'GSC', 'name' => 'GERENCIA SEGURIDAD CIUDADANA', 'parent' => 'GERENCIA MUNICIPAL', 'sede' => self::SEDES['SERENAZGO']],
+        ['code' => '09.01', 'acronym' => 'SGS', 'name' => 'SUBGERENCIA DE SERENAZGO', 'parent' => 'GERENCIA SEGURIDAD CIUDADANA', 'sede' => self::SEDES['SERENAZGO']],
+        ['code' => '10', 'acronym' => 'OCI', 'name' => 'ÓRGANO DE CONTROL INSTITUCIONAL', 'parent' => null, 'sede' => self::SEDES['PRINCIPAL']],
+        ['code' => '11', 'acronym' => 'PPM', 'name' => 'PROCURADURÍA PÚBLICA MUNICIPAL', 'parent' => null, 'sede' => self::SEDES['PRINCIPAL']],
+    ];
+
+    public function run(): void
+    {
+        $defaultSedes = [
+            ['name' => 'PALACIO MUNICIPAL (SEDE PRINCIPAL)', 'code' => 'PRINCIPAL', 'address' => 'Calle Junín s/n - Castilla', 'color' => 'emerald'],
+            ['name' => 'BASE DE SERENAZGO - CASTILLA', 'code' => 'SERENAZGO', 'address' => 'Av. Independencia', 'color' => 'blue'],
+            ['name' => 'GERENCIA DE SERVICIOS PÚBLICOS (MAESTRANZA)', 'code' => 'MAESTRANZA', 'address' => 'Carretera Los Ejidos', 'color' => 'orange'],
+            ['name' => 'DEPÓSITO MUNICIPAL DE VEHÍCULOS', 'code' => 'DEPOSITO', 'address' => 'Av. Corpac', 'color' => 'teal'],
+            ['name' => 'COMPLEJO DEPORTIVO MINILICHI', 'code' => 'MINILICHI', 'address' => 'Urb. Miraflores', 'color' => 'purple'],
+            ['name' => 'BIBLIOTECA MUNICIPAL', 'code' => 'BIBLIOTECA', 'address' => 'Av. Grau s/n', 'color' => 'amber'],
+            ['name' => 'LOCAL COMUNAL EL INDIO', 'code' => 'EL_INDIO', 'address' => 'A.H. El Indio', 'color' => 'emerald'],
+            ['name' => 'CENTRO DE SALUD MATERNO CHICLAYITO', 'code' => 'CHICLAYITO', 'address' => 'A.H. Chiclayito', 'color' => 'rose'],
+            ['name' => 'OFICINA DESCONCENTRADA TACALÁ', 'code' => 'TACALA', 'address' => 'A.H. Tacalá', 'color' => 'cyan'],
+            ['name' => 'VIVERO MUNICIPAL Y RELLENO SANITARIO', 'code' => 'VIVERO', 'address' => 'Sector La Primavera', 'color' => 'emerald'],
+        ];
+
+        foreach ($defaultSedes as $s) {
+            Sede::firstOrCreate(['name' => $s['name']], $s);
+        }
+
+        $createdMap = [];
+
+        foreach (self::SEED_OFFICES as $item) {
+            $cleanName = strtoupper(trim($item['name']));
+            $level = count(explode('.', $item['code']));
+            $existingOffice = Office::where('code', $item['code'])->first();
+            $officeSede = $item['sede'] ?? $existingOffice?->sede ?? self::SEDES['PRINCIPAL'];
+
+            $office = Office::updateOrCreate(
+                ['code' => $item['code']],
+                [
+                    'acronym' => strtoupper(trim($item['acronym'])),
+                    'name' => $cleanName,
+                    'parent_name' => $item['parent'] ? strtoupper(trim($item['parent'])) : null,
+                    'sede' => $officeSede,
+                    'level' => $level,
+                    'is_active' => true,
+                ]
+            );
+
+            $createdMap[$cleanName] = $office;
+            $createdMap[$item['code']] = $office;
+        }
+
+        foreach (self::SEED_OFFICES as $item) {
+            $child = $createdMap[$item['code']] ?? null;
+            if (! $child) {
+                continue;
+            }
+
+            if ($item['parent']) {
+                $cleanParent = strtoupper(trim($item['parent']));
+                $parent = $createdMap[$cleanParent] ?? null;
+                $child->parent_id = $parent?->id;
+                $child->parent_name = $parent?->name ?? $cleanParent;
+            } else {
+                $child->parent_id = null;
+                $child->parent_name = null;
+            }
+
+            $child->save();
+        }
+    }
+}

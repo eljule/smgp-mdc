@@ -1,0 +1,82 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        USER: sigm
+        UID: 1000
+        GID: 1000
+    container_name: sigm_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+    networks:
+      - sigm-network
+    depends_on:
+      database:
+        condition: service_healthy
+
+  webserver:
+    image: nginx:alpine
+    container_name: sigm_webserver
+    restart: unless-stopped
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - .:/var/www/html:ro
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - sigm-network
+    depends_on:
+      - app
+
+  database:
+    image: postgres:16-alpine
+    container_name: sigm_database
+    restart: unless-stopped
+    ports:
+      - "${FORWARD_DB_PORT:-5434}:5432"
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-sigm_db}
+      POSTGRES_USER: ${DB_USERNAME:-sigm_user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-sigm_secret}
+    volumes:
+      - sigm-postgres-data:/var/lib/postgresql/data
+    networks:
+      - sigm-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-sigm_user} -d ${DB_DATABASE:-sigm_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: sigm_pgadmin_portal
+    restart: unless-stopped
+    ports:
+      - "${PGADMIN_PORT:-5052}:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@sigm.gob.pe}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+    networks:
+      - sigm-network
+    depends_on:
+      - database
+
+networks:
+  sigm-network:
+    name: sigm-network
+    driver: bridge
+
+volumes:
+  sigm-postgres-data:
+    name: sigm_postgres_data
+    driver: local
