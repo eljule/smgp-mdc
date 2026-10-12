@@ -9,11 +9,25 @@
 <header class="sticky top-0 z-30 w-full bg-[#0d4f2f] dark:bg-slate-900 border-b border-emerald-800 dark:border-slate-800 text-white shadow-md transition-colors duration-200">
     <div class="max-w-full px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between">
         <!-- Lado izquierdo: Botón menú colapsable + Branding Municipal -->
-        <div class="flex items-center space-x-3.5">
+        <div class="flex items-center space-x-2 sm:space-x-3.5">
+            <!-- Botón Móvil: Abrir Drawer lateral -->
+            <button
+                type="button"
+                @click="mobileSidebarOpen = true"
+                class="p-1.5 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-800/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 cursor-pointer md:hidden"
+                title="Abrir menú"
+                aria-label="Abrir menú"
+            >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+
+            <!-- Botón Escritorio: Colapsar / Expandir barra lateral -->
             <button
                 type="button"
                 @click="sidebarCollapsed = !sidebarCollapsed"
-                class="p-1.5 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-800/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 cursor-pointer"
+                class="hidden md:inline-flex p-1.5 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-800/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 cursor-pointer"
                 title="Colapsar / expandir menú"
                 aria-label="Alternar menú lateral"
             >

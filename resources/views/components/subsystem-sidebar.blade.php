@@ -45,9 +45,44 @@
 @endphp
 
 <aside
-    class="bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 flex flex-col justify-between shrink-0 select-none overflow-y-auto"
-    :class="sidebarCollapsed ? 'w-18' : 'w-64'">
-    <div class="p-3 space-y-5">
+    class="fixed inset-y-0 left-0 z-50 w-72 max-w-[85vw] bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transition-all duration-300 flex flex-col justify-between shrink-0 select-none overflow-y-auto shadow-2xl md:static md:z-auto md:shadow-none md:translate-x-0"
+    :class="{
+        '-translate-x-full': !mobileSidebarOpen,
+        'translate-x-0': mobileSidebarOpen,
+        'md:w-18': sidebarCollapsed,
+        'md:w-64': !sidebarCollapsed
+    }">
+    <div class="p-3 space-y-5" @click="if ($event.target.closest('a')) mobileSidebarOpen = false">
+        <!-- Cabecera Móvil del Menú con Botón Cerrar (Solo Móvil) -->
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800 md:hidden">
+            <div class="flex items-center gap-2">
+                <img
+                    src="{{ asset('images/logo.png') }}"
+                    alt="Escudo Oficial de Castilla"
+                    class="h-7 w-auto object-contain drop-shadow"
+                />
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-tight">
+                        Menú de Navegación
+                    </span>
+                    <span class="text-[10px] text-emerald-700 dark:text-emerald-400 font-semibold">
+                        SIGM &bull; Castilla
+                    </span>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                @click="mobileSidebarOpen = false"
+                class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
+                title="Cerrar menú"
+                aria-label="Cerrar menú"
+            >
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
         <!-- ========================================== -->
         <!-- 1. ADMIN (8 PESTAÑAS)                      -->
         <!-- ========================================== -->
