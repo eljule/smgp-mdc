@@ -144,4 +144,31 @@ class ModuleLauncherTest extends TestCase
             ->assertDontSee('Inventario TI')
             ->assertDontSee('Licencias de Transportes');
     }
+
+    public function test_renders_maintenance_page_with_own_header_and_without_regular_header(): void
+    {
+        CoreModule::create([
+            'code' => 'transportes',
+            'name' => 'Licencias de Transportes',
+            'description' => 'Trámites de transportes',
+            'icon_url' => '/images/subsystem_transportes.png',
+            'route' => '/transportes',
+            'accent_color' => ModuleAccentColor::Amber,
+            'status' => ModuleStatus::Maintenance,
+            'order' => 2,
+            'is_active' => true,
+            'requires_auth' => true,
+        ]);
+
+        $response = $this->get('/mantenimiento?code=transportes');
+
+        $response->assertStatus(200);
+        $response->assertSee('SIGM');
+        $response->assertSee('Modo Mantenimiento');
+        $response->assertSee('Licencias de Transportes');
+        $response->assertSee('Panel de Subsistemas');
+        // Asegurar que NO se renderiza la cabecera regular del panel general
+        $response->assertDontSee('ADMINISTRADOR DEL SISTEMA SIGM');
+        $response->assertDontSee('Cerrar Sesión');
+    }
 }

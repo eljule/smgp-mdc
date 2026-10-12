@@ -1,4 +1,4 @@
-<div class="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 font-sans -m-4 sm:-m-6 lg:-m-8">
+<div class="min-h-screen flex flex-col bg-slate-50 dark:bg-slate-950 font-sans">
     <!-- Header Institucional -->
     <header class="w-full bg-[#0d4f2f] dark:bg-slate-900 border-b border-emerald-800 dark:border-slate-800 text-white shadow-md">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
@@ -9,16 +9,32 @@
                     class="h-10 sm:h-11 w-auto object-contain drop-shadow transition-transform group-hover:scale-105"
                 />
                 <div class="flex flex-col">
-                    <span class="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-emerald-200/90 dark:text-emerald-400">
+                    <span class="text-xs sm:text-sm font-bold uppercase tracking-wider leading-tight text-white group-hover:text-emerald-200 transition-colors">
                         Municipalidad Distrital de Castilla
                     </span>
-                    <span class="text-sm sm:text-base font-extrabold text-white tracking-tight leading-tight">
+                    <span class="text-[13px] font-medium text-emerald-200/90 leading-tight">
                         SIGM <span class="font-normal text-emerald-200">| Modo Mantenimiento</span>
                     </span>
                 </div>
             </a>
 
             <div class="flex items-center space-x-3">
+                <!-- Alternador de Tema Dark/Light (Alpine.js) -->
+                <div x-data="themeSwitcher">
+                    <button type="button"
+                            @click="toggle()"
+                            class="p-2 rounded-lg bg-emerald-800/80 hover:bg-emerald-700 text-emerald-100 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
+                            :title="darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
+                            aria-label="Alternar modo oscuro">
+                        <svg x-show="!darkMode" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                        <svg x-show="darkMode" x-cloak class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 9H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </button>
+                </div>
+
                 <a
                     href="{{ route('portal.launcher') }}"
                     class="text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-emerald-800/80 hover:bg-emerald-700 border border-emerald-600/40 text-white transition-colors flex items-center gap-1.5"

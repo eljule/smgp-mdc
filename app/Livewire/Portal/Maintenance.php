@@ -7,12 +7,12 @@ namespace App\Livewire\Portal;
 use App\Models\CoreModule;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-#[Layout('components.layouts.app')]
-#[Title('Subsistema en Mantenimiento Programado - SIGM Castilla')]
+#[Layout('components.layouts.ticket-portal', [
+    'title' => 'Subsistema en Mantenimiento Programado - SIGM Castilla',
+])]
 class Maintenance extends Component
 {
     #[Url(as: 'code')]

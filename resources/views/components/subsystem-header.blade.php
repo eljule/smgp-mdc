@@ -7,7 +7,7 @@
 ])
 
 <header class="sticky top-0 z-30 w-full bg-[#0d4f2f] dark:bg-slate-900 border-b border-emerald-800 dark:border-slate-800 text-white shadow-md transition-colors duration-200">
-    <div class="max-w-full px-4 sm:px-6 lg:px-8 h-18 py-2.5 flex items-center justify-between">
+    <div class="max-w-full px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between">
         <!-- Lado izquierdo: Botón menú colapsable + Branding Municipal -->
         <div class="flex items-center space-x-3.5">
             <button
@@ -30,10 +30,10 @@
                     class="h-10 sm:h-11 w-auto object-contain drop-shadow transition-transform duration-200 group-hover:scale-105"
                 />
                 <div class="flex flex-col">
-                    <span class="text-[11px] sm:text-xs font-bold tracking-wider uppercase text-emerald-200/90 dark:text-emerald-400 leading-tight">
+                    <span class="text-xs sm:text-sm font-bold tracking-wider leading-tight text-white group-hover:text-emerald-200 transition-colors">
                         MUNICIPALIDAD DISTRITAL DE CASTILLA
                     </span>
-                    <span class="text-sm sm:text-base font-extrabold text-white tracking-tight leading-tight flex items-center gap-2">
+                    <span class="text-[13px] font-medium text-emerald-200/90 leading-tight flex items-center gap-2">
                         @if ($subsystem === 'itam')
                             <span>SIGM <span class="font-light text-emerald-200">| Activos TI (ITAM)</span><span class="sr-only">Inventario y Gestión TI</span></span>
                             <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">

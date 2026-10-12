@@ -21,8 +21,9 @@
 </head>
 <body class="flex flex-col min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-gray-950 dark:text-slate-100 font-sans selection:bg-emerald-600 selection:text-white">
 
+    @unless($hideHeader ?? false)
     <!-- Header Institucional -->
-    <header class="bg-[#046A38] text-white border-b border-emerald-900 shadow-md sticky top-0 z-40 transition-colors duration-200">
+    <header class="bg-[#0d4f2f] text-white border-b border-emerald-900 shadow-md sticky top-0 z-40 transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <!-- Branding Municipal -->
@@ -80,12 +81,14 @@
             </div>
         </div>
     </header>
+    @endunless
 
     <!-- Contenido Principal -->
     <main class="flex-grow flex flex-col w-full">
         {{ $slot }}
     </main>
 
+    @unless($hideFooter ?? false)
     <!-- Footer Institucional -->
     <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 py-6 text-center text-xs text-gray-500 dark:text-gray-400 mt-auto transition-colors duration-200">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-1">
@@ -97,6 +100,7 @@
             </p>
         </div>
     </footer>
+    @endunless
 
     @livewireScripts
 </body>

@@ -3,8 +3,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portal Ágil de Reporte de Incidencias TI - Municipalidad Distrital de Castilla">
-    <title>{{ $title ?? 'Registrar Falla en su Puesto de Trabajo - SIGM Castilla' }}</title>
+    <meta name="description" content="{{ $description ?? 'Portal Institucional SIGM - Municipalidad Distrital de Castilla' }}">
+    <title>{{ $title ?? 'SIGM | Municipalidad Distrital de Castilla' }}</title>
 
     <!-- Script anti-parpadeo para tema oscuro -->
     <script>
