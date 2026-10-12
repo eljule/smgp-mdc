@@ -80,3 +80,4 @@ volumes:
   sigm-postgres-data:
     name: sigm_postgres_data
     driver: local
+

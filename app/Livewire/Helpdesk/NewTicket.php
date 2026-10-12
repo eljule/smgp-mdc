@@ -64,12 +64,18 @@ class NewTicket extends Component
 
     public ?string $errorMessage = null;
 
-    public function mount(): void
+    public function mount(?string $asset = null): void
     {
         $user = auth()->user();
         if ($user) {
             $this->applicantName = $user->name ?? $user->username ?? 'ADMINISTRADOR DEL SISTEMA SIGM';
             $this->applicantEmail = $user->email ?? 'admin@castilla.gob.pe';
+        }
+
+        $assetCode = $asset ?? request()->query('asset');
+        if (! empty($assetCode)) {
+            $this->qrCodeInput = (string) $assetCode;
+            $this->lookupAsset();
         }
     }
 

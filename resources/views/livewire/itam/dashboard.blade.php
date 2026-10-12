@@ -1813,14 +1813,8 @@
                 default => 'bg-slate-100 text-slate-700 border-slate-200',
             };
 
-            $qrPayload = json_encode([
-                'code' => $selectedAssetForDetail->computer_code,
-                'sbn' => $selectedAssetForDetail->patrimonial_code ?? 'N/A',
-                'model' => trim(($selectedAssetForDetail->brand?->name ?? '') . ' ' . ($selectedAssetForDetail->model?->name ?? '')),
-                'office' => $selectedAssetForDetail->office ?? 'MDC',
-                'custodian' => $selectedAssetForDetail->assignedPerson ? trim($selectedAssetForDetail->assignedPerson->first_name . ' ' . $selectedAssetForDetail->assignedPerson->last_name) : 'ALMACÉN TI',
-            ]);
-            $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=' . urlencode($qrPayload);
+            $scanUrl = url('/scan/activo/' . $selectedAssetForDetail->computer_code);
+            $qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=' . urlencode($scanUrl);
 
             $specs = is_array($selectedAssetForDetail->specifications)
                 ? $selectedAssetForDetail->specifications
@@ -1976,6 +1970,12 @@
                             <span class="text-[10px] font-mono font-bold text-slate-700 tracking-tight text-center">
                                 {{ $selectedAssetForDetail->computer_code }}
                             </span>
+                            <a href="{{ $scanUrl }}"
+                               target="_blank"
+                               class="text-[10px] font-bold text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-0.5 mt-0.5">
+                                <span>Abrir Ficha Móvil</span>
+                                <span>↗</span>
+                            </a>
                         </div>
                     </div>
 

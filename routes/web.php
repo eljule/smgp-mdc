@@ -24,6 +24,7 @@ use App\Livewire\Itam\Supplies as ItamSupplies;
 use App\Livewire\Portal\Maintenance as ModuleMaintenance;
 use App\Livewire\Portal\ModuleLauncher;
 use App\Livewire\Transportes\Dashboard as TransportesDashboard;
+use App\Models\Itam\Asset;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -78,3 +79,26 @@ Route::get('/helpdesk/kb', HelpdeskKnowledge::class)->name('helpdesk.kb');
 
 // Rutas de Otros Subsistemas Municipales
 Route::get('/transportes', TransportesDashboard::class)->name('subsystems.transportes');
+
+// Ficha Pública Móvil del Activo Tecnológico (Escaneo QR)
+Route::get('/scan/activo/{code}', function (string $code) {
+    $asset = Asset::with([
+        'category',
+        'brand',
+        'model',
+        'assignedPerson',
+        'parentAsset.brand',
+        'parentAsset.model',
+        'childAssets.category',
+        'childAssets.brand',
+        'childAssets.model',
+        'software',
+        'maintenanceOrders' => fn ($q) => $q->latest()->limit(5),
+    ])
+        ->where('computer_code', $code)
+        ->orWhere('patrimonial_code', $code)
+        ->orWhere('serial_number', $code)
+        ->firstOrFail();
+
+    return view('scan.asset', compact('asset'));
+})->name('scan.asset');
