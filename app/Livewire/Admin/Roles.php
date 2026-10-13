@@ -60,6 +60,11 @@ class Roles extends Component
 
     public string $flashMessage = '';
 
+    public function hydrate(): void
+    {
+        $this->flashMessage = '';
+    }
+
     public function setScopeFilter(string $scope): void
     {
         $this->scopeFilter = $scope;

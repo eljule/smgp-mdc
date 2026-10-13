@@ -151,6 +151,4 @@
     @include('livewire.admin.partials.person-form-modal')
     @include('livewire.admin.partials.user-form-modal')
 
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
 </div>

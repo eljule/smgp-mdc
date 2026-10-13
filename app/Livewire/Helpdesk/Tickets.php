@@ -56,6 +56,11 @@ class Tickets extends Component
     // Toast Alert
     public ?string $alertMessage = null;
 
+    public function hydrate(): void
+    {
+        $this->alertMessage = null;
+    }
+
     public string $alertType = 'success';
 
     // Búsqueda QR

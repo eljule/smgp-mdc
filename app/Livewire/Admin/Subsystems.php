@@ -70,6 +70,11 @@ class Subsystems extends Component
 
     public string $flashMessage = '';
 
+    public function hydrate(): void
+    {
+        $this->flashMessage = '';
+    }
+
     public function updatedSearch(): void
     {
         // Reactivity handled automatically

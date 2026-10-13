@@ -28,11 +28,33 @@
                     this.toasts = this.toasts.filter(t => t.id !== id);
                 }, 350);
             }
+        },
+        handleEvent(detail) {
+            if (!detail) return;
+            let msg = '';
+            let typ = 'success';
+            let dur = 6000;
+            if (typeof detail === 'string') {
+                msg = detail;
+            } else if (Array.isArray(detail)) {
+                const item = detail[0] || {};
+                msg = typeof item === 'string' ? item : (item.message || '');
+                typ = item.type || 'success';
+                dur = item.duration || 6000;
+            } else if (typeof detail === 'object') {
+                msg = detail.message || '';
+                typ = detail.type || 'success';
+                dur = detail.duration || 6000;
+            }
+            if (msg) {
+                this.add(msg, typ, dur);
+            }
         }
     }"
-    @notify.window="add($event.detail?.message || $event.detail, $event.detail?.type || 'success', $event.detail?.duration || 6000)"
-    @toast.window="add($event.detail?.message || $event.detail, $event.detail?.type || 'success', $event.detail?.duration || 6000)"
-    @alert.window="add($event.detail?.message || $event.detail, $event.detail?.type || 'success', $event.detail?.duration || 6000)"
+    @notify.window="handleEvent($event.detail)"
+    @toast.window="handleEvent($event.detail)"
+    @alert.window="handleEvent($event.detail)"
+    @show-toast.window="handleEvent($event.detail)"
     class="fixed top-20 right-6 sm:right-8 z-50 flex flex-col space-y-2 pointer-events-none"
     style="z-index: 9999;"
 >

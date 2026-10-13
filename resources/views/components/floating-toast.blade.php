@@ -21,7 +21,7 @@
     @endphp
 
     <div
-        wire:key="toast-{{ md5((string)$message . microtime()) }}"
+        wire:key="floating-toast-alert"
         x-data="{ show: true }"
         x-show="show"
         x-init="setTimeout(() => show = false, {{ $duration }})"

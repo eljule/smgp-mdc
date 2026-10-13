@@ -33,8 +33,6 @@
         </div>
     </div>
 
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$flashMessage" type="success" />
 
     <!-- 2. Tarjetas de Estadísticas (4 Stat Cards) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">

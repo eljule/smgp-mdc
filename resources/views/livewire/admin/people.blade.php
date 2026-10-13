@@ -1,6 +1,4 @@
 <div class="space-y-6 pb-12">
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
 
     <!-- Encabezado del Tab / Header Principal -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">

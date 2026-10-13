@@ -72,6 +72,11 @@ class Users extends Component
 
     public string $flashMessage = '';
 
+    public function hydrate(): void
+    {
+        $this->flashMessage = '';
+    }
+
     public function setRoleFilter(string $role): void
     {
         $this->roleFilter = $role;
@@ -95,6 +100,7 @@ class Users extends Component
 
     public function openEditPermissions(int $userId, ?GetUsersCatalogAction $action = null): void
     {
+        $this->flashMessage = '';
         $action ??= app(GetUsersCatalogAction::class);
         $user = $action->find($userId);
 
@@ -158,16 +164,19 @@ class Users extends Component
 
         $username = $this->selectedUser['username'] ?? 'usuario';
         $this->flashMessage = "Permisos actualizados correctamente para {$username}.";
+        $this->dispatch('toast', message: $this->flashMessage, type: 'success');
         $this->showEditModal = false;
     }
 
     public function openCreateUser(): void
     {
+        $this->flashMessage = '';
         $this->openCreateUserModal();
     }
 
     public function openCreateUserModal(): void
     {
+        $this->flashMessage = '';
         $this->resetUserForm();
         $this->showUserModal = true;
         $this->showCreateModal = true;
@@ -175,6 +184,7 @@ class Users extends Component
 
     public function closeUserModal(): void
     {
+        $this->flashMessage = '';
         $this->userModalError = null;
         $this->showUserModal = false;
         $this->showCreateModal = false;
@@ -270,6 +280,7 @@ class Users extends Component
         ]);
 
         $this->flashMessage = "Cuenta de usuario '{$user->username}' creada y permisos otorgados exitosamente.";
+        $this->dispatch('toast', message: $this->flashMessage, type: 'success');
         $this->showUserModal = false;
         $this->showCreateModal = false;
         $this->resetUserForm();
@@ -277,6 +288,7 @@ class Users extends Component
 
     public function closeModal(): void
     {
+        $this->flashMessage = '';
         $this->showEditModal = false;
         $this->showCreateModal = false;
         $this->showUserModal = false;

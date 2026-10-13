@@ -109,6 +109,11 @@ class People extends Component
 
     public ?string $alertMessage = null;
 
+    public function hydrate(): void
+    {
+        $this->alertMessage = null;
+    }
+
     public string $alertType = 'success';
 
     public function showAlert(string $message, string $type = 'success'): void

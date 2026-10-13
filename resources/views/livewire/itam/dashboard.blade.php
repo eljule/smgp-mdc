@@ -1,14 +1,12 @@
 <div class="space-y-6 pb-12" x-data="{ qrPreview: false }">
-    <!-- ========================================================================= -->
-    <!-- NOTIFICACIÓN TOAST FLOTANTE                                               -->
-    <!-- ========================================================================= -->
-    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
 
     <!-- ========================================================================= -->
     <!-- TAB 1: PARQUE TECNOLÓGICO INSTITUCIONAL (INVENTARIO ACTIVOS)              -->
     <!-- ========================================================================= -->
     @if ($activeTab === 'inventory')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <!-- Header Card -->
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
@@ -373,6 +371,8 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'movements')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -474,6 +474,8 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'maintenance')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -571,6 +573,8 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'supplies')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -671,6 +675,8 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'loans')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -809,6 +815,8 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'audits')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -883,6 +891,8 @@
 <!-- ========================================================================= -->
     @elseif ($activeTab === 'software')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2">
@@ -952,6 +962,8 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'categories')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <div>
                     <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -1030,6 +1042,8 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'catalogs')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <!-- Banner Superior -->
             <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -1196,6 +1210,8 @@
 
     @elseif ($activeTab === 'metrics')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <!-- Banner Superior -->
             <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
                 <h2 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
@@ -1306,6 +1322,8 @@
 
     @elseif ($activeTab === 'qr_lookup')
         <div class="space-y-6 animate-fadeIn">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="p-8 rounded-2xl bg-gradient-to-r from-[#0d4f2f] via-[#105d38] to-[#0a3d24] text-white shadow-xl space-y-4">
                 <div class="max-w-2xl">
                     <span class="text-xs font-bold uppercase tracking-wider text-emerald-300">

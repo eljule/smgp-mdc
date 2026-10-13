@@ -82,6 +82,11 @@ class Offices extends Component
 
     public string $flashMessage = '';
 
+    public function hydrate(): void
+    {
+        $this->flashMessage = '';
+    }
+
     // ==========================================
     // PROPIEDADES PARA GESTIÓN DE SEDES Y COLORES
     // ==========================================
@@ -326,9 +331,7 @@ class Offices extends Component
         $name = $office->name;
         $this->closeModal();
 
-        $this->flashMessage = $isEdit
-            ? "Dependencia '{$name}' actualizada con éxito en la estructura orgánica."
-            : "Dependencia '{$name}' registrada con éxito en la estructura orgánica.";
+        $this->flashMessage = $isEdit ? "Dependencia '{$name}' actualizada con éxito en la estructura orgánica." : "Dependencia '{$name}' registrada con éxito en la estructura orgánica.";
     }
 
     public function deleteOffice(int $id): void

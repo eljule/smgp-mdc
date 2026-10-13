@@ -1,4 +1,6 @@
 <div class="space-y-6 pb-12">
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$flashMessage" type="success" />
     <!-- 1. Header Card -->
     <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div class="flex items-start gap-4">
@@ -46,8 +48,6 @@
         </div>
     </div>
 
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$flashMessage" type="success" />
 
     <!-- 2. Search & Filter Bar -->
     <div class="bg-white dark:bg-slate-900 rounded-2xl p-3.5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
