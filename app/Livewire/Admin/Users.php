@@ -93,8 +93,9 @@ class Users extends Component
         $this->page = 1;
     }
 
-    public function openEditPermissions(int $userId, GetUsersCatalogAction $action): void
+    public function openEditPermissions(int $userId, ?GetUsersCatalogAction $action = null): void
     {
+        $action ??= app(GetUsersCatalogAction::class);
         $user = $action->find($userId);
 
         if ($user) {

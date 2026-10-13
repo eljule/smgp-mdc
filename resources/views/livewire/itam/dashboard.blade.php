@@ -2,16 +2,7 @@
     <!-- ========================================================================= -->
     <!-- NOTIFICACIÓN TOAST FLOTANTE                                               -->
     <!-- ========================================================================= -->
-    @if ($alertMessage)
-        <div x-data="{ show: true }"
-             x-show="show"
-             x-init="setTimeout(() => show = false, 4000)"
-             class="fixed top-20 right-6 z-50 p-4 rounded-xl shadow-2xl text-xs sm:text-sm font-semibold flex items-center space-x-2 transition-all {{ $alertType === 'success' ? 'bg-emerald-600 text-white border border-emerald-500' : 'bg-rose-600 text-white border border-rose-500' }}">
-            <span>{{ $alertType === 'success' ? '✓' : '⚠' }}</span>
-            <span>{{ $alertMessage }}</span>
-            <button @click="show = false" class="ml-2 text-white/80 hover:text-white cursor-pointer">&times;</button>
-        </div>
-    @endif
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
 
     <!-- ========================================================================= -->
     <!-- TAB 1: PARQUE TECNOLÓGICO INSTITUCIONAL (INVENTARIO ACTIVOS)              -->

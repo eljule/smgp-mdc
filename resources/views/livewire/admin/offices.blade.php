@@ -33,21 +33,8 @@
         </div>
     </div>
 
-    <!-- Flash message -->
-    @if ($flashMessage)
-        <div
-            x-data="{ show: true }"
-            x-show="show"
-            x-init="setTimeout(() => show = false, 5000)"
-            class="flex items-center justify-between p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs sm:text-sm font-semibold transition-all"
-        >
-            <div class="flex items-center gap-2">
-                <span class="text-lg">✓</span>
-                <span>{{ $flashMessage }}</span>
-            </div>
-            <button type="button" @click="show = false" class="text-emerald-600 hover:text-emerald-800 cursor-pointer">✕</button>
-        </div>
-    @endif
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$flashMessage" type="success" />
 
     <!-- 2. Tarjetas de Estadísticas (4 Stat Cards) -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">

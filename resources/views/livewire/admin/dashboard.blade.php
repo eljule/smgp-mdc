@@ -151,12 +151,6 @@
     @include('livewire.admin.partials.person-form-modal')
     @include('livewire.admin.partials.user-form-modal')
 
-    <!-- Alertas Toast -->
-    @if ($alertMessage)
-        <div class="fixed bottom-5 right-5 z-50 p-4 rounded-xl shadow-lg border text-xs font-bold flex items-center space-x-2 transition-all {{ $alertType === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/80 border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200' : 'bg-rose-50 dark:bg-rose-950/80 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200' }}">
-            <span>{{ $alertType === 'success' ? '✓' : '⚠️' }}</span>
-            <span>{{ $alertMessage }}</span>
-            <button type="button" wire:click="$set('alertMessage', null)" class="ml-2 text-slate-400 hover:text-slate-600">&times;</button>
-        </div>
-    @endif
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
 </div>

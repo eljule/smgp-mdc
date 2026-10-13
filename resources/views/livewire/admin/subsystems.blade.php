@@ -46,21 +46,8 @@
         </div>
     </div>
 
-    <!-- Flash message -->
-    @if ($flashMessage)
-        <div
-            x-data="{ show: true }"
-            x-show="show"
-            x-init="setTimeout(() => show = false, 5000)"
-            class="flex items-center justify-between p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-200 text-xs sm:text-sm font-semibold transition-all"
-        >
-            <div class="flex items-center gap-2">
-                <span class="text-lg">✓</span>
-                <span>{{ $flashMessage }}</span>
-            </div>
-            <button type="button" @click="show = false" class="text-emerald-600 hover:text-emerald-800 cursor-pointer">✕</button>
-        </div>
-    @endif
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$flashMessage" type="success" />
 
     <!-- 2. Search & Filter Bar -->
     <div class="bg-white dark:bg-slate-900 rounded-2xl p-3.5 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">

@@ -1,19 +1,6 @@
 <div class="space-y-6 animate-fadeIn">
-    <!-- Notificación Flash -->
-    @if ($flashMessage)
-        <div
-            x-data="{ show: true }"
-            x-show="show"
-            x-init="setTimeout(() => show = false, 4000)"
-            class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 flex items-center justify-between text-xs sm:text-sm font-semibold transition-all shadow-xs"
-        >
-            <div class="flex items-center space-x-2">
-                <span class="text-base">✅</span>
-                <span>{{ $flashMessage }}</span>
-            </div>
-            <button type="button" @click="show = false" class="text-emerald-600 hover:text-emerald-800 font-bold cursor-pointer">&times;</button>
-        </div>
-    @endif
+    <!-- Notificación Flotante con Rebote -->
+    <x-floating-toast :message="$flashMessage" type="success" />
 
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-white dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
@@ -181,6 +168,7 @@
                             <!-- Acciones -->
                             <td class="py-3.5 px-4 text-center">
                                 <button
+                                    id="btn-edit-permissions-{{ $user['id'] }}"
                                     type="button"
                                     wire:click="openEditPermissions({{ $user['id'] }})"
                                     class="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-semibold text-xs hover:bg-emerald-100 transition-colors cursor-pointer"
@@ -395,6 +383,7 @@
                             Cancelar
                         </button>
                         <button
+                            id="btn-save-permissions"
                             type="button"
                             wire:click="savePermissions"
                             class="px-5 py-2.5 rounded-xl bg-[#008f5d] hover:bg-emerald-800 text-white font-bold shadow-md cursor-pointer transition-colors text-xs"

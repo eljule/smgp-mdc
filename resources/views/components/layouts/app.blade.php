@@ -84,6 +84,7 @@
     @endunless
 
     <!-- Contenido Principal -->
+    <x-global-notifications />
     <main class="flex-grow flex flex-col w-full">
         {{ $slot }}
     </main>

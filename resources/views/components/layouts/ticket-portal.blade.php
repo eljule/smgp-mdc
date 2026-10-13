@@ -20,6 +20,7 @@
 </head>
 <body class="flex flex-col min-h-screen bg-[#f1f5f3] dark:bg-slate-950 text-slate-800 antialiased dark:text-slate-100 font-sans selection:bg-emerald-600 selection:text-white">
 
+    <x-global-notifications />
     {{ $slot }}
 
     @livewireScripts

@@ -28,6 +28,7 @@
     @keydown.window.escape="mobileSidebarOpen = false"
     class="min-h-screen flex flex-col w-full">
         <!-- 1. Cabecera Institucional Unificada -->
+        <x-global-notifications />
         <x-subsystem-header
             :moduleName="$moduleName ?? 'Panel de Administración'"
             :subsystem="$subsystem ?? 'admin'"
