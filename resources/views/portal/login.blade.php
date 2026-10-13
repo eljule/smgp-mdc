@@ -5,35 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso al Sistema | SIGM Castilla</title>
 
-    <!-- Script anti-parpadeo robusto para tema oscuro y claro -->
+    <!-- Script anti-parpadeo para tema oscuro -->
     <script>
-        (function() {
-            try {
-                const storedTheme = localStorage.getItem('theme');
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-                if (storedTheme === 'dark' || (!storedTheme && prefersDark)) {
-                    document.documentElement.classList.add('dark');
-                } else {
-                    document.documentElement.classList.remove('dark');
-                }
-            } catch (e) {
-                console.error('Error aplicando tema inicial:', e);
-            }
-        })();
-
-        window.toggleTheme = function() {
-            const html = document.documentElement;
-            const isDark = !html.classList.contains('dark');
-            if (isDark) {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
-            }
-            window.dispatchEvent(new CustomEvent('theme-changed', { detail: { dark: isDark } }));
-            return isDark;
-        };
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
     </script>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -90,16 +68,10 @@
 
         <!-- Panel Derecho: Formulario de Login -->
         <div class="flex-1 flex flex-col justify-between p-6 sm:p-10 lg:p-12 relative bg-white dark:bg-slate-900 transition-colors duration-200">
-            <!-- Alternador de Tema Top Right -->
-            <div class="flex justify-end" x-data="{
-                darkMode: document.documentElement.classList.contains('dark'),
-                toggle() {
-                    this.darkMode = window.toggleTheme();
-                }
-            }" @theme-changed.window="darkMode = $event.detail.dark">
+            <!-- Alternador de Tema Top Right (Unificado con themeSwitcher de Alpine) -->
+            <div class="flex justify-end" x-data="themeSwitcher">
                 <button type="button"
                         @click="toggle()"
-                        onclick="window.toggleTheme()"
                         class="p-2 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-600 dark:text-amber-300 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 cursor-pointer"
                         :title="darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
                         aria-label="Alternar tema claro/oscuro">
@@ -171,7 +143,7 @@
                             <button
                                 type="button"
                                 @click="showPass = !showPass"
-                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none"
+                                class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none cursor-pointer"
                                 title="Mostrar / Ocultar contraseña">
                                 <svg x-show="!showPass" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
