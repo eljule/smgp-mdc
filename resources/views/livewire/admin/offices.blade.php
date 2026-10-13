@@ -1,4 +1,6 @@
 <div class="space-y-6 pb-12">
+    <x-floating-toast :message="$flashMessage ?? $alertMessage ?? null" :type="$flashType ?? $alertType ?? 'success'" />
+
     <!-- 1. Encabezado Principal -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-emerald-700 via-teal-800 to-slate-900 p-6 rounded-2xl text-white shadow-xl">
         <div>

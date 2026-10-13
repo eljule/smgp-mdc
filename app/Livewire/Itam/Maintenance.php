@@ -25,6 +25,15 @@ class Maintenance extends Component
 {
     use WithPagination;
 
+    public ?string $flashMessage = null;
+
+    public string $flashType = 'success';
+
+    public function hydrate(): void
+    {
+        $this->flashMessage = null;
+    }
+
     #[Url(as: 'buscar')]
     public string $search = '';
 
@@ -60,6 +69,7 @@ class Maintenance extends Component
     public function closeCreateModal(): void
     {
         $this->showCreateModal = false;
+        $this->flashMessage = "Orden de mantenimiento {$code} programada y registrada con éxito.";
     }
 
     public function saveOrder(): void
@@ -84,6 +94,7 @@ class Maintenance extends Component
         ]);
 
         $this->showCreateModal = false;
+        $this->flashMessage = "Orden de mantenimiento {$code} programada y registrada con éxito.";
     }
 
     public function completeOrder(int $orderId): void
@@ -94,6 +105,7 @@ class Maintenance extends Component
             $order->completed_date = date('Y-m-d');
             $order->activities_performed = 'Mantenimiento preventivo completado: limpieza de chasis, cambio de pasta térmica y diagnóstico de software.';
             $order->save();
+            $this->flashMessage = "Orden {$order->code} marcada como completada en el historial técnico.";
         }
     }
 

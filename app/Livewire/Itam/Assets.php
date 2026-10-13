@@ -29,6 +29,15 @@ class Assets extends Component
 {
     use WithPagination;
 
+    public ?string $flashMessage = null;
+
+    public string $flashType = 'success';
+
+    public function hydrate(): void
+    {
+        $this->flashMessage = null;
+    }
+
     #[Url(as: 'buscar')]
     public string $search = '';
 
@@ -164,7 +173,7 @@ class Assets extends Component
         );
 
         $this->showCreateModal = false;
-        $this->dispatch('notify', message: 'Activo tecnológico registrado correctamente.');
+        $this->flashMessage = 'Activo tecnológico registrado y codificado en el catálogo ITAM.';
     }
 
     private function resetForm(): void

@@ -87,7 +87,8 @@ class AdminDashboardTest extends TestCase
             ->assertSee('Custodia de Activos Tecnológicos (ITAM)')
             ->assertSee('Confirmar Cese y Entrega de Cargo')
             ->call('saveCease')
-            ->assertSet('showCeaseModal', false);
+            ->assertSet('showCeaseModal', false)
+            ->assertSee('Cese laboral registrado para PEDRO JOSÉ ALMENDRAS FLORES');
 
         $person->refresh();
         $this->assertEquals('CESADO', $person->labor_status);
@@ -457,7 +458,8 @@ class AdminDashboardTest extends TestCase
             ->set('formParentId', $alcaldia->id)
             ->set('formSede', 'PALACIO MUNICIPAL (SEDE PRINCIPAL)')
             ->call('saveOffice')
-            ->assertSet('showCreateModal', false);
+            ->assertSet('showCreateModal', false)
+            ->assertSee('Dependencia \'OFICINA DE PRUEBA ORGANICA\' registrada con éxito');
 
         $created = Office::where('code', '02.99')->first();
         $this->assertNotNull($created);

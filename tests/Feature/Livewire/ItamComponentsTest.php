@@ -61,7 +61,8 @@ class ItamComponentsTest extends TestCase
 
         Livewire::test(SuppliesComponent::class)
             ->assertSee($supply->name)
-            ->call('adjustStock', $supply->id, 5);
+            ->call('adjustStock', $supply->id, 5)
+            ->assertSee('actualizado');
 
         $this->assertEquals($supply->stock + 5, $supply->fresh()->stock);
     }
@@ -77,7 +78,8 @@ class ItamComponentsTest extends TestCase
             ->set('formBorrowerName', 'Juan Carlos')
             ->set('formEventReason', 'Sesión de Consejo')
             ->set('formSelectedAssetIds', [$asset->id])
-            ->call('saveLoan');
+            ->call('saveLoan')
+            ->assertSee('registrado exitosamente con acta de entrega');
 
         $this->assertDatabaseHas('itam_asset_loans', [
             'borrower_name' => 'Juan Carlos',

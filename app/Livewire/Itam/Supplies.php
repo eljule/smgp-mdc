@@ -24,6 +24,15 @@ class Supplies extends Component
 {
     use WithPagination;
 
+    public ?string $flashMessage = null;
+
+    public string $flashType = 'success';
+
+    public function hydrate(): void
+    {
+        $this->flashMessage = null;
+    }
+
     #[Url(as: 'buscar')]
     public string $search = '';
 
@@ -74,6 +83,7 @@ class Supplies extends Component
     public function closeCreateModal(): void
     {
         $this->showCreateModal = false;
+        $this->flashMessage = "Insumo '{$this->formName}' registrado y actualizado en almacén.";
     }
 
     public function saveSupply(): void
@@ -99,6 +109,7 @@ class Supplies extends Component
         );
 
         $this->showCreateModal = false;
+        $this->flashMessage = "Insumo '{$this->formName}' registrado y actualizado en almacén.";
     }
 
     public function adjustStock(int $supplyId, int $delta): void
@@ -107,6 +118,7 @@ class Supplies extends Component
         if ($supply) {
             $supply->stock = max(0, $supply->stock + $delta);
             $supply->save();
+            $this->flashMessage = "Stock de '{$supply->name}' actualizado a {$supply->stock} {$supply->unit}(s).";
         }
     }
 

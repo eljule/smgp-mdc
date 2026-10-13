@@ -64,6 +64,15 @@ class NewTicket extends Component
 
     public ?string $errorMessage = null;
 
+    public ?string $flashMessage = null;
+
+    public string $flashType = 'success';
+
+    public function hydrate(): void
+    {
+        $this->flashMessage = null;
+    }
+
     public function mount(?string $asset = null): void
     {
         $user = auth()->user();
@@ -194,6 +203,7 @@ class NewTicket extends Component
         ]);
 
         $this->createdTicketNumber = $ticket->ticket_number;
+        $this->flashMessage = "Ticket {$ticket->ticket_number} registrado exitosamente. Su reporte fue enviado a Soporte TI.";
     }
 
     public function resetForm(): void

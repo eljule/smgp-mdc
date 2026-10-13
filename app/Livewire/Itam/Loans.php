@@ -28,6 +28,15 @@ class Loans extends Component
 {
     use WithPagination;
 
+    public ?string $flashMessage = null;
+
+    public string $flashType = 'success';
+
+    public function hydrate(): void
+    {
+        $this->flashMessage = null;
+    }
+
     #[Url(as: 'buscar')]
     public string $search = '';
 
@@ -66,6 +75,7 @@ class Loans extends Component
     public function closeCreateModal(): void
     {
         $this->showCreateModal = false;
+        $this->flashMessage = "Préstamo {$loanCode} registrado exitosamente con acta de entrega.";
     }
 
     public function saveLoan(): void
@@ -107,6 +117,7 @@ class Loans extends Component
         }
 
         $this->showCreateModal = false;
+        $this->flashMessage = "Préstamo {$loanCode} registrado exitosamente con acta de entrega.";
     }
 
     public function returnLoan(int $loanId): void
@@ -124,6 +135,7 @@ class Loans extends Component
                     $asset->save();
                 }
             }
+            $this->flashMessage = "Préstamo {$loan->loan_code} devuelto conforme. Activos retornados a estado Operativo.";
         }
     }
 

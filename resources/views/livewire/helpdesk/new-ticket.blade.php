@@ -1,4 +1,6 @@
 <div class="min-h-screen flex flex-col bg-[#f0f4f2] dark:bg-slate-950 font-sans">
+    <x-floating-toast :message="$flashMessage ?? $alertMessage ?? null" :type="$flashType ?? $alertType ?? 'success'" />
+
     <!-- Barra Superior Institucional (Header Verde Pantalla Completa) -->
     <header style="background-color: #0b482b;" class="border-b border-emerald-900 text-white sticky top-0 z-40 shadow-sm">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">

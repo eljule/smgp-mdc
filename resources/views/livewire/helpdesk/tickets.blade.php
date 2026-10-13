@@ -1,12 +1,12 @@
 <div class="space-y-6 pb-12" x-data="{ qrScanner: false }">
+    <x-floating-toast :message="$flashMessage ?? $alertMessage ?? null" :type="$flashType ?? $alertType ?? 'success'" />
+
 
     <!-- ========================================================================= -->
     <!-- PESTAÑA 1: BANDEJA GENERAL DE TICKETS (RF-06, RF-07, RF-12)               -->
     <!-- ========================================================================= -->
     @if ($activeTab === 'tickets')
         <div class="space-y-6 animate-fadeIn">
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <!-- Tarjetas Superiores de Métricas y Contadores (ITIL Lifecycle) -->
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
                 <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-xs border border-slate-200 dark:border-slate-800">
@@ -280,8 +280,6 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'my_tickets')
         <div class="space-y-6 animate-fadeIn">
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <!-- Banner Encabezado Portal Solicitante -->
             <div class="bg-gradient-to-r from-[#0d4f2f] via-[#105d38] to-[#0a3d24] p-6 rounded-2xl text-white shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
@@ -403,8 +401,6 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'workload')
         <div class="space-y-6 animate-fadeIn">
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-600 dark:text-indigo-400 block mb-1">
                     PANEL DE SUPERVISIÓN Y BALANCEO (RF-13)
@@ -505,8 +501,6 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'knowledge')
         <div class="space-y-6 animate-fadeIn">
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <span class="text-[10px] font-bold uppercase tracking-widest text-amber-600 block mb-1">
@@ -691,8 +685,6 @@
     <!-- ========================================================================= -->
     @elseif ($activeTab === 'metrics')
         <div class="space-y-6 animate-fadeIn">
-    <!-- Notificación Flotante con Rebote -->
-    <x-floating-toast :message="$alertMessage" :type="$alertType ?? 'success'" />
             <div class="bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800">
                 <span class="text-[10px] font-bold uppercase tracking-widest text-indigo-600 block mb-1">
                     Indicadores de Rendimiento y Calidad de Servicio (RNF-01 / RF-13)

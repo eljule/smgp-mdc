@@ -34,6 +34,15 @@ class Movements extends Component
 
     public bool $showCreateModal = false;
 
+    public ?string $flashMessage = null;
+
+    public string $flashType = 'success';
+
+    public function hydrate(): void
+    {
+        $this->flashMessage = null;
+    }
+
     public ?int $formAssetId = null;
 
     public string $formAssetSearch = '';
@@ -222,6 +231,7 @@ class Movements extends Component
         }
 
         session()->flash('success', "Movimiento registrado con éxito. Acta oficial {$actaNumber} generada.");
+        $this->flashMessage = "Movimiento registrado con éxito. Acta oficial {$actaNumber} generada.";
         $this->showCreateModal = false;
     }
 

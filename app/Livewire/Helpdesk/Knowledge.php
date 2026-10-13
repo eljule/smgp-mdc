@@ -24,6 +24,15 @@ class Knowledge extends Component
 {
     use WithPagination;
 
+    public ?string $flashMessage = null;
+
+    public string $flashType = 'success';
+
+    public function hydrate(): void
+    {
+        $this->flashMessage = null;
+    }
+
     #[Url(as: 'buscar')]
     public string $search = '';
 
@@ -81,6 +90,7 @@ class Knowledge extends Component
     public function closeCreateModal(): void
     {
         $this->showCreateModal = false;
+        $this->flashMessage = "Artículo '{$this->formTitle}' publicado exitosamente en la base de conocimientos.";
     }
 
     public function saveArticle(): void
@@ -106,6 +116,7 @@ class Knowledge extends Component
         ]);
 
         $this->showCreateModal = false;
+        $this->flashMessage = "Artículo '{$this->formTitle}' publicado exitosamente en la base de conocimientos.";
     }
 
     public function render(GetKnowledgeArticlesAction $action): View
