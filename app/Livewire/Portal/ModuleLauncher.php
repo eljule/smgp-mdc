@@ -10,7 +10,6 @@ use App\Models\CoreModule;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
-use Livewire\Attributes\Url;
 use Livewire\Component;
 
 #[Layout('components.layouts.app')]
@@ -19,8 +18,14 @@ class ModuleLauncher extends Component
 {
     use WithSearch;
 
-    #[Url(as: 'user', except: '')]
-    public string $activeUser = 'ROOT';
+    public ?string $activeUser = null;
+
+    public function mount(?string $user = null): void
+    {
+        if ($user !== null) {
+            $this->activeUser = $user;
+        }
+    }
 
     /**
      * Render the module launcher portal view.
@@ -28,10 +33,15 @@ class ModuleLauncher extends Component
      */
     public function render(GetActiveModulesAction $action): View
     {
-        $modules = $action->handle($this->search, $this->activeUser);
+        $authUser = auth()->user();
+        $targetUser = $this->activeUser ?: ($authUser?->username ?? 'root');
+
+        $modules = $action->handle($this->search, $targetUser);
         $totalActiveCount = CoreModule::query()->active()->count();
 
-        $userInfo = match (strtolower(trim($this->activeUser))) {
+        $normalized = strtolower(trim($targetUser));
+
+        $userInfo = match ($normalized) {
             'jperez' => [
                 'initials' => 'JP',
                 'name' => 'jperez',
@@ -49,10 +59,10 @@ class ModuleLauncher extends Component
                 'assignedCount' => 2,
             ],
             default => [
-                'initials' => 'RO',
-                'name' => 'root',
-                'title' => 'ADMINISTRADOR DEL SISTEMA SIGM',
-                'role' => 'Administrador Central',
+                'initials' => $authUser?->initials ?? 'RO',
+                'name' => $authUser?->username ?? $targetUser,
+                'title' => $authUser ? ($authUser->display_title ?? mb_strtoupper($authUser->full_name)) : 'ADMINISTRADOR DEL SISTEMA SIGM',
+                'role' => $authUser?->display_role ?? 'Administrador Central',
                 'description' => 'Cuenta con privilegios totales de administración. Todos los subsistemas distritales se encuentran habilitados.',
                 'assignedCount' => 4,
             ],
@@ -61,6 +71,8 @@ class ModuleLauncher extends Component
         return view('livewire.portal.module-launcher', [
             'modules' => $modules,
             'totalActiveCount' => $totalActiveCount,
+            'userInfo' => $userInfo,
+        ])->layout('components.layouts.app', [
             'userInfo' => $userInfo,
         ]);
     }

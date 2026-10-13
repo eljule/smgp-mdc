@@ -6,28 +6,35 @@
     'openTicketsCount' => 5,
 ])
 
-<header class="sticky top-0 z-30 w-full bg-[#0d4f2f] dark:bg-slate-900 border-b border-emerald-800 dark:border-slate-800 text-white shadow-md transition-colors duration-200">
-    <div class="max-w-full px-4 sm:px-6 lg:px-8 py-2.5 flex items-center justify-between">
-        <!-- Lado izquierdo: Botón menú colapsable + Branding Municipal -->
-        <div class="flex items-center space-x-2 sm:space-x-3.5">
-            <!-- Botón Móvil: Abrir Drawer lateral -->
+@php
+    $subsystemAuthUser = auth()->user();
+    $subsystemInitials = $subsystemAuthUser?->initials ?? 'RO';
+    $subsystemTitle = $subsystemAuthUser ? ($subsystemAuthUser->display_title ?? mb_strtoupper($subsystemAuthUser->full_name)) : 'ADMINISTRADOR DEL SISTEMA SIGM';
+    $subsystemRole = $subsystemAuthUser?->display_role ?? 'Administrador Central';
+@endphp
+
+<header class="bg-[#046A38] text-white border-b border-emerald-800 shadow-md sticky top-0 z-40 transition-colors duration-200">
+    <div class="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+        <!-- Lado izquierdo: Botón colapsar menú + Escudo e Identidad Distrital -->
+        <div class="flex items-center space-x-3 sm:space-x-4">
+            <!-- Botón Móvil: Abrir Drawer Lateral -->
             <button
                 type="button"
                 @click="mobileSidebarOpen = true"
-                class="p-1.5 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-800/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 cursor-pointer md:hidden"
-                title="Abrir menú"
-                aria-label="Abrir menú"
+                class="md:hidden p-2 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-800/80 focus:outline-none focus:ring-2 focus:ring-emerald-400 cursor-pointer"
+                title="Abrir menú de navegación"
+                aria-label="Abrir menú lateral"
             >
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
                 </svg>
             </button>
 
-            <!-- Botón Escritorio: Colapsar / Expandir barra lateral -->
+            <!-- Botón Escritorio: Colapsar/Expandir Barra Lateral -->
             <button
                 type="button"
                 @click="sidebarCollapsed = !sidebarCollapsed"
-                class="hidden md:inline-flex p-1.5 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-800/80 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 cursor-pointer"
+                class="hidden md:inline-flex p-2 rounded-lg text-emerald-100 hover:text-white hover:bg-emerald-800/80 focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-colors cursor-pointer"
                 title="Colapsar / expandir menú"
                 aria-label="Alternar menú lateral"
             >
@@ -104,8 +111,6 @@
                 </a>
             @endif
 
-
-
             <!-- Botón de regreso al lanzador -->
             <a
                 href="{{ route('portal.launcher') }}"
@@ -144,20 +149,32 @@
                 </button>
             </div>
 
-            <!-- Perfil del Usuario Activo Institucional -->
+            <!-- Perfil del Usuario Activo Institucional Dinámico -->
             <div class="hidden md:flex items-center space-x-3 bg-emerald-900/60 dark:bg-slate-800/80 border border-emerald-700/50 dark:border-slate-700 px-3.5 py-1.5 rounded-lg text-xs">
                 <div class="w-7 h-7 rounded-full bg-emerald-700 dark:bg-emerald-600 flex items-center justify-center font-bold text-white shadow-inner">
-                    A
+                    {{ $subsystemInitials }}
                 </div>
                 <div class="flex flex-col text-left">
-                    <span class="font-bold text-white leading-tight">
-                        ADMINISTRADOR DEL SISTEMA SIGM
+                    <span class="font-bold text-white leading-tight uppercase">
+                        {{ $subsystemTitle }}
                     </span>
                     <span class="text-[10px] text-emerald-300 font-medium">
-                        Administrador Central
+                        {{ $subsystemRole }}
                     </span>
                 </div>
             </div>
+
+            <!-- Botón Cerrar Sesión en Cabecera de Subsistema -->
+            <a
+                href="{{ route('logout') }}"
+                class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-900/70 hover:bg-emerald-900 text-xs font-medium text-emerald-100 hover:text-white border border-emerald-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
+                title="Cerrar Sesión"
+            >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                <span class="hidden sm:inline">Cerrar Sesión</span>
+            </a>
         </div>
     </div>
 </header>

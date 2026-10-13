@@ -40,4 +40,48 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Person::class, 'person_id');
     }
+
+    public function getNameAttribute(): string
+    {
+        return $this->full_name ?: $this->username;
+    }
+
+    public function getInitialsAttribute(): string
+    {
+        $u = strtolower(trim((string) $this->username));
+        if ($u === 'root') {
+            return 'RO';
+        }
+        if ($u === 'jperez') {
+            return 'JP';
+        }
+        if ($u === 'mgomez') {
+            return 'MG';
+        }
+
+        if (! empty($this->full_name)) {
+            $words = preg_split('/\s+/', trim((string) $this->full_name));
+            if ($words && count($words) >= 2) {
+                return mb_strtoupper(mb_substr($words[0], 0, 1).mb_substr($words[count($words) - 1], 0, 1));
+            }
+
+            return mb_strtoupper(mb_substr((string) $this->full_name, 0, 2));
+        }
+
+        return mb_strtoupper(mb_substr((string) $this->username, 0, 2));
+    }
+
+    public function getDisplayTitleAttribute(): string
+    {
+        if (strtolower(trim((string) $this->username)) === 'root') {
+            return 'ADMINISTRADOR DEL SISTEMA SIGM';
+        }
+
+        return mb_strtoupper($this->full_name ?: $this->username);
+    }
+
+    public function getDisplayRoleAttribute(): string
+    {
+        return $this->role ?: 'Usuario Municipal';
+    }
 }

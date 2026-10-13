@@ -36,7 +36,6 @@
         };
     </script>
 
-        
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
@@ -129,8 +128,17 @@
                     </p>
                 </div>
 
-                <!-- Formulario hacia el Lanzador de Módulos -->
-                <form action="{{ route('portal.launcher') }}" method="GET" class="space-y-4" x-data="{ showPass: false, user: 'ROOT' }">
+                <!-- Formulario de Autenticación Segura (POST hacia LoginController) -->
+                <form action="{{ route('login.post') }}" method="POST" class="space-y-4" x-data="{ showPass: false, user: 'root' }">
+                    @csrf
+
+                    @if (session('error'))
+                        <div class="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs font-semibold flex items-center gap-2">
+                            <span class="font-bold">✕</span>
+                            <span>{{ session('error') }}</span>
+                        </div>
+                    @endif
+
                     <!-- Usuario -->
                     <div class="space-y-1">
                         <label for="username" class="block text-xs font-semibold text-gray-700 dark:text-gray-300">
@@ -138,7 +146,7 @@
                         </label>
                         <input
                             id="username"
-                            name="user"
+                            name="username"
                             type="text"
                             x-model="user"
                             required
@@ -156,7 +164,7 @@
                                 id="password"
                                 name="password"
                                 :type="showPass ? 'text' : 'password'"
-                                value="password123"
+                                value="admin123"
                                 required
                                 class="block w-full px-3.5 py-2.5 pr-10 text-sm bg-gray-50 dark:bg-slate-800 border border-gray-300 dark:border-slate-700 rounded-lg shadow-xs focus:ring-2 focus:ring-emerald-600 focus:border-emerald-600 dark:focus:ring-emerald-500"
                             >
@@ -179,7 +187,7 @@
                     <!-- Recordarme -->
                     <div class="flex items-center justify-between text-xs">
                         <label class="flex items-center gap-2 cursor-pointer text-gray-600 dark:text-gray-400">
-                            <input type="checkbox" checked class="rounded-sm border-gray-300 text-emerald-700 focus:ring-emerald-500">
+                            <input type="checkbox" name="remember" value="1" checked class="rounded-sm border-gray-300 text-emerald-700 focus:ring-emerald-500">
                             <span>Recordarme</span>
                         </label>
                     </div>
@@ -189,7 +197,7 @@
                         variant="primary"
                         size="md"
                         type="submit"
-                        class="w-full bg-[#046A38] hover:bg-emerald-800 py-2.5 text-sm font-bold shadow-md">
+                        class="w-full bg-[#046A38] hover:bg-emerald-800 py-2.5 text-sm font-bold shadow-md cursor-pointer">
                         Entrar
                     </x-ui.button>
 
@@ -209,7 +217,7 @@
                             <!-- ROOT -->
                             <button
                                 type="button"
-                                @click="user = 'ROOT'; $nextTick(() => $el.closest('form').submit())"
+                                @click="user = 'root'; $nextTick(() => $el.closest('form').submit())"
                                 class="p-2 rounded-lg border border-emerald-200 dark:border-emerald-800/80 bg-emerald-50/50 dark:bg-emerald-950/20 text-center hover:bg-emerald-100/50 transition-colors cursor-pointer">
                                 <span class="block text-xs font-bold text-emerald-800 dark:text-emerald-300">👑 ROOT</span>
                                 <span class="block text-[10px] text-emerald-600 dark:text-emerald-400">4 módulos</span>

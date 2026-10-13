@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
 use App\Livewire\Admin\Offices as AdminOffices;
 use App\Livewire\Admin\People as AdminPeople;
@@ -33,13 +34,12 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Vista Principal: Pantalla de Login Institucional
-Route::get('/', function () {
-    return view('portal.login');
-})->name('login');
-
-// Redirección de /login hacia la vista principal /
-Route::redirect('/login', '/');
+// Rutas de Autenticación Institucional Segura (POST /login sin exponer credenciales en URL)
+Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
+Route::get('/login', [LoginController::class, 'showLoginForm']);
+Route::post('/login', [LoginController::class, 'login'])->name('login.post');
+Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout.post');
 
 // Portal Lanzador Institucional de Módulos (Livewire 3)
 Route::get('/portal', ModuleLauncher::class)->name('portal.launcher');
