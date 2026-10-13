@@ -8,7 +8,7 @@ use App\Models\Person;
 
 final class GetPeopleCatalogAction
 {
-    private const PEOPLE_DATA = [
+    public const PEOPLE_DATA = [
         [
             'id' => 1,
             'type' => 'PERSONAL',

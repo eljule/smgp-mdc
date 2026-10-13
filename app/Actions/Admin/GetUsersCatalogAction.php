@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin;
 
+use App\Models\User;
+
 final class GetUsersCatalogAction
 {
     /**
@@ -632,6 +634,17 @@ final class GetUsersCatalogAction
     ];
 
     /**
+     * Remove accents and normalize string for intelligent case and accent insensitive search.
+     */
+    public static function normalizeString(string $text): string
+    {
+        $accents = ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ü', 'Ñ'];
+        $clean = ['a', 'e', 'i', 'o', 'u', 'u', 'n', 'a', 'e', 'i', 'o', 'u', 'u', 'n'];
+
+        return mb_strtolower(str_replace($accents, $clean, trim($text)));
+    }
+
+    /**
      * Retrieve paginated users catalog with search and role filters.
      *
      * @return array<string, mixed>
@@ -642,7 +655,46 @@ final class GetUsersCatalogAction
         int $page = 1,
         int $perPage = 10
     ): array {
-        $all = self::USERS_DATA;
+        $peopleDniMap = [];
+        foreach (GetPeopleCatalogAction::PEOPLE_DATA as $p) {
+            $peopleDniMap[$p['id']] = $p['documentNumber'];
+        }
+
+        $all = [];
+        foreach (self::USERS_DATA as $user) {
+            $dni = null;
+            if (is_numeric($user['username']) && strlen((string) $user['username']) === 8) {
+                $dni = (string) $user['username'];
+            } elseif (! empty($user['personId']) && isset($peopleDniMap[$user['personId']])) {
+                $dni = $peopleDniMap[$user['personId']];
+            }
+            $user['dni'] = $dni;
+            $all[] = $user;
+        }
+
+        // Merge any database users registered dynamically in core_users
+        try {
+            $existingUsernames = array_column($all, 'username');
+            $dbUsers = User::with('person')->get();
+            foreach ($dbUsers as $dbUser) {
+                if (! in_array($dbUser->username, $existingUsernames, true)) {
+                    $all[] = [
+                        'id' => $dbUser->id + 1000,
+                        'username' => $dbUser->username,
+                        'avatar' => $dbUser->initials,
+                        'fullName' => $dbUser->display_title,
+                        'email' => $dbUser->email,
+                        'primaryRole' => $dbUser->role ?: 'Usuario Municipal',
+                        'subsystems' => $dbUser->allowed_modules ?: ['helpdesk'],
+                        'status' => $dbUser->is_active ? 'Activo' : 'Inactivo',
+                        'personId' => $dbUser->person_id,
+                        'dni' => $dbUser->person?->document_number ?: (is_numeric($dbUser->username) && strlen((string) $dbUser->username) === 8 ? $dbUser->username : null),
+                    ];
+                }
+            }
+        } catch (\Throwable) {
+            // Silently fallback if database is not available during initial boot
+        }
 
         // Filter by role if set
         $filtered = array_filter($all, function (array $user) use ($roleFilter): bool {
@@ -653,14 +705,21 @@ final class GetUsersCatalogAction
             return mb_strtoupper($user['primaryRole']) === mb_strtoupper($roleFilter);
         });
 
-        // Filter by search term
-        $trimmedSearch = mb_strtolower(trim($search));
+        // Filter by search term (Buscador Inteligente: DNI, Nombre, Usuario, Correo, Rol)
+        $trimmedSearch = self::normalizeString($search);
         if ($trimmedSearch !== '') {
             $filtered = array_filter($filtered, function (array $user) use ($trimmedSearch): bool {
-                return str_contains(mb_strtolower($user['username']), $trimmedSearch)
-                    || str_contains(mb_strtolower($user['fullName']), $trimmedSearch)
-                    || str_contains(mb_strtolower($user['email']), $trimmedSearch)
-                    || str_contains(mb_strtolower($user['primaryRole']), $trimmedSearch);
+                $userDni = (string) ($user['dni'] ?? '');
+                $username = (string) ($user['username'] ?? '');
+                $fullName = (string) ($user['fullName'] ?? '');
+                $email = (string) ($user['email'] ?? '');
+                $role = (string) ($user['primaryRole'] ?? '');
+
+                return str_contains(self::normalizeString($username), $trimmedSearch)
+                    || str_contains(self::normalizeString($fullName), $trimmedSearch)
+                    || str_contains(self::normalizeString($email), $trimmedSearch)
+                    || str_contains(self::normalizeString($role), $trimmedSearch)
+                    || ($userDni !== '' && str_contains(self::normalizeString($userDni), $trimmedSearch));
             });
         }
 
@@ -686,8 +745,9 @@ final class GetUsersCatalogAction
             'presets' => self::ROLE_PRESETS,
             'subsystemsMeta' => self::SUBSYSTEMS_META,
             'counts' => [
-                'total' => count(self::USERS_DATA),
-                'active' => count(self::USERS_DATA),
+                'total' => count($all),
+                'active' => count(array_filter($all, fn ($u) => ($u['status'] ?? 'Activo') === 'Activo')),
+                'filtered' => $total,
             ],
         ];
     }
@@ -699,6 +759,13 @@ final class GetUsersCatalogAction
      */
     public function find(int $id): ?array
     {
+        $res = $this->handle(perPage: 9999);
+        foreach ($res['items'] as $user) {
+            if ($user['id'] === $id) {
+                return $user;
+            }
+        }
+
         foreach (self::USERS_DATA as $user) {
             if ($user['id'] === $id) {
                 return $user;

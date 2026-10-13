@@ -88,6 +88,12 @@ class Users extends Component
         $this->page = 1;
     }
 
+    public function clearSearch(): void
+    {
+        $this->search = '';
+        $this->page = 1;
+    }
+
     public function gotoPage(int $targetPage): void
     {
         $this->page = max(1, $targetPage);

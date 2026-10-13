@@ -64,17 +64,117 @@
         @endforeach
     </div>
 
+    <!-- Barra de Búsqueda Inteligente y Filtros Rápidos -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+        <!-- Pestañas de Filtro por Rol Principal -->
+        <div class="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs w-full sm:w-auto overflow-x-auto">
+            <button
+                type="button"
+                wire:click="setRoleFilter('TODOS')"
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer whitespace-nowrap {{ $roleFilter === 'TODOS'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }}"
+            >
+                Todos ({{ $counts['total'] ?? 49 }})
+            </button>
+            <button
+                type="button"
+                wire:click="setRoleFilter('Administrador Central')"
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer flex items-center justify-center space-x-1.5 whitespace-nowrap {{ $roleFilter === 'Administrador Central'
+                    ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }}"
+            >
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>Admin Central</span>
+            </button>
+            <button
+                type="button"
+                wire:click="setRoleFilter('Técnico de Soporte e ITAM')"
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer flex items-center justify-center space-x-1.5 whitespace-nowrap {{ $roleFilter === 'Técnico de Soporte e ITAM'
+                    ? 'bg-white dark:bg-slate-900 text-blue-800 dark:text-blue-300 shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }}"
+            >
+                <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                <span>Soporte e ITAM</span>
+            </button>
+            <button
+                type="button"
+                wire:click="setRoleFilter('Operador de Transportes')"
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer flex items-center justify-center space-x-1.5 whitespace-nowrap {{ $roleFilter === 'Operador de Transportes'
+                    ? 'bg-white dark:bg-slate-900 text-amber-800 dark:text-amber-300 shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }}"
+            >
+                <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                <span>Transportes</span>
+            </button>
+            <button
+                type="button"
+                wire:click="setRoleFilter('Personal General / Reportante')"
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer flex items-center justify-center space-x-1.5 whitespace-nowrap {{ $roleFilter === 'Personal General / Reportante'
+                    ? 'bg-white dark:bg-slate-900 text-purple-800 dark:text-purple-300 shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }}"
+            >
+                <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+                <span>Personal General</span>
+            </button>
+        </div>
+
+        <!-- Buscador Inteligente -->
+        <div class="flex items-center space-x-2 w-full sm:w-80 shrink-0">
+            <div class="relative w-full">
+                <input
+                    id="users-search-input"
+                    type="text"
+                    placeholder="Buscar por DNI, nombre..."
+                    wire:model.live.debounce.300ms="search"
+                    class="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 shadow-2xs"
+                />
+                @if (!empty($search))
+                    <button
+                        type="button"
+                        wire:click="clearSearch"
+                        class="absolute inset-y-0 right-0 pr-2.5 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition cursor-pointer"
+                        title="Limpiar búsqueda"
+                    >
+                        <span class="text-sm font-bold leading-none">&times;</span>
+                    </button>
+                @endif
+            </div>
+            <button
+                type="button"
+                wire:click="$refresh"
+                class="px-3.5 py-1.5 rounded-lg bg-[#00965e] hover:bg-[#007f50] text-white text-xs font-semibold shadow-xs transition cursor-pointer shrink-0"
+            >
+                Buscar
+            </button>
+        </div>
+    </div>
+
     <!-- Listado de Usuarios -->
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
-        <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
+        <div class="p-4 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div class="flex flex-wrap items-center gap-2">
                 <h3 class="text-sm font-bold text-slate-900 dark:text-white">
                     Cuentas de Usuario Activas ({{ $counts['active'] ?? 49 }})
                 </h3>
+                <span class="text-xs px-2.5 py-0.5 rounded-full font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    {{ $total }} {{ $total === 1 ? 'resultado' : 'resultados' }}
+                </span>
                 @if ($roleFilter !== 'TODOS')
                     <span class="inline-flex items-center space-x-1 text-xs px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 font-semibold">
-                        <span>Filtro: {{ $roleFilter }}</span>
+                        <span>Rol: {{ $roleFilter }}</span>
                         <button type="button" wire:click="setRoleFilter('TODOS')" class="ml-1 text-emerald-600 hover:text-emerald-900 font-bold cursor-pointer">&times;</button>
+                    </span>
+                @endif
+                @if (!empty($search))
+                    <span class="inline-flex items-center space-x-1 text-xs px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 font-semibold">
+                        <span>Búsqueda: &quot;{{ $search }}&quot;</span>
+                        <button type="button" wire:click="clearSearch" class="ml-1 text-blue-600 hover:text-blue-900 font-bold cursor-pointer">&times;</button>
                     </span>
                 @endif
             </div>
@@ -101,12 +201,23 @@
                         <tr class="hover:bg-slate-50/80 dark:hover:bg-slate-800/50">
                             <!-- Usuario -->
                             <td class="py-3.5 px-4 font-mono font-bold text-slate-900 dark:text-white">
-                                <span class="inline-flex items-center space-x-1.5">
-                                    <span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-[10px] text-slate-700 dark:text-slate-200 font-bold shrink-0">
+                                <div class="flex items-center space-x-2">
+                                    <span class="w-7 h-7 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-[10px] text-slate-700 dark:text-slate-200 font-bold shrink-0">
                                         {{ strtolower(substr($user['username'], 0, 2)) }}
                                     </span>
-                                    <span>{{ $user['username'] }}</span>
-                                </span>
+                                    <div>
+                                        <span class="block leading-tight text-xs font-mono font-bold">{{ $user['username'] }}</span>
+                                        @if (!empty($user['dni']) && $user['dni'] !== $user['username'])
+                                            <span class="inline-flex items-center text-[10px] text-slate-400 dark:text-slate-500 font-sans font-normal">
+                                                DNI: {{ $user['dni'] }}
+                                            </span>
+                                        @elseif (is_numeric($user['username']) && strlen((string)$user['username']) === 8)
+                                            <span class="inline-block text-[9px] px-1.5 py-0.2 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 font-sans font-semibold">
+                                                DNI
+                                            </span>
+                                        @endif
+                                    </div>
+                                </div>
                             </td>
 
                             <!-- Nombre Completo -->
@@ -179,9 +290,31 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-12 text-center text-slate-400 dark:text-slate-500">
-                                <p class="text-base font-semibold">No se encontraron cuentas de usuario</p>
-                                <p class="text-xs mt-1">Pruebe ajustando el término de búsqueda o el filtro de rol.</p>
+                            <td colspan="6" class="py-12 text-center">
+                                <div class="flex flex-col items-center justify-center space-y-3">
+                                    <div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 text-xl">
+                                        🔍
+                                    </div>
+                                    <div class="text-sm font-bold text-slate-800 dark:text-slate-200">
+                                        No se encontraron cuentas de usuario
+                                    </div>
+                                    <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm">
+                                        @if (!empty($search))
+                                            No hay usuarios que coincidan con la búsqueda <strong class="text-slate-700 dark:text-slate-200">&quot;{{ $search }}&quot;</strong>.
+                                        @else
+                                            No hay usuarios registrados bajo los filtros seleccionados.
+                                        @endif
+                                    </p>
+                                    @if (!empty($search) || $roleFilter !== 'TODOS')
+                                        <button
+                                            type="button"
+                                            wire:click="clearSearch(); setRoleFilter('TODOS')"
+                                            class="mt-2 px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-emerald-700 dark:text-emerald-400 text-xs font-bold transition cursor-pointer"
+                                        >
+                                            Restablecer Filtros y Búsqueda
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @endforelse
