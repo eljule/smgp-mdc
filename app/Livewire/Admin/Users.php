@@ -164,7 +164,6 @@ class Users extends Component
 
         $username = $this->selectedUser['username'] ?? 'usuario';
         $this->flashMessage = "Permisos actualizados correctamente para {$username}.";
-        $this->dispatch('toast', message: $this->flashMessage, type: 'success');
         $this->showEditModal = false;
     }
 
@@ -280,7 +279,6 @@ class Users extends Component
         ]);
 
         $this->flashMessage = "Cuenta de usuario '{$user->username}' creada y permisos otorgados exitosamente.";
-        $this->dispatch('toast', message: $this->flashMessage, type: 'success');
         $this->showUserModal = false;
         $this->showCreateModal = false;
         $this->resetUserForm();

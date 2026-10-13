@@ -389,7 +389,6 @@ class Dashboard extends Component
     {
         $this->alertMessage = $message;
         $this->alertType = $type;
-        $this->dispatch('show-toast', message: $message, type: $type);
     }
 
     public function handleQuickLookup(): void
