@@ -103,4 +103,43 @@ class AuthTest extends TestCase
         $response->assertRedirect('/');
         $this->assertGuest();
     }
+
+    public function test_login_page_renders_helpdesk_tab_and_dni_lookup_endpoint(): void
+    {
+        $response = $this->get('/login');
+        $response->assertStatus(200);
+        $response->assertSee('Acceso Módulos');
+        $response->assertSee('Mesa de Ayuda');
+        $response->assertSee('DNI del Usuario / Servidor Municipal');
+        $response->assertSee('Imprimir QR');
+
+        // Test DNI lookup for known catalog person
+        $dniLookupResponse = $this->getJson('/api/helpdesk/dni-lookup?dni=02821801');
+        $dniLookupResponse->assertStatus(200);
+        $dniLookupResponse->assertJson([
+            'found' => true,
+            'person' => [
+                'dni' => '02821801',
+                'name' => 'CARLOS EDUARDO ROJAS MATIAS',
+            ],
+        ]);
+        $this->assertStringContainsString('soporte/nuevo-ticket', $dniLookupResponse->json('ticket_url'));
+        $this->assertStringContainsString('create-qr-code', $dniLookupResponse->json('qr_url'));
+
+        // Test DNI lookup for nonexistent DNI
+        $nonexistentResponse = $this->getJson('/api/helpdesk/dni-lookup?dni=00000000');
+        $nonexistentResponse->assertStatus(200);
+        $nonexistentResponse->assertJson([
+            'found' => false,
+        ]);
+
+        // Test office QR endpoint
+        $officeQrResponse = $this->getJson('/api/helpdesk/office-qr?office=ALCALDÍA');
+        $officeQrResponse->assertStatus(200);
+        $officeQrResponse->assertJson([
+            'found' => true,
+            'office' => 'ALCALDÍA',
+        ]);
+        $this->assertStringContainsString('soporte/nuevo-ticket', $officeQrResponse->json('ticket_url'));
+    }
 }

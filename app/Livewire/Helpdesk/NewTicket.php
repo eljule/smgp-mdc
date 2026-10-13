@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Livewire\Helpdesk;
 
+use App\Actions\Admin\GetPeopleCatalogAction;
 use App\Models\Helpdesk\Ticket;
 use App\Models\Helpdesk\TicketAuditLog;
 use App\Models\Itam\Asset;
 use App\Models\Office;
+use App\Models\Person;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -79,6 +81,45 @@ class NewTicket extends Component
         if ($user) {
             $this->applicantName = $user->name ?? $user->username ?? 'ADMINISTRADOR DEL SISTEMA SIGM';
             $this->applicantEmail = $user->email ?? 'admin@castilla.gob.pe';
+        }
+
+        $office = request()->query('oficina') ?? request()->query('office');
+        if (! empty($office)) {
+            $this->officeName = trim((string) $office);
+        }
+
+        $dni = request()->query('dni');
+        if (! empty($dni)) {
+            $dniStr = trim((string) $dni);
+            $person = Person::where('document_number', $dniStr)->first();
+            if ($person) {
+                $this->applicantName = $person->full_name;
+                if (empty($office) && ! empty($person->office)) {
+                    $this->officeName = $person->office;
+                }
+                if (! empty($person->email)) {
+                    $this->applicantEmail = $person->email;
+                }
+                if (! empty($person->phone)) {
+                    $this->applicantPhone = $person->phone;
+                }
+            } else {
+                foreach (GetPeopleCatalogAction::PEOPLE_DATA as $p) {
+                    if (($p['documentNumber'] ?? '') === $dniStr) {
+                        $this->applicantName = $p['fullName'];
+                        if (empty($office) && ! empty($p['office'])) {
+                            $this->officeName = $p['office'];
+                        }
+                        if (! empty($p['email'])) {
+                            $this->applicantEmail = $p['email'];
+                        }
+                        if (! empty($p['phone'])) {
+                            $this->applicantPhone = $p['phone'];
+                        }
+                        break;
+                    }
+                }
+            }
         }
 
         $assetCode = $asset ?? request()->query('asset');

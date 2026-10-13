@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Tests\Feature\Livewire;
 
 use App\Livewire\Helpdesk\Knowledge as KnowledgeComponent;
+use App\Livewire\Helpdesk\NewTicket as NewTicketComponent;
 use App\Livewire\Helpdesk\Tickets as TicketsComponent;
 use App\Models\Helpdesk\KnowledgeArticle;
 use App\Models\Helpdesk\Ticket;
@@ -110,5 +111,19 @@ class HelpdeskComponentsTest extends TestCase
 
             $this->assertEquals($initialViews + 1, $article->fresh()->views_count);
         }
+    }
+
+    public function test_new_ticket_page_prefills_office_and_applicant_by_query_parameters(): void
+    {
+        $response = $this->get('/soporte/nuevo-ticket?oficina=GERENCIA%20MUNICIPAL&dni=02821801');
+        $response->assertStatus(200);
+
+        Livewire::withQueryParams([
+            'oficina' => 'GERENCIA MUNICIPAL',
+            'dni' => '02821801',
+        ])
+            ->test(NewTicketComponent::class)
+            ->assertSet('officeName', 'GERENCIA MUNICIPAL')
+            ->assertSet('applicantName', 'CARLOS EDUARDO ROJAS MATIAS');
     }
 }

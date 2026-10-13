@@ -340,6 +340,19 @@ class AdminDashboardTest extends TestCase
             ->assertSet('showCreateModal', true);
     }
 
+    public function test_offices_component_qr_modal_renders_and_closes(): void
+    {
+        Livewire::test(OfficesComponent::class)
+            ->assertSee('OFICINA DE REGIDORES')
+            ->call('openQrModal', 1)
+            ->assertSet('showQrModal', true)
+            ->assertSee('Código QR para Mesa de Ayuda TI')
+            ->assertSee('Imprimir Cartel QR')
+            ->assertSee('Descargar Imagen')
+            ->call('closeQrModal')
+            ->assertSet('showQrModal', false);
+    }
+
     public function test_renders_subsystems_page_successfully(): void
     {
         $this->seed();

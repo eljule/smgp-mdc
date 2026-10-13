@@ -37,6 +37,14 @@
             </span>
             <button
                 type="button"
+                wire:click="openQrModal({{ $node['id'] }})"
+                class="p-1 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded text-xs text-emerald-600 dark:text-emerald-400 font-bold transition-colors cursor-pointer"
+                title="Generar / Imprimir Código QR para Tickets de Mesa de Ayuda"
+            >
+                📱 QR
+            </button>
+            <button
+                type="button"
                 wire:click="openEditModal({{ $node['id'] }})"
                 class="p-1 hover:bg-slate-200 dark:hover:bg-slate-700 rounded text-xs text-amber-600 dark:text-amber-400 transition-colors cursor-pointer"
                 title="Editar"

@@ -41,6 +41,10 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout.post');
 
+// Consulta Pública de DNI y Códigos QR de Oficinas para Mesa de Ayuda
+Route::get('/api/helpdesk/dni-lookup', [LoginController::class, 'lookupDni'])->name('helpdesk.dni.lookup');
+Route::get('/api/helpdesk/office-qr', [LoginController::class, 'officeTicketQr'])->name('helpdesk.office.qr');
+
 // Portal Lanzador Institucional de Módulos (Livewire 3)
 Route::get('/portal', ModuleLauncher::class)->name('portal.launcher');
 

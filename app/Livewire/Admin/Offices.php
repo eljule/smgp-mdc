@@ -82,6 +82,16 @@ class Offices extends Component
 
     public string $flashMessage = '';
 
+    // ==========================================
+    // PROPIEDADES PARA MODAL DE CÓDIGO QR DE OFICINA
+    // ==========================================
+    public bool $showQrModal = false;
+
+    /**
+     * @var array<string, mixed>|null
+     */
+    public ?array $selectedOfficeForQr = null;
+
     public function hydrate(): void
     {
         $this->flashMessage = '';
@@ -491,6 +501,38 @@ class Offices extends Component
                 : '';
             $this->flashMessage = "La sede '{$name}' ha sido eliminada{$reassignMsg}.";
         }
+    }
+
+    // ==========================================
+    // MÉTODOS PARA MODAL DE CÓDIGO QR DE OFICINA
+    // ==========================================
+
+    public function openQrModal(int $id, ?GetOfficesCatalogAction $action = null): void
+    {
+        $action ??= new GetOfficesCatalogAction;
+        $all = $action->execute();
+
+        foreach ($all as $office) {
+            if ($office['id'] === $id) {
+                $ticketUrl = route('soporte.nuevo', [
+                    'oficina' => $office['name'],
+                ]);
+
+                $this->selectedOfficeForQr = array_merge($office, [
+                    'ticketUrl' => $ticketUrl,
+                    'qrUrl' => 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data='.urlencode($ticketUrl),
+                ]);
+                $this->showQrModal = true;
+
+                return;
+            }
+        }
+    }
+
+    public function closeQrModal(): void
+    {
+        $this->showQrModal = false;
+        $this->selectedOfficeForQr = null;
     }
 
     public function render(GetOfficesCatalogAction $action): View
