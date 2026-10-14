@@ -299,32 +299,48 @@
                                 <label class="block text-xs font-bold text-slate-800 dark:text-slate-200">
                                     Nivel de Severidad / Impacto en sus labores:
                                 </label>
-                                <div class="grid grid-cols-4 gap-2.5 text-xs font-bold">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                                     @php
                                         $priorities = [
                                             [
                                                 'id' => 'BAJA',
-                                                'label' => 'Baja',
+                                                'icon' => '👤',
+                                                'title' => 'Solo en mi equipo',
+                                                'badge' => 'Baja',
+                                                'desc' => 'Solo me afecta a mí. Puedo continuar con otras labores en mi puesto.',
                                                 'active' => 'border-2 border-slate-600 bg-slate-100 text-slate-900 ring-2 ring-slate-400/20 dark:bg-slate-800 dark:text-white',
-                                                'inactive' => 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50',
+                                                'badgeActive' => 'bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200',
+                                                'badgeInactive' => 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
                                             ],
                                             [
                                                 'id' => 'MEDIA',
-                                                'label' => 'Media',
-                                                'active' => 'border-2 border-blue-500 bg-blue-50/70 text-blue-700 ring-2 ring-blue-500/20 dark:bg-blue-950/50 dark:text-blue-300',
-                                                'inactive' => 'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-blue-50/40',
+                                                'icon' => '👥',
+                                                'title' => 'Afecta a mi oficina',
+                                                'badge' => 'Media',
+                                                'desc' => 'Varios compañeros presentan la misma falla o lentitud en el área.',
+                                                'active' => 'border-2 border-blue-500 bg-blue-50/80 text-blue-900 ring-2 ring-blue-500/20 dark:bg-blue-950/50 dark:text-blue-200',
+                                                'badgeActive' => 'bg-blue-200 dark:bg-blue-900 text-blue-800 dark:text-blue-300',
+                                                'badgeInactive' => 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
                                             ],
                                             [
                                                 'id' => 'ALTA',
-                                                'label' => 'Alta',
-                                                'active' => 'border-2 border-amber-500 bg-amber-50/70 text-amber-800 ring-2 ring-amber-500/20 dark:bg-amber-950/50 dark:text-amber-300',
-                                                'inactive' => 'border border-amber-200 dark:border-amber-800/80 bg-white dark:bg-slate-900 text-amber-700 dark:text-amber-400 hover:bg-amber-50/40',
+                                                'icon' => '🏛️',
+                                                'title' => 'Atención al Público',
+                                                'badge' => 'Alta',
+                                                'desc' => 'Trámites de vecinos detenidos, caja, mesa de partes o servicio externo.',
+                                                'active' => 'border-2 border-amber-500 bg-amber-50/80 text-amber-900 ring-2 ring-amber-500/20 dark:bg-amber-950/50 dark:text-amber-200',
+                                                'badgeActive' => 'bg-amber-200 dark:bg-amber-900 text-amber-900 dark:text-amber-300',
+                                                'badgeInactive' => 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
                                             ],
                                             [
                                                 'id' => 'CRITICA',
-                                                'label' => 'Crítica',
-                                                'active' => 'border-2 border-rose-600 bg-rose-50/70 text-rose-800 ring-2 ring-rose-500/20 dark:bg-rose-950/50 dark:text-rose-300',
-                                                'inactive' => 'border border-rose-200 dark:border-rose-800/80 bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 hover:bg-rose-50/40',
+                                                'icon' => '🚨',
+                                                'title' => 'Área Paralizada',
+                                                'badge' => 'Crítica',
+                                                'desc' => 'Dependencia totalmente inoperativa, sin red, sin energía ni sistema.',
+                                                'active' => 'border-2 border-rose-600 bg-rose-50/80 text-rose-900 ring-2 ring-rose-500/20 dark:bg-rose-950/50 dark:text-rose-200',
+                                                'badgeActive' => 'bg-rose-200 dark:bg-rose-900 text-rose-800 dark:text-rose-300',
+                                                'badgeInactive' => 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400',
                                             ],
                                         ];
                                     @endphp
@@ -332,8 +348,19 @@
                                     @foreach ($priorities as $p)
                                         <button type="button"
                                                 wire:click="setPriority('{{ $p['id'] }}')"
-                                                class="py-2.5 px-2 text-center rounded-xl transition-all cursor-pointer {{ $priority === $p['id'] ? $p['active'] : $p['inactive'] }}">
-                                            {{ $p['label'] }}
+                                                class="p-3 text-left rounded-xl transition-all cursor-pointer flex flex-col justify-between {{ $priority === $p['id'] ? $p['active'] : 'border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800' }}">
+                                            <div class="flex items-center justify-between w-full mb-1">
+                                                <div class="flex items-center gap-1.5 font-bold text-xs">
+                                                    <span class="text-base">{{ $p['icon'] }}</span>
+                                                    <span>{{ $p['title'] }}</span>
+                                                </div>
+                                                <span class="text-[10px] font-mono px-1.5 py-0.5 rounded font-bold {{ $priority === $p['id'] ? $p['badgeActive'] : $p['badgeInactive'] }}">
+                                                    {{ $p['badge'] }}
+                                                </span>
+                                            </div>
+                                            <p class="text-[11px] {{ $priority === $p['id'] ? 'text-slate-700 dark:text-slate-300 font-medium' : 'text-slate-400 dark:text-slate-500' }} leading-tight mt-0.5">
+                                                {{ $p['desc'] }}
+                                            </p>
                                         </button>
                                     @endforeach
                                 </div>
