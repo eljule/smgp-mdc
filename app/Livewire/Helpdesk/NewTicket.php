@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Livewire\Helpdesk;
 
-use App\Actions\Admin\GetOfficesCatalogAction;
 use App\Actions\Admin\GetPeopleCatalogAction;
 use App\Models\Helpdesk\Ticket;
 use App\Models\Helpdesk\TicketAuditLog;
@@ -18,25 +17,23 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 
 #[Layout('components.layouts.ticket-portal', [
-    'title' => 'Mesa de Ayuda y Soporte TI - Municipalidad Distrital de Castilla',
+    'title' => 'Registrar Falla en su Puesto de Trabajo - SIGM Castilla',
 ])]
-#[Title('Mesa de Ayuda y Soporte TI - Municipalidad Distrital de Castilla')]
+#[Title('Registrar Falla en su Puesto de Trabajo - SIGM Castilla')]
 class NewTicket extends Component
 {
     use WithFileUploads;
 
-    // 1. Dependencia y Responsable de la Oficina Requirente
+    // 1. Datos de Identificación (RF-02)
+    public string $applicantName = 'ADMINISTRADOR DEL SISTEMA SIGM';
+
     public string $officeName = 'OFICINA DE REGIDORES';
 
-    public string $applicantName = 'JULIO ERNESTO CHAVEZ CRISANTO';
+    public string $applicantPhone = 'Anexo 104';
 
-    public string $applicantPosition = 'ESPECIALISTA TECNOLÓGICO';
+    public string $applicantEmail = 'admin@castilla.gob.pe';
 
-    public string $applicantPhone = 'Anexo 102';
-
-    public string $applicantEmail = 'jchavez@castilla.gob.pe';
-
-    // 2. Escaneo de Código QR o Activo (Opcional)
+    // 2. Escaneo de Código QR (RF-03)
     public string $qrCodeInput = '';
 
     public ?int $selectedAssetId = null;
@@ -49,7 +46,7 @@ class NewTicket extends Component
 
     public ?string $assetLookupError = null;
 
-    // 3. Formulario de Incidencia
+    // 3. Formulario de Incidencia (RF-04)
     public string $category = 'HARDWARE';
 
     public string $priority = 'MEDIA';
@@ -61,13 +58,6 @@ class NewTicket extends Component
     public $photo = null;
 
     public ?string $evidencePhotoUrl = null;
-
-    // Historial y Consulta de la Oficina (Columna Derecha)
-    public string $historySearch = '';
-
-    public ?int $selectedHistoryTicketId = null;
-
-    public ?Ticket $selectedHistoryTicket = null;
 
     // Estado del envío
     public bool $submitting = false;
@@ -104,7 +94,6 @@ class NewTicket extends Component
             $person = Person::where('document_number', $dniStr)->first();
             if ($person) {
                 $this->applicantName = $person->full_name;
-                $this->applicantPosition = $person->position ?: 'Servidor Municipal';
                 if (empty($office) && ! empty($person->office)) {
                     $this->officeName = $person->office;
                 }
@@ -118,7 +107,6 @@ class NewTicket extends Component
                 foreach (GetPeopleCatalogAction::PEOPLE_DATA as $p) {
                     if (($p['documentNumber'] ?? '') === $dniStr) {
                         $this->applicantName = $p['fullName'];
-                        $this->applicantPosition = $p['position'] ?? 'Servidor Municipal';
                         if (empty($office) && ! empty($p['office'])) {
                             $this->officeName = $p['office'];
                         }
@@ -141,54 +129,12 @@ class NewTicket extends Component
         }
     }
 
-    public function updatedOfficeName(?string $val = null): void
-    {
-        $office = trim((string) ($val ?? $this->officeName));
-        if (empty($office)) {
-            return;
-        }
-
-        // Buscar si existe un responsable registrado para esta oficina
-        $person = Person::where('office', $office)
-            ->orWhere('office', 'like', "%{$office}%")
-            ->first();
-
-        if ($person) {
-            $this->applicantName = $person->full_name;
-            $this->applicantPosition = $person->position ?: 'Responsable de Oficina';
-            if (! empty($person->phone)) {
-                $this->applicantPhone = $person->phone;
-            }
-            if (! empty($person->email)) {
-                $this->applicantEmail = $person->email;
-            }
-
-            return;
-        }
-
-        foreach (GetPeopleCatalogAction::PEOPLE_DATA as $p) {
-            if (str_contains(strtoupper((string) ($p['office'] ?? '')), strtoupper($office))) {
-                $this->applicantName = $p['fullName'];
-                $this->applicantPosition = $p['position'] ?? 'Responsable de Oficina';
-                if (! empty($p['phone'])) {
-                    $this->applicantPhone = $p['phone'];
-                }
-                if (! empty($p['email'])) {
-                    $this->applicantEmail = $p['email'];
-                }
-
-                return;
-            }
-        }
-    }
-
     public function autoDetect(): void
     {
-        $this->applicantName = 'JULIO ERNESTO CHAVEZ CRISANTO';
+        $this->applicantName = 'ADMINISTRADOR DEL SISTEMA SIGM';
         $this->officeName = 'OFICINA DE REGIDORES';
-        $this->applicantPosition = 'ESPECIALISTA TECNOLÓGICO';
-        $this->applicantPhone = 'Anexo 102';
-        $this->applicantEmail = 'jchavez@castilla.gob.pe';
+        $this->applicantPhone = 'Anexo 104';
+        $this->applicantEmail = 'admin@castilla.gob.pe';
     }
 
     public function lookupAsset(): void
@@ -250,18 +196,6 @@ class NewTicket extends Component
         $this->priority = $prio;
     }
 
-    public function viewHistoryTicket(int $id): void
-    {
-        $this->selectedHistoryTicketId = $id;
-        $this->selectedHistoryTicket = Ticket::with(['technicalDetail'])->find($id);
-    }
-
-    public function closeHistoryTicket(): void
-    {
-        $this->selectedHistoryTicketId = null;
-        $this->selectedHistoryTicket = null;
-    }
-
     public function saveTicket(): void
     {
         $this->errorMessage = null;
@@ -273,13 +207,13 @@ class NewTicket extends Component
         }
 
         if (empty(trim($this->applicantName))) {
-            $this->errorMessage = 'Por favor ingrese el nombre del solicitante o responsable.';
+            $this->errorMessage = 'Por favor ingrese el nombre del solicitante.';
 
             return;
         }
 
         $count = Ticket::count() + 1;
-        $ticketNumber = 'INC-'.date('Y').'-'.str_pad((string) $count, 3, '0', STR_PAD_LEFT);
+        $ticketNumber = 'TCK-'.date('Y').'-'.str_pad((string) $count, 4, '0', STR_PAD_LEFT);
 
         $office = Office::where('name', $this->officeName)->first();
 
@@ -311,12 +245,6 @@ class NewTicket extends Component
 
         $this->createdTicketNumber = $ticket->ticket_number;
         $this->flashMessage = "Ticket {$ticket->ticket_number} registrado exitosamente. Su reporte fue enviado a Soporte TI.";
-
-        // Limpiar campos de la incidencia manteniendo la oficina
-        $this->subject = '';
-        $this->description = '';
-        $this->photo = null;
-        $this->clearAsset();
     }
 
     public function resetForm(): void
@@ -332,38 +260,9 @@ class NewTicket extends Component
     public function render(): View
     {
         $offices = Office::orderBy('name')->get();
-        if ($offices->isEmpty()) {
-            $catalogAction = new GetOfficesCatalogAction;
-            $offices = collect($catalogAction->execute())->map(fn ($o) => (object) [
-                'id' => $o['id'],
-                'name' => $o['name'],
-                'acronym' => $o['sigla'],
-            ]);
-        }
-
-        $cleanOffice = trim($this->officeName);
-        $ticketsQuery = Ticket::with(['technicalDetail'])
-            ->where(function ($q) use ($cleanOffice) {
-                $q->where('office_name', $cleanOffice)
-                    ->orWhere('office_name', 'like', "%{$cleanOffice}%");
-            });
-
-        if (! empty($this->historySearch)) {
-            $term = trim($this->historySearch);
-            $ticketsQuery->where(function ($q) use ($term) {
-                $q->where('ticket_number', 'like', "%{$term}%")
-                    ->orWhere('subject', 'like', "%{$term}%")
-                    ->orWhere('applicant_name', 'like', "%{$term}%")
-                    ->orWhere('category', 'like', "%{$term}%")
-                    ->orWhere('status', 'like', "%{$term}%");
-            });
-        }
-
-        $officeTickets = $ticketsQuery->latest()->take(20)->get();
 
         return view('livewire.helpdesk.new-ticket', [
             'offices' => $offices,
-            'officeTickets' => $officeTickets,
         ]);
     }
 }
