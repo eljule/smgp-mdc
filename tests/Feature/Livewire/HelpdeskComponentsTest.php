@@ -126,4 +126,33 @@ class HelpdeskComponentsTest extends TestCase
             ->assertSet('officeName', 'GERENCIA MUNICIPAL')
             ->assertSet('applicantName', 'CARLOS EDUARDO ROJAS MATIAS');
     }
+
+    public function test_new_ticket_page_renders_two_columns_with_office_history_and_odt_info(): void
+    {
+        $response = $this->get('/soporte/nuevo-ticket');
+        $response->assertStatus(200);
+        $response->assertSee('Mesa de Ayuda y Soporte TI');
+        $response->assertSee('PORTAL DE SOPORTE Y HELPDESK');
+        $response->assertSee('Registrar Incidencia Técnica');
+        $response->assertSee('1. Dependencia u Oficina Requirente');
+        $response->assertSee('2. Responsable de la Oficina (Auto)');
+        $response->assertSee('3. Selección Rápida de Categoría');
+        $response->assertSee('HW / Hardware');
+        $response->assertSee('SIS / Sistemas');
+        $response->assertSee('ACC / Permisos');
+        $response->assertSee('RED / Redes');
+        $response->assertSee('Mis Incidencias Registradas');
+        $response->assertSee('Información de Atención ODT');
+        $response->assertSee('Horario:');
+        $response->assertSee('Ubicación:');
+
+        // Test Livewire component dynamically filtering history by office
+        Livewire::test(NewTicketComponent::class)
+            ->set('officeName', 'Gerencia Municipal')
+            ->assertSee('Gerencia Municipal')
+            ->assertSee('Sin acceso a la red de Gerencia Municipal')
+            ->set('officeName', 'Gerencia de Seguridad Ciudadana y Serenazgo')
+            ->assertSee('Gerencia de Seguridad Ciudadana y Serenazgo')
+            ->assertSee('Monitor de videovigilancia parpadea');
+    }
 }
