@@ -126,4 +126,46 @@ class HelpdeskComponentsTest extends TestCase
             ->assertSet('officeName', 'GERENCIA MUNICIPAL')
             ->assertSet('applicantName', 'CARLOS EDUARDO ROJAS MATIAS');
     }
+
+    public function test_new_ticket_page_keeps_all_form_fields_intact_and_renders_tracking_column(): void
+    {
+        $response = $this->get('/soporte/nuevo-ticket');
+        $response->assertStatus(200);
+
+        // Assert all existing form fields are completely intact
+        $response->assertSee('FORMULARIO DE SOPORTE TÉCNICO (SRS RF-01 / RF-04)');
+        $response->assertSee('1. DATOS DE IDENTIFICACIÓN (RF-02)');
+        $response->assertSee('Nombre del Funcionario / Custodio *:');
+        $response->assertSee('Oficina o Dependencia Municipal *:');
+        $response->assertSee('2. ESCANEO DE CÓDIGO QR DEL EQUIPO (RF-03)');
+        $response->assertSee('Tipo de Inconveniente o Falla (Categoría)');
+        $response->assertSee('Nivel de Severidad / Impacto en sus labores:');
+        $response->assertSee('Asunto breve con sus propias palabras *:');
+        $response->assertSee('Detalle del problema (¿Qué sucedió y cuándo?) *:');
+        $response->assertSee('Foto o Captura de Pantalla:');
+        $response->assertSee('Enviar Ticket a Soporte Técnico');
+
+        // Assert right side tracking column is rendered
+        $response->assertSee('Seguimiento de Tickets del Área');
+        $response->assertSee('Técnico Asignado de Atención');
+
+        $ticket = Ticket::where('office_name', 'like', '%REGIDORES%')->where('status', '!=', 'CERRADO')->first();
+        $this->assertNotNull($ticket);
+
+        Livewire::test(NewTicketComponent::class)
+            ->set('officeName', 'OFICINA DE REGIDORES')
+            ->assertSee($ticket->ticket_number)
+            ->assertSee('Dar Visto Bueno / Cerrar Ticket')
+            ->call('openConformityModal', $ticket->id)
+            ->assertSet('isConformityModalOpen', true)
+            ->call('setRating', 5)
+            ->call('setConformity', true)
+            ->call('saveUserConformity')
+            ->assertSet('isConformityModalOpen', false);
+
+        $fresh = $ticket->fresh();
+        $this->assertEquals('CERRADO', $fresh->status);
+        $this->assertTrue((bool) $fresh->user_conformity);
+        $this->assertEquals(5, $fresh->user_rating);
+    }
 }
