@@ -42,14 +42,37 @@
         </div>
     </header>
 
-    <!-- Contenedor Principal: Dividido en 2 Columnas (Formulario intacto a la izquierda, Seguimiento y Visto Bueno a la derecha) -->
-    <main class="flex-1 py-6 sm:py-8 px-4 sm:px-6 w-full max-w-7xl mx-auto">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+    <style>
+        @media (min-width: 1024px) {
+            .side-by-side-container {
+                display: flex !important;
+                flex-direction: row !important;
+                align-items: flex-start !important;
+                gap: 1.5rem !important;
+            }
+            .side-by-side-left {
+                flex: 0 0 calc(58% - 0.75rem) !important;
+                width: calc(58% - 0.75rem) !important;
+                max-width: calc(58% - 0.75rem) !important;
+            }
+            .side-by-side-right {
+                flex: 0 0 calc(42% - 0.75rem) !important;
+                width: calc(42% - 0.75rem) !important;
+                max-width: calc(42% - 0.75rem) !important;
+                position: sticky !important;
+                top: 5.5rem !important;
+            }
+        }
+    </style>
+
+    <!-- Contenedor Principal: Lado a Lado (Izquierda: Formulario intacto, Derecha: Seguimiento y Visto Bueno) -->
+    <main class="flex-1 py-6 sm:py-8 px-4 sm:px-6 w-full max-w-[1700px] mx-auto">
+        <div class="side-by-side-container flex flex-col gap-6 items-start">
 
             <!-- ========================================================================= -->
-            <!-- COLUMNA IZQUIERDA: FORMULARIO EXISTENTE SIN CAMBIAR NINGÚN CAMPO (lg:col-span-7) -->
+            <!-- COLUMNA IZQUIERDA: FORMULARIO EXISTENTE SIN CAMBIAR NINGÚN CAMPO         -->
             <!-- ========================================================================= -->
-            <div class="lg:col-span-7 space-y-6">
+            <div class="side-by-side-left w-full space-y-6">
 
                 @if ($createdTicketNumber)
                     <!-- Pantalla de Éxito / Confirmación -->
@@ -374,9 +397,9 @@
             </div>
 
             <!-- =============================================================================================== -->
-            <!-- COLUMNA DERECHA: ESPACIO PARA SEGUIMIENTO DE TICKETS, TÉCNICO Y VISTO BUENO (lg:col-span-5)    -->
+            <!-- COLUMNA DERECHA: ESPACIO PARA SEGUIMIENTO DE TICKETS, TÉCNICO Y VISTO BUENO (LADO A LADO)      -->
             <!-- =============================================================================================== -->
-            <div class="lg:col-span-5 space-y-4">
+            <div class="side-by-side-right w-full space-y-4">
                 
                 <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-md border border-slate-200/90 dark:border-slate-800 overflow-hidden">
                     
