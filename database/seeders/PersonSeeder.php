@@ -4,688 +4,188 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
+use App\Actions\Admin\GetPeopleCatalogAction;
 use App\Models\Person;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class PersonSeeder extends Seeder
 {
-    private const PEOPLE_DATA = [
-        [
-            'id' => 1,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02821801',
-            'fullName' => 'CARLOS EDUARDO ROJAS MATIAS',
-            'email' => null,
-            'phone' => null,
-            'position' => 'PROCURADURADOR PUBLICA MUNICIPAL',
-            'office' => '[PPM] PROCURADURÍA PÚBLICA MUNICIPAL',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 2,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02852121',
-            'fullName' => 'EMMA FLOR SAAVEDRA PACHERREZ',
-            'email' => null,
-            'phone' => null,
-            'position' => 'JEFE DEL ORGANO DE CONTROL INSTITUCIONAL',
-            'office' => '[OCI] ÓRGANO DE CONTROL INSTITUCION..',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 3,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '43268255',
-            'fullName' => 'ROBERTO PABLO BARRERA ZUÑIGA',
-            'email' => null,
-            'phone' => null,
-            'position' => 'SUBGERENTE DE SERENAZGO',
-            'office' => '[SGS] SUBGERENCIA DE SERENAZGO',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 4,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '43465876',
-            'fullName' => 'RICARDO FELIX MARTINEZ CÓNDOR',
-            'email' => null,
-            'phone' => null,
-            'position' => 'GERENTE DE SEGURIDAD CIUDADANA',
-            'office' => '[GSC] GERENCIA SEGURIDAD CIUDADANA',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 5,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02830165',
-            'fullName' => 'GUSTAVO ADOLFO PAREDES SHIMOKAWA',
-            'email' => null,
-            'phone' => null,
-            'position' => 'SUBGERENTE DE TRANSPORTE,TRANSITO Y VIALIDAD',
-            'office' => '[STTV] SUBGERENCIA DE TRANSPORTE, TR..',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 6,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '16688162',
-            'fullName' => 'JOSE FERNANDO RAMIREZ MORENO',
-            'email' => null,
-            'phone' => null,
-            'position' => 'JEFE DE LA UNIDAD DE ORNATO PARQUES Y JARDINES',
-            'office' => '[UPJ] UNIDAD DE PARQUES Y JARDINES',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 7,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02657504',
-            'fullName' => 'WILLIAM OSWALDO ROJAS MERINO',
-            'email' => null,
-            'phone' => null,
-            'position' => 'JEFE DE LA UNIDAD DE LIMPIEZA PUBLICA',
-            'office' => '[ULP] UNIDAD DE LIMPIEZA PÚBLICA',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 8,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '03386696',
-            'fullName' => 'JUAN RUPERTO VILELA ESPINOZA',
-            'email' => null,
-            'phone' => null,
-            'position' => 'SUBGERENTE DE GESTION AMBIENTAL',
-            'office' => '[SGGA] SUBGERENCIA DE GESTIÓN AMBIE...',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 9,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02783056',
-            'fullName' => 'LUIS RICARDO LLACSAHUANGA TIMOTEO',
-            'email' => null,
-            'phone' => null,
-            'position' => 'GERENCIA DE SERVICIOS PUBLICOS',
-            'office' => '[GSP] GERENCIA DE SERVICIOS PÚBLICOS',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 10,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '40774696',
-            'fullName' => 'DORIS LOPEZ GARCIA',
-            'email' => null,
-            'phone' => null,
-            'position' => 'JEFE DE ULE',
-            'office' => '[ULE] OFICINA DE LA UNIDAD LOCAL DE E..',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 11,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '10783864',
-            'fullName' => 'JAIME HENRRY SANDOVAL NIEVES',
-            'email' => 'jsandoval@municastilla.gob.pe',
-            'phone' => '969123456',
-            'position' => 'JEFE DE LA OFICINA DE DESARROLLO TECNOLÓGICO',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS - DIRECTIVO',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 12,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '45821903',
-            'fullName' => 'JUAN ALBERTO PÉREZ MORALES',
-            'email' => 'jperez@sigm.gob.pe',
-            'phone' => '969123456',
-            'position' => 'TÉCNICO DE SOPORTE E ITAM',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 13,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '40192837',
-            'fullName' => 'MARÍA ELENA GÓMEZ CASTILLO',
-            'email' => 'mgomez@sigm.gob.pe',
-            'phone' => '968765432',
-            'position' => 'OPERADOR DE TRANSPORTES Y LICENCIAS',
-            'office' => '[STTV] SUBGERENCIA DE TRANSPORTE Y TRÁNSITO',
-            'laborCondition' => 'D.L. 276',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 14,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '42747895',
-            'fullName' => 'CINTHYA KATTY FERRO COLUMBUS',
-            'email' => 'cferro@municastilla.gob.pe',
-            'phone' => '956123987',
-            'position' => 'GERENTE DE ADMINISTRACIÓN TRIBUTARIA',
-            'office' => '[GAT] GERENCIA DE ADMINISTRACIÓN TRIBUTARIA',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 15,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '47120938',
-            'fullName' => 'WALTER SÁNCHEZ NAVARRO',
-            'email' => 'wsanchez@castilla.gob.pe',
-            'phone' => '945678123',
-            'position' => 'INSPECTOR MUNICIPAL DE TRÁNSITO',
-            'office' => '[STTV] SUBGERENCIA DE TRANSPORTE Y TRÁNSITO',
-            'laborCondition' => 'LOCACIÓN DE SERVICIOS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 16,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '08192844',
-            'fullName' => 'CARLOS EDUARDO MENDOZA RUIZ',
-            'email' => 'admin@castilla.gob.pe',
-            'phone' => '956098712',
-            'position' => 'JEFE DE SISTEMAS Y TRANSFORMACIÓN DIGITAL',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS - DIRECTIVO',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 17,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02871142',
-            'fullName' => 'ANA MARÍA RIVAS ZAPATA',
-            'email' => 'arivas@municastilla.gob.pe',
-            'phone' => '978654321',
-            'position' => 'SUBGERENTE DE FISCALIZACIÓN Y CONTROL',
-            'office' => '[SFC] SUBGERENCIA DE FISCALIZACIÓN',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 18,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '03891244',
-            'fullName' => 'SEGUNDO MANUEL CORDOVA MORALES',
-            'email' => 'scordova@municastilla.gob.pe',
-            'phone' => '981234567',
-            'position' => 'GERENTE MUNICIPAL',
-            'office' => '[GM] GERENCIA MUNICIPAL',
-            'laborCondition' => 'CAS - DIRECTIVO',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 19,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '41892301',
-            'fullName' => 'PATRICIA DEL PILAR MOROCHO RUIZ',
-            'email' => 'pmorocho@municastilla.gob.pe',
-            'phone' => '976543210',
-            'position' => 'SUBGERENTE DE TESORERÍA',
-            'office' => '[SGT] SUBGERENCIA DE TESORERÍA',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 20,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02914829',
-            'fullName' => 'MIGUEL ANGEL FARFÁN JIMÉNEZ',
-            'email' => 'mfarfan@municastilla.gob.pe',
-            'phone' => '987123456',
-            'position' => 'SUBGERENTE DE LOGÍSTICA Y CONTROL PATRIMONIAL',
-            'office' => '[SGLCP] SUBGERENCIA DE LOGÍSTICA',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 21,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '44910283',
-            'fullName' => 'GLADYS BEATRIZ CARREÑO VIERA',
-            'email' => 'gcarreno@municastilla.gob.pe',
-            'phone' => '974123890',
-            'position' => 'SUBGERENTE DE RECURSOS HUMANOS',
-            'office' => '[SGRH] SUBGERENCIA DE RECURSOS HUMANOS',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 22,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '03819234',
-            'fullName' => 'VICTOR RAUL CHUNGA NUNURA',
-            'email' => 'vchunga@municastilla.gob.pe',
-            'phone' => '965432109',
-            'position' => 'SUBGERENTE DE CONTABILIDAD',
-            'office' => '[SGC] SUBGERENCIA DE CONTABILIDAD',
-            'laborCondition' => 'D.L. 276',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 23,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '42190847',
-            'fullName' => 'ROSA ELENA CASTILLO PEÑA',
-            'email' => 'rcastillo@municastilla.gob.pe',
-            'phone' => '976123049',
-            'position' => 'JEFE DE MESA DE PARTES Y ATENCIÓN CIUDADANA',
-            'office' => '[SG] SECRETARÍA GENERAL',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 24,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02948172',
-            'fullName' => 'FELIX ARTURO SOSA MONTERO',
-            'email' => 'fsosa@municastilla.gob.pe',
-            'phone' => '981203948',
-            'position' => 'SECRETARIO GENERAL',
-            'office' => '[SG] SECRETARÍA GENERAL',
-            'laborCondition' => 'CAS - DIRECTIVO',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 25,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '45102938',
-            'fullName' => 'JOSÉ LUIS TAVARA BENITES',
-            'email' => 'jtavara@municastilla.gob.pe',
-            'phone' => '942109834',
-            'position' => 'SUBGERENTE DE PLANIFICACIÓN Y PRESUPUESTO',
-            'office' => '[GPP] GERENCIA DE PLANIFICACIÓN',
-            'laborCondition' => 'CAS - CONFIANZA',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 26,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02849103',
-            'fullName' => 'KARINA LISSET VALVERDE TIMANA',
-            'email' => 'kvalverde@municastilla.gob.pe',
-            'phone' => '968102934',
-            'position' => 'SUBGERENTE DE REGISTRO CIVIL',
-            'office' => '[SGRC] SUBGERENCIA DE REGISTRO CIVIL',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 27,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '43920194',
-            'fullName' => 'EDGAR OMAR SILVA MECA',
-            'email' => 'esilva@municastilla.gob.pe',
-            'phone' => '978102934',
-            'position' => 'ESPECIALISTA EN INFRAESTRUCTURA DE REDES',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 28,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '03810294',
-            'fullName' => 'LILIANA PAOLA CORREA GUERRERO',
-            'email' => 'lcorrea@municastilla.gob.pe',
-            'phone' => '945102938',
-            'position' => 'ADMINISTRADORA DE BASE DE DATOS',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 29,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '46102938',
-            'fullName' => 'HECTOR DANIEL ZAVALA CORONADO',
-            'email' => 'hzavala@municastilla.gob.pe',
-            'phone' => '967102938',
-            'position' => 'ESPECIALISTA EN SEGURIDAD DE LA INFORMACIÓN',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 30,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02910394',
-            'fullName' => 'CLAUDIA MARIBEL CHERO LITANO',
-            'email' => 'cchero@municastilla.gob.pe',
-            'phone' => '974102938',
-            'position' => 'ANALISTA DE COBRANZA COACTIVA',
-            'office' => '[GAT] GERENCIA DE ADMINISTRACIÓN TRIBUTARIA',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 31,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '44102938',
-            'fullName' => 'CESAR AUGUSTO PURIZACA FLORES',
-            'email' => 'cpurizaca@municastilla.gob.pe',
-            'phone' => '981029384',
-            'position' => 'ESPECIALISTA EN FISCALIZACIÓN TRIBUTARIA',
-            'office' => '[GAT] GERENCIA DE ADMINISTRACIÓN TRIBUTARIA',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 32,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '03810283',
-            'fullName' => 'MARCOS ANTONIO ALAMA SILVA',
-            'email' => 'malama@municastilla.gob.pe',
-            'phone' => '961029384',
-            'position' => 'OPERADOR DE REGISTRO DE MOTOTAXIS',
-            'office' => '[STTV] SUBGERENCIA DE TRANSPORTE Y TRÁNSITO',
-            'laborCondition' => 'LOCACIÓN DE SERVICIOS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 33,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '45102984',
-            'fullName' => 'VANESSA DEL CARMEN DIOSES IPANAQUE',
-            'email' => 'vdioses@municastilla.gob.pe',
-            'phone' => '971029384',
-            'position' => 'ASISTENTE DE LICENCIAS CLASE B',
-            'office' => '[STTV] SUBGERENCIA DE TRANSPORTE Y TRÁNSITO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 34,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02910485',
-            'fullName' => 'JORGE ARMANDO TINEO CORNEJO',
-            'email' => 'jtineo@municastilla.gob.pe',
-            'phone' => '951029384',
-            'position' => 'INSPECTOR DE CONTROL URBANO',
-            'office' => '[SFC] SUBGERENCIA DE FISCALIZACIÓN',
-            'laborCondition' => 'LOCACIÓN DE SERVICIOS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 35,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '43102948',
-            'fullName' => 'MONICA ROXANA TALLEDO RIVERA',
-            'email' => 'mtalledo@municastilla.gob.pe',
-            'phone' => '981029485',
-            'position' => 'SUPERVISORA DE MESA DE AYUDA',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 36,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '03910284',
-            'fullName' => 'RAFAEL ESTEBAN VIERA ATO',
-            'email' => 'rviera@municastilla.gob.pe',
-            'phone' => '941029485',
-            'position' => 'TÉCNICO DE MANTENIMIENTO PREVENTIVO',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 37,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '46102948',
-            'fullName' => 'CARMEN ROSA VILCHEZ SAAVEDRA',
-            'email' => 'cvilchez@municastilla.gob.pe',
-            'phone' => '961029485',
-            'position' => 'ESPECIALISTA EN ATENCIÓN AL CONTRIBUYENTE',
-            'office' => '[GAT] GERENCIA DE ADMINISTRACIÓN TRIBUTARIA',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 38,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02810394',
-            'fullName' => 'MANUEL ALBERTO OROZCO GUZMAN',
-            'email' => 'morozco@municastilla.gob.pe',
-            'phone' => '971029485',
-            'position' => 'SUPERVISOR DE OPERATIVOS DE TRÁNSITO',
-            'office' => '[STTV] SUBGERENCIA DE TRANSPORTE Y TRÁNSITO',
-            'laborCondition' => 'D.L. 276',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 39,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '44102985',
-            'fullName' => 'TERESA DE JESUS MEDINA ZAPATA',
-            'email' => 'tmedina@municastilla.gob.pe',
-            'phone' => '951029485',
-            'position' => 'ASISTENTE DE CONTROL PATRIMONIAL',
-            'office' => '[SGLCP] SUBGERENCIA DE LOGÍSTICA',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 40,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '03810495',
-            'fullName' => 'ALBERTO ENRIQUE NOLE CORREA',
-            'email' => 'anole@municastilla.gob.pe',
-            'phone' => '981029584',
-            'position' => 'ENCARGADO DE ALMACÉN DE INFORMÁTICA',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 41,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '45102958',
-            'fullName' => 'SILVIA MARLENE YARLEQUE MORALES',
-            'email' => 'syarleque@municastilla.gob.pe',
-            'phone' => '941029584',
-            'position' => 'ASISTENTE ADMINISTRATIVO DE GERENCIA',
-            'office' => '[GM] GERENCIA MUNICIPAL',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 42,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02910594',
-            'fullName' => 'OSCAR ROLANDO VALLADARES RIVAS',
-            'email' => 'ovalladares@municastilla.gob.pe',
-            'phone' => '961029584',
-            'position' => 'SUPERVISOR DE LIMPIEZA PÚBLICA Y RECICLAJE',
-            'office' => '[ULP] UNIDAD DE LIMPIEZA PÚBLICA',
-            'laborCondition' => 'D.L. 728',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 43,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '43102958',
-            'fullName' => 'LUCIA ESPERANZA SOSA CHUNGA',
-            'email' => 'lsosa@municastilla.gob.pe',
-            'phone' => '971029584',
-            'position' => 'OPERADORA DE CENTRAL DE EMERGENCIAS',
-            'office' => '[SGS] SUBGERENCIA DE SERENAZGO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 44,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '03910394',
-            'fullName' => 'FERNANDO JAVIER CHAVEZ NIZAMA',
-            'email' => 'fchavez@municastilla.gob.pe',
-            'phone' => '951029584',
-            'position' => 'ANALISTA PROGRAMADOR DE SISTEMAS',
-            'office' => '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 45,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '46102958',
-            'fullName' => 'MILAGROS DEL ROSARIO MORALES SILVA',
-            'email' => 'mmorales@municastilla.gob.pe',
-            'phone' => '981029684',
-            'position' => 'ASISTENTE DE ARCHIVO CENTRAL Y TRÁMITE',
-            'office' => '[SG] SECRETARÍA GENERAL',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-        [
-            'id' => 46,
-            'type' => 'PERSONAL',
-            'documentType' => 'DNI',
-            'documentNumber' => '02810495',
-            'fullName' => 'GUILLERMO ALONSO PACHERREZ RAMOS',
-            'email' => 'gpacherrez@municastilla.gob.pe',
-            'phone' => '941029684',
-            'position' => 'AUDITOR DE CONTROL INSTITUCIONAL',
-            'office' => '[OCI] ÓRGANO DE CONTROL INSTITUCION..',
-            'laborCondition' => 'CAS',
-            'isActive' => true,
-            'laborStatus' => 'ACTIVO',
-        ],
-    ];
-
     public function run(): void
     {
-        foreach (self::PEOPLE_DATA as $item) {
-            $parts = explode(' ', trim($item['fullName']));
-            $firstName = $parts[0] ?? '';
-            $paternal = $parts[1] ?? '';
-            $maternal = isset($parts[2]) ? implode(' ', array_slice($parts, 2)) : null;
+        $jsonPath = file_exists(base_path("personas.json"))
+            ? base_path("personas.json")
+            : database_path("data/personas.json");
 
-            Person::updateOrCreate(
-                ['document_number' => $item['documentNumber']],
-                [
-                    'type' => $item['type'],
-                    'document_type' => $item['documentType'],
-                    'document_number' => $item['documentNumber'],
-                    'first_name' => $firstName,
-                    'paternal_surname' => $paternal,
-                    'maternal_surname' => $maternal,
-                    'email' => $item['email'] ?? null,
-                    'phone' => $item['phone'] ?? null,
-                    'address' => 'Castilla, Piura',
-                    'position' => $item['position'] ?? null,
-                    'office' => $item['office'] ?? null,
-                    'labor_condition' => $item['laborCondition'] ?? null,
-                    'entry_date' => '2023-01-01',
-                    'business_name' => null,
-                    'allows_online_access' => false,
-                    'labor_status' => $item['laborStatus'] ?? 'ACTIVO',
-                    'is_active' => $item['isActive'] ?? true,
-                ]
-            );
+        $isPgsql = DB::getDriverName() === "pgsql";
+
+        if ($isPgsql) {
+            DB::statement("SET session_replication_role = replica;");
+        } else {
+            Schema::disableForeignKeyConstraints();
+        }
+
+        // Borrar completamente la información existente en la base de datos
+        DB::table("core_people")->delete();
+
+        if (file_exists($jsonPath)) {
+            $data = json_decode((string) file_get_contents($jsonPath), true);
+            if (is_array($data)) {
+                $now = now();
+                $records = [];
+
+                foreach ($data as $item) {
+                    $id = isset($item["id"]) ? (int) $item["id"] : null;
+                    $docRaw = $item["DOCUMENTO"] ?? "";
+                    $docType = "DNI";
+                    $docNumber = "";
+
+                    if (str_contains($docRaw, ":")) {
+                        [$dt, $dn] = explode(":", $docRaw, 2);
+                        $docType = trim($dt);
+                        $docNumber = trim($dn);
+                    } else {
+                        $docNumber = trim($docRaw);
+                    }
+
+                    $rawName = trim($item["NOMBRES / RAZÓN SOCIAL"] ?? "");
+                    $parts = preg_split("/\s+/", $rawName) ?: [];
+                    $firstName = "";
+                    $paternal = "";
+                    $maternal = null;
+
+                    if (count($parts) >= 3) {
+                        $maternal = array_pop($parts);
+                        $paternal = array_pop($parts);
+                        $firstName = implode(" ", $parts);
+                    } elseif (count($parts) === 2) {
+                        $firstName = $parts[0];
+                        $paternal = $parts[1];
+                    } elseif (count($parts) === 1) {
+                        $firstName = $parts[0];
+                    }
+
+                    $contacto = $item["CONTACTO"] ?? [];
+                    $email = !empty($contacto["email"]) ? trim($contacto["email"]) : null;
+                    $phone = !empty($contacto["telefono"]) ? trim($contacto["telefono"]) : null;
+
+                    $detalle = $item["DETALLE INSTITUCIONAL / TRÁMITE"] ?? [];
+                    $cargo = !empty($detalle["cargo"]) ? trim($detalle["cargo"]) : null;
+                    $oficina = !empty($detalle["oficina"]) ? trim($detalle["oficina"]) : null;
+                    $condicion = !empty($detalle["condicion_laboral"]) ? trim($detalle["condicion_laboral"]) : null;
+
+                    $estado = strtoupper(trim($item["ESTADO"] ?? "ACTIVO"));
+                    $isActive = ($estado === "ACTIVO");
+                    $clasificacion = strtoupper(trim($item["CLASIFICACIÓN"] ?? "PERSONAL"));
+
+                    $record = [
+                        "type" => $clasificacion,
+                        "document_type" => $docType,
+                        "document_number" => $docNumber,
+                        "first_name" => $firstName,
+                        "paternal_surname" => $paternal,
+                        "maternal_surname" => $maternal,
+                        "email" => $email,
+                        "phone" => $phone,
+                        "address" => "Castilla, Piura",
+                        "position" => $cargo,
+                        "office" => $oficina,
+                        "labor_condition" => $condicion,
+                        "entry_date" => "2023-01-01",
+                        "business_name" => null,
+                        "allows_online_access" => false,
+                        "labor_status" => $estado,
+                        "departure_date" => null,
+                        "cessation_reason" => null,
+                        "is_active" => $isActive,
+                        "created_at" => $now,
+                        "updated_at" => $now,
+                    ];
+
+                    if ($id !== null) {
+                        $record["id"] = $id;
+                    }
+
+                    $records[] = $record;
+                }
+
+                if (!empty($records)) {
+                    DB::table("core_people")->insert($records);
+                }
+            }
+        } else {
+            // Fallback usando GetPeopleCatalogAction::PEOPLE_DATA
+            $now = now();
+            $records = [];
+            foreach (GetPeopleCatalogAction::PEOPLE_DATA as $item) {
+                $parts = preg_split("/\s+/", trim($item["fullName"])) ?: [];
+                $firstName = "";
+                $paternal = "";
+                $maternal = null;
+
+                if (count($parts) >= 3) {
+                    $maternal = array_pop($parts);
+                    $paternal = array_pop($parts);
+                    $firstName = implode(" ", $parts);
+                } elseif (count($parts) === 2) {
+                    $firstName = $parts[0];
+                    $paternal = $parts[1];
+                } elseif (count($parts) === 1) {
+                    $firstName = $parts[0];
+                }
+
+                $records[] = [
+                    "id" => $item["id"],
+                    "type" => $item["type"],
+                    "document_type" => $item["documentType"],
+                    "document_number" => $item["documentNumber"],
+                    "first_name" => $firstName,
+                    "paternal_surname" => $paternal,
+                    "maternal_surname" => $maternal,
+                    "email" => $item["email"] ?? null,
+                    "phone" => $item["phone"] ?? null,
+                    "address" => "Castilla, Piura",
+                    "position" => $item["position"] ?? null,
+                    "office" => $item["office"] ?? null,
+                    "labor_condition" => $item["laborCondition"] ?? null,
+                    "entry_date" => "2023-01-01",
+                    "business_name" => null,
+                    "allows_online_access" => false,
+                    "labor_status" => $item["laborStatus"] ?? "ACTIVO",
+                    "departure_date" => null,
+                    "cessation_reason" => null,
+                    "is_active" => $item["isActive"] ?? true,
+                    "created_at" => $now,
+                    "updated_at" => $now,
+                ];
+            }
+
+            if (!empty($records)) {
+                DB::table("core_people")->insert($records);
+            }
+        }
+
+        // Restablecer secuencia en PostgreSQL si corresponde
+        if ($isPgsql) {
+            DB::statement("SELECT setval(pg_get_serial_sequence(\x27core_people\x27, \x27id\x27), coalesce(max(id), 0) + 1, false) FROM core_people;");
+            DB::statement("SET session_replication_role = DEFAULT;");
+        } else {
+            Schema::enableForeignKeyConstraints();
+        }
+
+        // Asegurar consistencia de llaves foráneas en core_users
+        $mendoza = Person::where("document_number", "08192844")->first();
+        if ($mendoza) {
+            DB::table("core_users")->where("username", "root")->update(["person_id" => $mendoza->id]);
+        }
+        $perez = Person::where("document_number", "45821903")->first();
+        if ($perez) {
+            DB::table("core_users")->where("username", "jperez")->update(["person_id" => $perez->id]);
+        }
+        $gomez = Person::where("document_number", "40192837")->first();
+        if ($gomez) {
+            DB::table("core_users")->where("username", "mgomez")->update(["person_id" => $gomez->id]);
         }
     }
 }

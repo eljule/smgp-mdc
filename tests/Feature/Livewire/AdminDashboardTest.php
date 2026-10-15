@@ -105,7 +105,7 @@ class AdminDashboardTest extends TestCase
             ->assertDontSee('EMMA FLOR SAAVEDRA PACHERREZ')
             ->set('search', '')
             ->call('gotoPage', 2)
-            ->assertSee('JAIME HENRRY SANDOVAL NIEVES')
+            ->assertSee('JACK TERREROS GARAY')
             ->assertDontSee('CARLOS EDUARDO ROJAS MATIAS');
     }
 

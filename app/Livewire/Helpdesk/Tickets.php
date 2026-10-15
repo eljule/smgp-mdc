@@ -14,6 +14,7 @@ use App\Models\Helpdesk\TicketTechnicalDetail;
 use App\Models\Itam\Asset;
 use App\Models\Itam\Supply;
 use App\Models\Office;
+use App\Models\Person;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
@@ -92,6 +93,8 @@ class Tickets extends Component
     public string $formOfficeName = 'Secretaría General y Mesa de Partes';
 
     public ?int $formOfficeId = null;
+    public bool $formApplicantIsInherited = false;
+    public ?string $formApplicantInheritedOffice = null;
 
     public ?int $formAssetId = null;
 
@@ -251,12 +254,10 @@ class Tickets extends Component
     // ==========================================
     public function openCreateModal(?int $assetId = null): void
     {
-        $user = auth()->user();
-        $this->formApplicantName = $user ? ($user->full_name ?? $user->name) : 'ADMINISTRADOR DEL SISTEMA SIGM';
-        $this->formApplicantPhone = 'Anexo 115';
-        $this->formApplicantEmail = 'usuario@castilla.gob.pe';
-        $this->formOfficeName = 'Secretaría General y Mesa de Partes';
-        $this->formOfficeId = Office::where('name', 'like', '%Secretaría General%')->first()?->id ?? Office::first()?->id;
+        $office = Office::where('name', 'like', '%Secretaría General%')->first() ?? Office::first();
+        $this->formOfficeName = $office?->name ?? 'Secretaría General y Mesa de Partes';
+        $this->loadApplicantDataForOffice($this->formOfficeName);
+
         $this->formAssetId = $assetId;
         $this->formAssetComputerCode = null;
         $this->formAssetCategory = null;
@@ -269,6 +270,35 @@ class Tickets extends Component
         $this->formEvidencePhoto = null;
         $this->isCreateModalOpen = true;
         $this->showCreateModal = true;
+    }
+
+    public function updatedFormOfficeName($value): void
+    {
+        $this->loadApplicantDataForOffice($value);
+    }
+
+    public function loadApplicantDataForOffice(string $officeName): void
+    {
+        $office = Office::where('name', $officeName)->first()
+            ?? Office::where('name', 'like', '%'.$officeName.'%')->first();
+
+        $this->formOfficeId = $office?->id;
+
+        if ($office) {
+            $resp = $office->resolveActiveResponsible();
+            $this->formApplicantName = $resp['name'];
+            $this->formApplicantPhone = $resp['phone'];
+            $this->formApplicantEmail = $resp['email'];
+            $this->formApplicantIsInherited = (bool) $resp['is_inherited'];
+            $this->formApplicantInheritedOffice = $resp['inherited_from'];
+        } else {
+            $user = auth()->user();
+            $this->formApplicantName = $user ? ($user->full_name ?? $user->name) : 'ADMINISTRADOR DEL SISTEMA SIGM';
+            $this->formApplicantPhone = 'Anexo 115';
+            $this->formApplicantEmail = $user?->email ?: 'usuario@castilla.gob.pe';
+            $this->formApplicantIsInherited = false;
+            $this->formApplicantInheritedOffice = null;
+        }
     }
 
     public function lookupAsset(): void
@@ -288,6 +318,7 @@ class Tickets extends Component
             $this->formAssetCategory = $asset->category_name ?? 'Equipo Informático';
             if ($asset->office_name) {
                 $this->formOfficeName = $asset->office_name;
+                $this->formOfficeId = $asset->office_id ?? Office::where('name', $asset->office_name)->first()?->id;
             }
             if ($asset->assigned_person_name) {
                 $this->formApplicantName = $asset->assigned_person_name;
@@ -322,10 +353,12 @@ class Tickets extends Component
         $ticketNumber = 'TK-'.date('Y').'-'.str_pad((string) $count, 5, '0', STR_PAD_LEFT);
 
         $office = null;
-        if ($this->formOfficeId) {
+        if ($this->formOfficeName) {
+            $office = Office::where('name', $this->formOfficeName)->first()
+                ?? Office::where('name', 'like', '%'.$this->formOfficeName.'%')->first();
+        }
+        if (!$office && $this->formOfficeId) {
             $office = Office::find($this->formOfficeId);
-        } elseif ($this->formOfficeName) {
-            $office = Office::where('name', 'like', '%'.$this->formOfficeName.'%')->first();
         }
         $officeName = $office?->name ?? ($this->formOfficeName ?: 'Secretaría General y Mesa de Partes');
 
@@ -747,7 +780,17 @@ class Tickets extends Component
 
         // 4. Técnicos & Usuarios
         $technicians = User::where('role', 'like', '%Soporte%')->orWhere('role', 'like', '%Administrador%')->get();
-        $offices = Office::orderBy('name')->get();
+        $offices = Office::with('parent')->orderBy('name')->get();
+        $people = Person::where('is_active', true)->get();
+
+        $offices->each(function ($off) use ($people, $offices) {
+            $resp = $off->resolveActiveResponsible($people, $offices);
+            $off->applicant_name = $resp['name'];
+            $off->applicant_phone = $resp['phone'];
+            $off->applicant_email = $resp['email'];
+            $off->is_inherited = (bool) $resp['is_inherited'];
+            $off->inherited_from = $resp['inherited_from'];
+        });
         $assets = Asset::orderBy('computer_code')->get();
         $supplies = Supply::where('stock', '>', 0)->get();
         $metrics = $metricsAction->handle();

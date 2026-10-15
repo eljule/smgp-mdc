@@ -1,0 +1,830 @@
+[
+  {
+    "id": 1,
+    "DOCUMENTO": "DNI: 02821801",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "CARLOS EDUARDO ROJAS MATIAS",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[PPM] PROCURADURÍA PÚBLICA MUNICIPAL",
+      "texto": "PROCURADURADOR PUBLICA MUNICIPAL - [PPM] PROCURADURÍA PÚBLICA MUNICIPAL (CAS)",
+      "cargo": "PROCURADURADOR PUBLICA MUNICIPAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 2,
+    "DOCUMENTO": "DNI: 02852121",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "EMMA FLOR SAAVEDRA PACHERREZ",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[OCI] ÓRGANO DE CONTROL INSTITUCIONAL",
+      "texto": "JEFE DEL ORGANO DE CONTROL INSTITUCIONAL - [OCI] ÓRGANO DE CONTROL INSTITUCIONAL (CAS)",
+      "cargo": "JEFE DEL ORGANO DE CONTROL INSTITUCIONAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 3,
+    "DOCUMENTO": "DNI: 43268255",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "ROBERTO PABLO BARRERA ZUÑIGA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGS] SUBGERENCIA DE SERENAZGO",
+      "texto": "SUBGERENTE DE SERENAZGO - [SGS] SUBGERENCIA DE SERENAZGO (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE SERENAZGO"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 4,
+    "DOCUMENTO": "DNI: 43465876",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "RICARDO FELIX MARTINEZ CÓNDOR",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[GSC] GERENCIA SEGURIDAD CIUDADANA",
+      "texto": "GERENTE DE SEGURIDAD CIUDADANA - [GSC] GERENCIA SEGURIDAD CIUDADANA (CAS - CONFIANZA)",
+      "cargo": "GERENTE DE SEGURIDAD CIUDADANA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 5,
+    "DOCUMENTO": "DNI: 02830165",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "GUSTAVO ADOLFO PAREDES SHIMOKAWA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[STTV] SUBGERENCIA DE TRANSPORTE, TRÁNSITO Y VIALIDAD",
+      "texto": "SUBGERENTE DE TRANSPORTE,TRANSITO Y VIALIDAD - [STTV] SUBGERENCIA DE TRANSPORTE, TRÁNSITO Y VIALIDAD (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE TRANSPORTE,TRANSITO Y VIALIDAD"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 6,
+    "DOCUMENTO": "DNI: 16680162",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JOSE FERNANDO RAMIREZ MORENO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[UPJ] UNIDAD DE PARQUES Y JARDINES",
+      "texto": "JEFE DE LA UNIDAD DE ORNATO PARQUES Y JARDINES - [UPJ] UNIDAD DE PARQUES Y JARDINES (CAS)",
+      "cargo": "JEFE DE LA UNIDAD DE ORNATO PARQUES Y JARDINES"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 7,
+    "DOCUMENTO": "DNI: 02657504",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "WILLIAM OSWALDO ROJAS MERINO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[ULP] UNIDAD DE LIMPIEZA PÚBLICA",
+      "texto": "JEFE DE LA UNIDAD DE LIMPIEZA PUBLICA - [ULP] UNIDAD DE LIMPIEZA PÚBLICA (CAS)",
+      "cargo": "JEFE DE LA UNIDAD DE LIMPIEZA PUBLICA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 8,
+    "DOCUMENTO": "DNI: 03386696",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JUAN RUPERTO VILELA ESPINOZA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGGA] SUBGERENCIA DE GESTIÓN AMBIENTAL",
+      "texto": "SUBGERENTE DE GESTION AMBIENTAL - [SGGA] SUBGERENCIA DE GESTIÓN AMBIENTAL (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE GESTION AMBIENTAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 9,
+    "DOCUMENTO": "DNI: 02783056",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "LUIS RICARDO LLACSAHUANGA TIMOTEO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[GSP] GERENCIA DE SERVICIOS PÚBLICOS",
+      "texto": "GERENCIA DE SERVICIOS PUBLICOS - [GSP] GERENCIA DE SERVICIOS PÚBLICOS (CAS - CONFIANZA)",
+      "cargo": "GERENCIA DE SERVICIOS PUBLICOS"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 10,
+    "DOCUMENTO": "DNI: 40774696",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "DORIS LOPEZ GARCIA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[ULE] OFICINA DE LA UNIDAD LOCAL DE EMPADRONAMIENTO",
+      "texto": "JEFE DE ULE - [ULE] OFICINA DE LA UNIDAD LOCAL DE EMPADRONAMIENTO (CAS)",
+      "cargo": "JEFE DE ULE"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 11,
+    "DOCUMENTO": "DNI: 40677673",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JACK TERREROS GARAY",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SRCPPS] SUBGERENCIA DE REGISTRO CIVIL, POBLACIÓN Y PROMOCIÓN DE LA SALUD",
+      "texto": "SUBGERENTE DE REGISTRO CIVIL, POBLACIÓN Y SALUD - [SRCPPS] SUBGERENCIA DE REGISTRO CIVIL, POBLACIÓN Y PROMOCIÓN DE LA SALUD (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE REGISTRO CIVIL, POBLACIÓN Y SALUD"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 12,
+    "DOCUMENTO": "DNI: 44385851",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "KAREN STHEFANY FEBRE ZEGARRA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[OMAPED] OFICINA MUNICIPAL DE ATENCIÓN A LA PERSONA CON DISCAPACIDAD",
+      "texto": "COORDINADOR OMAPED - [OMAPED] OFICINA MUNICIPAL DE ATENCIÓN A LA PERSONA CON DISCAPACIDAD (CAS)",
+      "cargo": "COORDINADOR OMAPED"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 13,
+    "DOCUMENTO": "DNI: 02874839",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "CAROL ELAINE MORALES REBAZA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[DEMUNA] DEFENSORÍA MUNICIPAL DEL NIÑO Y DEL ADOLESCENTE",
+      "texto": "COORDINADOR DE DEMUNA - [DEMUNA] DEFENSORÍA MUNICIPAL DEL NIÑO Y DEL ADOLESCENTE (CAS)",
+      "cargo": "COORDINADOR DE DEMUNA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 14,
+    "DOCUMENTO": "DNI: 44432136",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "ROXANA MARLENY NEYRA ALVARADO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[CIAM] CENTRO INTEGRAL DE ATENCIÓN AL ADULTO MAYOR",
+      "texto": "COORDINADORA DEL CENTRO INTEGRAL DE ATENCIÓN AL ADULTO MAYOR - CIAM - [CIAM] CENTRO INTEGRAL DE ATENCIÓN AL ADULTO MAYOR (CAS)",
+      "cargo": "COORDINADORA DEL CENTRO INTEGRAL DE ATENCIÓN AL ADULTO MAYOR - CIAM"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 15,
+    "DOCUMENTO": "DNI: 47190033",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "HILARION PALACIOS SEMINARIO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGIS] SUBGERENCIA DE INCLUSIÓN SOCIAL",
+      "texto": "SUBGERENTE DE INCLUSION SOCIAL - [SGIS] SUBGERENCIA DE INCLUSIÓN SOCIAL (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE INCLUSION SOCIAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 16,
+    "DOCUMENTO": "DNI: 03130676",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "GLADYS RAQUEL CÓRDOVA ALCARAZO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SECDR] SUBGERENCIA DE EDUCACIÓN, CULTURA, DEPORTE Y RECREACIÓN",
+      "texto": "SUBGERENTE DE EDUCACION,CULTURA DEPORTE Y RECREACION - [SECDR] SUBGERENCIA DE EDUCACIÓN, CULTURA, DEPORTE Y RECREACIÓN (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE EDUCACION,CULTURA DEPORTE Y RECREACION"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 17,
+    "DOCUMENTO": "DNI: 02868204",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "VICTOR ELIAS AZABACHE MONZON",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[GDH] GERENCIA DE DESARROLLO HUMANO",
+      "texto": "GERENTE DE DESARROLLO HUMANO - [GDH] GERENCIA DE DESARROLLO HUMANO (CAS - CONFIANZA)",
+      "cargo": "GERENTE DE DESARROLLO HUMANO"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 18,
+    "DOCUMENTO": "DNI: 42260564",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "DAVID ANIBAL GUEVARA BENITES",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGPTEI] SUBGERENCIA DE PROMOCIÓN TURÍSTICA, EMPRESARIAL E INVERSIONES",
+      "texto": "SUBGERENTE DE PROMOCION TURISTICA EMPRESARIAL E INVERSIONES - [SGPTEI] SUBGERENCIA DE PROMOCIÓN TURÍSTICA, EMPRESARIAL E INVERSIONES (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE PROMOCION TURISTICA EMPRESARIAL E INVERSIONES"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 19,
+    "DOCUMENTO": "DNI: 02866917",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JOSE ZACARIAS CASTILLO ROMERO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS",
+      "oficina": "[SGC] SUBGERENCIA DE COMERCIALIZACIÓN",
+      "texto": "SUBGERENTE DE COMERCIALIZACION - [SGC] SUBGERENCIA DE COMERCIALIZACIÓN (CAS)",
+      "cargo": "SUBGERENTE DE COMERCIALIZACION"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 20,
+    "DOCUMENTO": "DNI: 02780042",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "MIGUEL ERNESTO RUIZ GOMEZ",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[GDEL] GERENCIA DE DESARROLLO ECONÓMICO LOCAL",
+      "texto": "GERENTE DE DESARROLLO ECONOMICO LOCAL - [GDEL] GERENCIA DE DESARROLLO ECONÓMICO LOCAL (CAS - CONFIANZA)",
+      "cargo": "GERENTE DE DESARROLLO ECONOMICO LOCAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 21,
+    "DOCUMENTO": "DNI: 02659686",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "MARTIN NICOLAS ADANAQUE YARLEQUE",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGGRD] SUBGERENCIA DE GESTIÓN DEL RIESGO DE DESASTRES",
+      "texto": "SUBGERENTE DE GESTION DEL RIESGO DE DESASTRES - [SGGRD] SUBGERENCIA DE GESTIÓN DEL RIESGO DE DESASTRES (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE GESTION DEL RIESGO DE DESASTRES"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 22,
+    "DOCUMENTO": "DNI: 70068007",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "AIDA MARLENE CHIRITO FLORES",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGSFL] SUBGERENCIA DE SANEAMIENTO FÍSICO LEGAL",
+      "texto": "SUBGERENTE DE SANEAMIENTO FISICO LEGAL - [SGSFL] SUBGERENCIA DE SANEAMIENTO FÍSICO LEGAL (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE SANEAMIENTO FISICO LEGAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 23,
+    "DOCUMENTO": "DNI: 02897042",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "HERNAN CORNEJO RUIZ",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGC] SUBGERENCIA DE CATASTRO",
+      "texto": "SUBGERENTE DE CATASTRO - [SGC] SUBGERENCIA DE CATASTRO (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE CATASTRO"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 24,
+    "DOCUMENTO": "DNI: 43274346",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "WALTER OLGUER ESCOBAR RUGEL",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGO] SUBGERENCIA DE OBRAS",
+      "texto": "SUBGERENTE DE OBRAS - [SGO] SUBGERENCIA DE OBRAS (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE OBRAS"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 25,
+    "DOCUMENTO": "DNI: 46549781",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JUANA ELIZABETH ELIAS GIRON",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SEPIP] SUBGERENCIA DE ESTUDIOS Y PROYECTOS DE INVERSIÓN PÚBLICA",
+      "texto": "SUBGERENTE DE ESTUDIOS Y PROYECTOS DE INVERSIÓN PÚBLICA - [SEPIP] SUBGERENCIA DE ESTUDIOS Y PROYECTOS DE INVERSIÓN PÚBLICA (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE ESTUDIOS Y PROYECTOS DE INVERSIÓN PÚBLICA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 26,
+    "DOCUMENTO": "DNI: 48525061",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "ANA ISABEL GUERRERO FLORES",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SFPIP] SUBGERENCIA DE FORMULACIÓN DE PROYECTOS DE INVERSIÓN PÚBLICA",
+      "texto": "SUBGERENTE DE FORMULACION DE PROYECTOS DE INVERSIÓN PÚBLICA - [SFPIP] SUBGERENCIA DE FORMULACIÓN DE PROYECTOS DE INVERSIÓN PÚBLICA (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE FORMULACION DE PROYECTOS DE INVERSIÓN PÚBLICA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 27,
+    "DOCUMENTO": "DNI: 47880494",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JORDY FABIÁN PANTA SALDARRIAGA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[GDURI] GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA",
+      "texto": "GERENTE DE DESARROLLO URBANO - RURAL INFRAESTRUCTURA - [GDURI] GERENCIA DE DESARROLLO URBANO-RURAL E INFRAESTRUCTURA (CAS - CONFIANZA)",
+      "cargo": "GERENTE DE DESARROLLO URBANO - RURAL INFRAESTRUCTURA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 28,
+    "DOCUMENTO": "DNI: 48431189",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "GEISSLER MILAGROS GAONA JIMENEZ",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGF] SUBGERENCIA DE FISCALIZACIÓN",
+      "texto": "SUBGERENTE DE FISCALIZACION - [SGF] SUBGERENCIA DE FISCALIZACIÓN (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE FISCALIZACION"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 29,
+    "DOCUMENTO": "DNI: 03662224",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "BENNY ESTUARDO GONZALES CORDOVA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "NOMBRADO D.L. 276",
+      "oficina": "[EC] EJECUTORÍA COACTIVA",
+      "texto": "EJECUTOR COACTIVO - [EC] EJECUTORÍA COACTIVA (NOMBRADO D.L. 276)",
+      "cargo": "EJECUTOR COACTIVO"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 30,
+    "DOCUMENTO": "DNI: 45997806",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "MILAGROS DEL ROSARIO CRUZ RAMOS",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SGR] SUBGERENCIA DE RECAUDACIÓN",
+      "texto": "SUBGERENTE DE RECAUDACION - [SGR] SUBGERENCIA DE RECAUDACIÓN (CAS - CONFIANZA)",
+      "cargo": "SUBGERENTE DE RECAUDACION"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 31,
+    "DOCUMENTO": "DNI: 42747895",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "CINTHYA KATTY FERRO COLUMBUS",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "NOMBRADO D.L. 276",
+      "oficina": "[GAT] GERENCIA DE ADMINISTRACIÓN TRIBUTARIA",
+      "texto": "GERENTE DE ADMINISTRACION TRIBUTARIA - [GAT] GERENCIA DE ADMINISTRACIÓN TRIBUTARIA (NOMBRADO D.L. 276)",
+      "cargo": "GERENTE DE ADMINISTRACION TRIBUTARIA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 32,
+    "DOCUMENTO": "DNI: 45138140",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "HECTOR ARON RIVERA CALVA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OMIE] OFICINA DE MODERNIZACIÓN INSTITUCIONAL Y ESTADÍSTICA",
+      "texto": "JEFE DE LA OFICINA DE MODERNIZACION INSTITUCIONAL Y ESTADISTICA - [OMIE] OFICINA DE MODERNIZACIÓN INSTITUCIONAL Y ESTADÍSTICA (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA DE MODERNIZACION INSTITUCIONAL Y ESTADISTICA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 33,
+    "DOCUMENTO": "DNI: 16792978",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "MIGUEL RUIZ TOCTO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OGPP] OFICINA GENERAL DE PLANEAMIENTO Y PRESUPUESTO",
+      "texto": "JEFE DE LA OFICINA GENERAL DE PLANEAMIENTO Y PRESUPUESTO - [OGPP] OFICINA GENERAL DE PLANEAMIENTO Y PRESUPUESTO (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA GENERAL DE PLANEAMIENTO Y PRESUPUESTO"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 34,
+    "DOCUMENTO": "DNI: 46363924",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "KARINA RAQUEL FACHO GUERRERO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OGAJ] OFICINA GENERAL DE ASESORÍA JURÍDICA",
+      "texto": "JEFE DE LA OFICINA GENERAL DE ASESORIA JURIDICA - [OGAJ] OFICINA GENERAL DE ASESORÍA JURÍDICA (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA GENERAL DE ASESORIA JURIDICA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 35,
+    "DOCUMENTO": "DNI: 10783864",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JAIME HENRY SANDOVAL NIEVES",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[ODT] OFICINA DE DESARROLLO TECNOLÓGICO",
+      "texto": "JEFE DE LA OFICINA DE DESARROLLO TECNOLOGICO - [ODT] OFICINA DE DESARROLLO TECNOLÓGICO (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA DE DESARROLLO TECNOLOGICO"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 36,
+    "DOCUMENTO": "DNI: 40404645",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JULIO CÉSAR GUZMÁN RONDOY",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OT] OFICINA DE TESORERÍA",
+      "texto": "JEFE DE LA OFICINA DE TESORERIA - [OT] OFICINA DE TESORERÍA (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA DE TESORERIA"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 37,
+    "DOCUMENTO": "DNI: 43556955",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "DANI DANIEL VILLEGAS PURIZACA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OCC] OFICINA DE CONTABILIDAD Y COSTOS",
+      "texto": "JEFE DE LA OFICINA DE CONTABILIDAD Y COSTOS - [OCC] OFICINA DE CONTABILIDAD Y COSTOS (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA DE CONTABILIDAD Y COSTOS"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 38,
+    "DOCUMENTO": "DNI: 05641940",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JULIO CESAR BAYONA YARLEQUE",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OACG] OFICINA DE ALMACEN CENTRAL GENERAL",
+      "texto": "JEFE DE LA UNIDAD DE ALMACEN - [OACG] OFICINA DE ALMACEN CENTRAL GENERAL (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA UNIDAD DE ALMACEN"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 39,
+    "DOCUMENTO": "DNI: 00328619",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JUAN KEHUARUCHO SAAVEDRA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OACP] OFICINA DE ABASTECIMIENTOS Y CONTROL PATRIMONIAL",
+      "texto": "JEFE DE LA OFICINA DE ABASTECIMIENTO Y CONTROL PATRIMONIAL - [OACP] OFICINA DE ABASTECIMIENTOS Y CONTROL PATRIMONIAL (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA DE ABASTECIMIENTO Y CONTROL PATRIMONIAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 40,
+    "DOCUMENTO": "DNI: 41461309",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "GUILLERMO MARTÍN RODRIGUEZ PALACIOS",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OR] OFICINA DE REGIDORES",
+      "texto": "JEFE DE LA OFICINA DE CONTROL DE PERSONAL - [OR] OFICINA DE REGIDORES (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA DE CONTROL DE PERSONAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 41,
+    "DOCUMENTO": "DNI: 02833465",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JULIO ALBERTO LIZANO HUAMAN",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OGAF] OFICINA GENERAL DE ADMINISTRACIÓN Y FINANZAS",
+      "texto": "JEFE DE LA OFICINA GENERAL DE ADMINISTRACION Y FINANZAS - [OGAF] OFICINA GENERAL DE ADMINISTRACIÓN Y FINANZAS (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA GENERAL DE ADMINISTRACION Y FINANZAS"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 42,
+    "DOCUMENTO": "DNI: 46797120",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JHON DEYVI INGA LITANO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OCSRP] OFICINA DE COMUNICACIÓN SOCIAL Y RELACIONES PÚBLICAS",
+      "texto": "JEFE DE LA OFICINA DE COMUNICACION SOCIAL Y RELACIONES PUBLICAS - [OCSRP] OFICINA DE COMUNICACIÓN SOCIAL Y RELACIONES PÚBLICAS (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA DE COMUNICACION SOCIAL Y RELACIONES PUBLICAS"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 43,
+    "DOCUMENTO": "DNI: 42712478",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "CESAR IVAN MAZA SEMINARIO",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[OGDAC] OFICINA DE GESTIÓN DOCUMENTARIA Y ATENCIÓN AL CIUDADANO",
+      "texto": "JEFE DE LA OFICINA DE GESTION DOCUMENTARIA Y ATENCION AL CIUDADANO - [OGDAC] OFICINA DE GESTIÓN DOCUMENTARIA Y ATENCIÓN AL CIUDADANO (CAS - CONFIANZA)",
+      "cargo": "JEFE DE LA OFICINA DE GESTION DOCUMENTARIA Y ATENCION AL CIUDADANO"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 44,
+    "DOCUMENTO": "DNI: 42697940",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "PABLO MIGUEL GIRÓN ESPINOZA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[SG] SECRETARÍA GENERAL",
+      "texto": "SECRETARIO GENERAL - [SG] SECRETARÍA GENERAL (CAS - CONFIANZA)",
+      "cargo": "SECRETARIO GENERAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 45,
+    "DOCUMENTO": "DNI: 43139417",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "ROGGER MICHAEL RAMIREZ ROMAN",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "CAS - CONFIANZA",
+      "oficina": "[GM] GERENCIA MUNICIPAL",
+      "texto": "GERENTE MUNICIPAL - [GM] GERENCIA MUNICIPAL (CAS - CONFIANZA)",
+      "cargo": "GERENTE MUNICIPAL"
+    },
+    "ESTADO": "ACTIVO"
+  },
+  {
+    "id": 46,
+    "DOCUMENTO": "DNI: 02665436",
+    "CLASIFICACIÓN": "Personal",
+    "NOMBRES / RAZÓN SOCIAL": "JULIO CESAR VASQUEZ ALBERCA",
+    "CONTACTO": {
+      "texto": "Email: — | Tel: —",
+      "email": null,
+      "telefono": null
+    },
+    "DETALLE INSTITUCIONAL / TRÁMITE": {
+      "condicion_laboral": "SIN MODALIDAD",
+      "oficina": "[ALC] ALCALDÍA",
+      "texto": "ALCALDE - [ALC] ALCALDÍA (SIN MODALIDAD)",
+      "cargo": "ALCALDE"
+    },
+    "ESTADO": "ACTIVO"
+  }
+]
