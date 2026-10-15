@@ -263,7 +263,7 @@ class ItamSeeder extends Seeder
         $pcCat = AssetCategory::where('code', 'PC')->first();
         $hpBrand = AssetBrand::where('name', 'HP')->first();
         $pcModel = AssetModel::where('name', 'ProDesk 400 G7')->first();
-        $personMendoza = Person::where('document_number', '08192844')->first();
+        $personMendoza = Person::where('document_number', '10783864')->first() ?? Person::where('office', 'like', '%[ODT]%')->first() ?? Person::first();
 
         if ($pcCat && $hpBrand && $pcModel) {
             Asset::updateOrCreate(

@@ -145,12 +145,14 @@ class HelpdeskSeeder extends Seeder
         $lapAsset = Asset::where('computer_code', 'MDC-TI-LAP-0001')->first();
         $estAsset = Asset::where('computer_code', 'MDC-TI-EST-0012')->first();
 
-        // Buscar personas para solicitantes
-        $person1 = Person::find(9); // Carlos Eduardo
-        $person2 = Person::find(11); // Roberto Pablo (Serenazgo)
-        $person3 = Person::find(12); // Ricardo Felix
-        $person4 = Person::find(10); // Emma Flor
-        $person5 = Person::find(5);  // Rosa Luz
+        // Buscar personas para solicitantes según nómina oficial municipal
+        $person1 = Person::find(9);  // Luis Ricardo Llacahuanga Timoteo (GSP)
+        $person2 = Person::find(11); // Jack Terreros Garay (SRCPPS)
+        $person3 = Person::find(12); // Karen Sthefany Febre Zegarra (OMAPED)
+        $person4 = Person::find(10); // Doris Lopez Garcia (ULE)
+        $person5 = Person::find(5);  // Gustavo Adolfo Paredes Shimokawa (STTV)
+        $personMaza = Person::where('document_number', '42712478')->first() ?? Person::find(43); // Cesar Ivan Maza (OGDAC)
+        $personRegidores = Person::where('document_number', '41461309')->first() ?? Person::find(40); // Guillermo Rodriguez (OR)
 
         // Insumos
         $conSupply = Supply::where('code', 'INS-CON-003')->first();
@@ -163,10 +165,10 @@ class HelpdeskSeeder extends Seeder
             ['ticket_number' => 'TK-2026-00001'],
             [
                 'applicant_id' => $person1?->id,
-                'applicant_name' => 'Walter Sánchez Navarro',
-                'applicant_phone' => 'Anexo 115',
-                'applicant_email' => 'wsanchez@castilla.gob.pe',
-                'office_name' => 'Secretaría General y Mesa de Partes',
+                'applicant_name' => $person1?->full_name ?? 'Luis Ricardo Llacahuanga Timoteo',
+                'applicant_phone' => $person1?->phone ?? 'Anexo 115',
+                'applicant_email' => $person1?->email ?? 'usuario@castilla.gob.pe',
+                'office_name' => $person1?->office ?? 'Gerencia de Servicios Públicos',
                 'asset_id' => $prnAsset?->id,
                 'asset_computer_code' => $prnAsset?->computer_code ?? 'MDC-TI-PRN-0001',
                 'asset_category' => 'Impresora y Multifuncional',
@@ -217,10 +219,10 @@ class HelpdeskSeeder extends Seeder
             ['ticket_number' => 'TK-2026-00002'],
             [
                 'applicant_id' => $person2?->id,
-                'applicant_name' => 'Juan Alberto Pérez Morales',
-                'applicant_phone' => '969123456',
-                'applicant_email' => 'jperez@castilla.gob.pe',
-                'office_name' => 'Gerencia de Seguridad Ciudadana y Serenazgo',
+                'applicant_name' => $person2?->full_name ?? 'Jack Terreros Garay',
+                'applicant_phone' => $person2?->phone ?? 'Anexo 111',
+                'applicant_email' => $person2?->email ?? 'usuario@castilla.gob.pe',
+                'office_name' => $person2?->office ?? 'Subgerencia de Registro Civil, Población y Salud',
                 'asset_id' => $monAsset?->id,
                 'asset_computer_code' => $monAsset?->computer_code ?? 'MDC-TI-MON-0001',
                 'asset_category' => 'Monitor de Video',
@@ -271,10 +273,10 @@ class HelpdeskSeeder extends Seeder
             ['ticket_number' => 'TK-2026-00003'],
             [
                 'applicant_id' => $person3?->id,
-                'applicant_name' => 'María Elena Gómez Castillo',
-                'applicant_phone' => 'Anexo 102',
-                'applicant_email' => 'mgomez@castilla.gob.pe',
-                'office_name' => 'Gerencia Municipal',
+                'applicant_name' => $person3?->full_name ?? 'Karen Sthefany Febre Zegarra',
+                'applicant_phone' => $person3?->phone ?? 'Anexo 112',
+                'applicant_email' => $person3?->email ?? 'usuario@castilla.gob.pe',
+                'office_name' => $person3?->office ?? 'Oficina Municipal de Atención a la Persona con Discapacidad',
                 'asset_id' => $pcAsset?->id,
                 'asset_computer_code' => $pcAsset?->computer_code ?? 'MDC-TI-PC-0001',
                 'asset_category' => 'PC de Escritorio',
@@ -325,10 +327,10 @@ class HelpdeskSeeder extends Seeder
             ['ticket_number' => 'TK-2026-00004'],
             [
                 'applicant_id' => $person4?->id,
-                'applicant_name' => 'Ana Lucía Farfán Ruiz',
-                'applicant_phone' => 'Anexo 145',
-                'applicant_email' => 'afarfan@castilla.gob.pe',
-                'office_name' => 'Subgerencia de Fiscalización y Control',
+                'applicant_name' => $person4?->full_name ?? 'Doris Lopez Garcia',
+                'applicant_phone' => $person4?->phone ?? 'Anexo 110',
+                'applicant_email' => $person4?->email ?? 'usuario@castilla.gob.pe',
+                'office_name' => $person4?->office ?? 'Oficina de la Unidad Local de Empadronamiento',
                 'category' => 'PERMISOS',
                 'priority' => 'MEDIA',
                 'subject' => 'Solicitud de acceso a carpeta compartida de Resoluciones Sancionadoras 2026',
@@ -345,10 +347,10 @@ class HelpdeskSeeder extends Seeder
             ['ticket_number' => 'TK-2026-00005'],
             [
                 'applicant_id' => $person5?->id,
-                'applicant_name' => 'Pedro José Almendras Flores',
-                'applicant_phone' => 'Anexo 130',
-                'applicant_email' => 'palmendras@castilla.gob.pe',
-                'office_name' => 'Gerencia de Desarrollo Urbano',
+                'applicant_name' => $person5?->full_name ?? 'Gustavo Adolfo Paredes Shimokawa',
+                'applicant_phone' => $person5?->phone ?? 'Anexo 105',
+                'applicant_email' => $person5?->email ?? 'usuario@castilla.gob.pe',
+                'office_name' => $person5?->office ?? 'Subgerencia de Transporte, Tránsito y Vialidad',
                 'asset_id' => $estAsset?->id,
                 'asset_computer_code' => $estAsset?->computer_code ?? 'MDC-TI-EST-0012',
                 'asset_category' => 'Estabilizador de Voltaje',
@@ -381,8 +383,8 @@ class HelpdeskSeeder extends Seeder
         $t6 = Ticket::updateOrCreate(
             ['ticket_number' => 'TK-2026-00006'],
             [
-                'applicant_id' => $person1?->id,
-                'applicant_name' => 'Cesar Ivan Maza',
+                'applicant_id' => $personMaza?->id,
+                'applicant_name' => $personMaza?->full_name ?? 'Cesar Ivan Maza Seminario',
                 'applicant_phone' => '968741258',
                 'applicant_email' => 'cmaza@castilla.gob.pe',
                 'office_name' => 'Oficina de Gestión Documentaria y Atención al Ciudadano',
@@ -420,7 +422,8 @@ class HelpdeskSeeder extends Seeder
         Ticket::updateOrCreate(
             ['ticket_number' => 'INC-2026-003'],
             [
-                'applicant_name' => 'JULIO ERNESTO CHAVEZ CRISANTO',
+                'applicant_id' => $personRegidores?->id,
+                'applicant_name' => $personRegidores?->full_name ?? 'JULIO ERNESTO CHAVEZ CRISANTO',
                 'applicant_phone' => 'Anexo 104',
                 'applicant_email' => 'admin@castilla.gob.pe',
                 'office_name' => 'OFICINA DE REGIDORES',
@@ -439,7 +442,8 @@ class HelpdeskSeeder extends Seeder
         Ticket::updateOrCreate(
             ['ticket_number' => 'INC-2026-002'],
             [
-                'applicant_name' => 'JULIO ERNESTO CHAVEZ CRISANTO',
+                'applicant_id' => $personRegidores?->id,
+                'applicant_name' => $personRegidores?->full_name ?? 'JULIO ERNESTO CHAVEZ CRISANTO',
                 'applicant_phone' => 'Anexo 104',
                 'applicant_email' => 'admin@castilla.gob.pe',
                 'office_name' => 'OFICINA DE REGIDORES',
@@ -459,7 +463,8 @@ class HelpdeskSeeder extends Seeder
         Ticket::updateOrCreate(
             ['ticket_number' => 'INC-2026-001'],
             [
-                'applicant_name' => 'JULIO ERNESTO CHAVEZ CRISANTO',
+                'applicant_id' => $personRegidores?->id,
+                'applicant_name' => $personRegidores?->full_name ?? 'JULIO ERNESTO CHAVEZ CRISANTO',
                 'applicant_phone' => 'Anexo 104',
                 'applicant_email' => 'admin@castilla.gob.pe',
                 'office_name' => 'OFICINA DE REGIDORES',

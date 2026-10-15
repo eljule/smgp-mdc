@@ -13,9 +13,15 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $personMendoza = Person::where('document_number', '08192844')->first();
-        $personPerez = Person::where('document_number', '45821903')->first();
-        $personGomez = Person::where('document_number', '40192837')->first();
+        // Buscar personas del padrón municipal para asociar los usuarios clave
+        $personRoot = Person::where('document_number', '10783864')->first() // Jaime Henry Sandoval Nieves (Jefe ODT)
+            ?? Person::where('office', 'like', '%[ODT]%')->first();
+
+        $personSupport = Person::where('document_number', '00328619')->first() // Juan Kehuarucho Saavedra (OACP)
+            ?? Person::where('office', 'like', '%[OACP]%')->first();
+
+        $personTransport = Person::where('document_number', '02830165')->first() // Gustavo Adolfo Paredes Shimokawa (STTV)
+            ?? Person::where('office', 'like', '%[STTV]%')->first();
 
         $users = [
             [
@@ -26,7 +32,7 @@ class UserSeeder extends Seeder
                 'role' => 'Administrador Central',
                 'allowed_modules' => ['admin', 'itam', 'transportes', 'helpdesk'],
                 'is_active' => true,
-                'person_id' => $personMendoza?->id,
+                'person_id' => $personRoot?->id,
             ],
             [
                 'username' => 'jperez',
@@ -36,7 +42,7 @@ class UserSeeder extends Seeder
                 'role' => 'Técnico de Soporte e ITAM',
                 'allowed_modules' => ['admin', 'itam', 'helpdesk'],
                 'is_active' => true,
-                'person_id' => $personPerez?->id,
+                'person_id' => $personSupport?->id,
             ],
             [
                 'username' => 'mgomez',
@@ -46,7 +52,7 @@ class UserSeeder extends Seeder
                 'role' => 'Operador de Transportes',
                 'allowed_modules' => ['transportes', 'helpdesk'],
                 'is_active' => true,
-                'person_id' => $personGomez?->id,
+                'person_id' => $personTransport?->id,
             ],
         ];
 

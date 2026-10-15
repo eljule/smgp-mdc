@@ -175,15 +175,15 @@ class PersonSeeder extends Seeder
         }
 
         // Asegurar consistencia de llaves foráneas en core_users
-        $mendoza = Person::where("document_number", "08192844")->first();
+        $mendoza = Person::where("document_number", "10783864")->first();
         if ($mendoza) {
             DB::table("core_users")->where("username", "root")->update(["person_id" => $mendoza->id]);
         }
-        $perez = Person::where("document_number", "45821903")->first();
+        $perez = Person::where("document_number", "00328619")->first();
         if ($perez) {
             DB::table("core_users")->where("username", "jperez")->update(["person_id" => $perez->id]);
         }
-        $gomez = Person::where("document_number", "40192837")->first();
+        $gomez = Person::where("document_number", "02830165")->first();
         if ($gomez) {
             DB::table("core_users")->where("username", "mgomez")->update(["person_id" => $gomez->id]);
         }
