@@ -221,6 +221,16 @@
                                             </button>
                                         @endif
 
+                                        @if (!in_array($t->status, ['RESUELTO', 'CERRADO']))
+                                            <button type="button"
+                                                    wire:click="openReassignModal({{ $t->id }})"
+                                                    class="px-2 py-1 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 dark:bg-indigo-950/60 dark:hover:bg-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-[11px] font-bold transition-colors cursor-pointer inline-flex items-center gap-1"
+                                                    title="Traspasar ticket a otro técnico">
+                                                <span>⇄</span>
+                                                <span>Traspasar</span>
+                                            </button>
+                                        @endif
+
                                         <button type="button"
                                                 wire:click="openDetailModal({{ $t->id }})"
                                                 class="px-2.5 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-200 rounded text-[11px] font-medium transition-colors cursor-pointer">
@@ -559,16 +569,30 @@
                                 </h3>
                                 <p class="text-[11px] text-slate-400">Oficina de Informática y Sistemas</p>
                             </div>
-                            @php
-                                $statusBg = match($tech['status']) {
-                                    'DISPONIBLE' => 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300',
-                                    'OCUPADO' => 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-                                    default => 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300',
-                                };
-                            @endphp
-                            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {{ $statusBg }}">
-                                {{ $tech['status'] }}
-                            </span>
+                            <div class="flex items-center gap-2">
+                                @if($tech['inProgressCount'] > 0)
+                                    <button type="button"
+                                            wire:click="openBulkTransferModal('{{ addslashes($tech['technicianName']) }}')"
+                                            class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-xs active:scale-95"
+                                            title="Traspasar carga pendiente de {{ $tech['technicianName'] }} por contingencia o descanso médico">
+                                        <span>⇄</span>
+                                        <span>Traspasar Carga</span>
+                                        <span class="text-[10px] bg-indigo-200/80 dark:bg-indigo-900 px-1.5 py-0.2 rounded font-mono font-black">
+                                            {{ $tech['inProgressCount'] }}
+                                        </span>
+                                    </button>
+                                @endif
+                                @php
+                                    $statusBg = match($tech['status']) {
+                                        'DISPONIBLE' => 'bg-green-100 text-green-800 dark:bg-green-950 dark:text-green-300',
+                                        'OCUPADO' => 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                                        default => 'bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300',
+                                    };
+                                @endphp
+                                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold {{ $statusBg }}">
+                                    {{ $tech['status'] }}
+                                </span>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl text-center">
@@ -600,26 +624,37 @@
                                 @forelse ($tech['assignedTickets'] as $t)
                                     <div
                                         wire:click="openDetailModal({{ $t->id }})"
-                                        class="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs cursor-pointer hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors flex justify-between items-center"
+                                        class="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg text-xs cursor-pointer hover:bg-indigo-50 dark:hover:bg-slate-700 transition-colors flex justify-between items-center group"
                                     >
-                                        <div class="truncate mr-2">
+                                        <div class="truncate mr-2 min-w-0">
                                             <span class="font-mono font-bold text-indigo-600 dark:text-indigo-400">
                                                 {{ $t->ticket_number }}
                                             </span> - {{ $t->subject }}
                                         </div>
-                                        @php
-                                            $badgeBg = match($t->status) {
-                                                'RESUELTO' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
-                                                'CERRADO' => 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300',
-                                                'EN_ATENCION' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300',
-                                                'EN_LABORATORIO', 'EN_TALLER' => 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300',
-                                                'EN_PAUSA' => 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-                                                default => 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300',
-                                            };
-                                        @endphp
-                                        <span class="px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 {{ $badgeBg }}">
-                                            {{ $t->status }}
-                                        </span>
+                                        <div class="flex items-center gap-1.5 shrink-0">
+                                            @if(!in_array($t->status, ['RESUELTO', 'CERRADO']))
+                                                <button type="button"
+                                                        wire:click.stop="openReassignModal({{ $t->id }})"
+                                                        class="opacity-0 group-hover:opacity-100 focus:opacity-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer flex items-center gap-0.5"
+                                                        title="Traspasar ticket {{ $t->ticket_number }} a otro técnico">
+                                                    <span>⇄</span>
+                                                    <span>Traspasar</span>
+                                                </button>
+                                            @endif
+                                            @php
+                                                $badgeBg = match($t->status) {
+                                                    'RESUELTO' => 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300',
+                                                    'CERRADO' => 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300',
+                                                    'EN_ATENCION' => 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300',
+                                                    'EN_LABORATORIO', 'EN_TALLER' => 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300',
+                                                    'EN_PAUSA' => 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                                                    default => 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300',
+                                                };
+                                            @endphp
+                                            <span class="px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0 {{ $badgeBg }}">
+                                                {{ $t->status }}
+                                            </span>
+                                        </div>
                                     </div>
                                 @empty
                                     <p class="text-xs text-slate-400 italic p-2">Sin tickets asignados actualmente.</p>
@@ -1285,7 +1320,14 @@
                                     class="px-3.5 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg font-medium transition-colors cursor-pointer">
                                 Asignar a Técnico
                             </button>
-                        @elseif (in_array(strtoupper($selectedTicketForDetail->status), ['EN_ATENCION', 'EN_LABORATORIO', 'EN_TALLER']))
+                        @elseif (in_array(strtoupper($selectedTicketForDetail->status), ['EN_ATENCION', 'EN_LABORATORIO', 'EN_TALLER', 'EN_PAUSA']))
+                            <button type="button"
+                                    wire:click="openReassignModal({{ $selectedTicketForDetail->id }})"
+                                    class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/60 dark:hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                                    title="Traspasar ticket a otro técnico">
+                                <span>⇄</span>
+                                <span>Traspasar Ticket</span>
+                            </button>
                             <button type="button"
                                     wire:click="openTechnicalModal({{ $selectedTicketForDetail->id }})"
                                     class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer">
@@ -1731,39 +1773,195 @@
     @endif
 
     <!-- ========================================================================= -->
-    <!-- MODAL 6: REASIGNAR TÉCNICO                                                -->
+    <!-- MODAL 6: REASIGNAR / TRASPASAR TICKET A TÉCNICO (RF-13)                  -->
     <!-- ========================================================================= -->
     @if ($isReassignModalOpen)
+        @php
+            $currTicket = \App\Models\Helpdesk\Ticket::find($reassignTicketId);
+        @endphp
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
-            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4 animate-scaleUp">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 animate-scaleUp border border-slate-200 dark:border-slate-800">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-                    <h3 class="text-base font-extrabold text-slate-900 dark:text-white">
-                        Reasignar Ticket a Técnico ODT
-                    </h3>
-                    <button wire:click="$set('isReassignModalOpen', false)" class="text-slate-400 hover:text-slate-600">&times;</button>
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 flex items-center justify-center font-bold text-sm">
+                            ⇄
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-slate-900 dark:text-white">
+                                Traspasar / Reasignar Ticket
+                            </h3>
+                            <p class="text-[11px] text-slate-400">
+                                Ticket #{{ $currTicket?->ticket_number ?? $reassignTicketId }} — Rebalanceo de Carga ODT
+                            </p>
+                        </div>
+                    </div>
+                    <button wire:click="$set('isReassignModalOpen', false)" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">&times;</button>
                 </div>
 
-                <form wire:submit.prevent="saveReassign" class="space-y-3 text-xs">
+                @if ($currTicket)
+                    <div class="p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl border border-slate-200/80 dark:border-slate-700/60 space-y-1 text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold text-slate-700 dark:text-slate-300">Asunto:</span>
+                            <span class="text-slate-500 font-mono text-[11px]">{{ $currTicket->status }}</span>
+                        </div>
+                        <p class="text-slate-800 dark:text-slate-200 font-medium truncate">{{ $currTicket->subject }}</p>
+                        <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/50 dark:border-slate-700/50">
+                            <span>Técnico actual: <strong class="text-slate-700 dark:text-slate-300">{{ $currTicket->assigned_technician_name ?: 'Sin asignar' }}</strong></span>
+                            <span>Oficina: <strong>{{ $currTicket->office?->name ?? 'MDC' }}</strong></span>
+                        </div>
+                    </div>
+                @endif
+
+                <form wire:submit.prevent="saveReassign" class="space-y-4 text-xs">
                     <div>
-                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Nuevo Técnico Asignado *</label>
-                        <select wire:model="reassignUserId" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200" required>
-                            @foreach ($technicians as $tech)
-                                <option value="{{ $tech->id }}">{{ $tech->full_name }} ({{ $tech->role }})</option>
-                            @endforeach
-                        </select>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                            Seleccionar Nuevo Técnico Destino *
+                        </label>
+                        <div class="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                            @forelse ($operationalTechnicians as $opTech)
+                                <label class="flex items-center justify-between p-2.5 rounded-xl border transition-all cursor-pointer {{ $reassignTechnicianName === $opTech['name'] ? 'border-indigo-600 bg-indigo-50/60 dark:bg-indigo-950/40 dark:border-indigo-500' : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/40' }}">
+                                    <div class="flex items-center gap-2.5">
+                                        <input type="radio"
+                                               name="reassignTechnicianChoice"
+                                               value="{{ $opTech['name'] }}"
+                                               wire:model.live="reassignTechnicianName"
+                                               class="text-indigo-600 focus:ring-indigo-500">
+                                        <div>
+                                            <span class="font-bold text-slate-800 dark:text-slate-100 block">{{ $opTech['name'] }}</span>
+                                            <span class="text-[10px] text-slate-400">Soporte Técnico Informático</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full {{ $opTech['status'] === 'DISPONIBLE' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300' : ($opTech['status'] === 'OCUPADO' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300' : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300') }}">
+                                            {{ $opTech['activeTickets'] }} activos • {{ $opTech['status'] }}
+                                        </span>
+                                    </div>
+                                </label>
+                            @empty
+                                <div class="text-slate-400 italic p-3 text-center">No hay otros técnicos registrados.</div>
+                            @endforelse
+                        </div>
                     </div>
 
                     <div>
-                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Motivo de Reasignación</label>
-                        <textarea wire:model="reassignNotes" rows="2" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200"></textarea>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Motivo / Causa del Traspaso *</label>
+                        <textarea wire:model="reassignNotes" rows="2" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200" placeholder="Ej: Especialidad en redes, técnico actual en salida a campo, etc." required></textarea>
                     </div>
 
                     <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                        <button type="button" wire:click="$set('isReassignModalOpen', false)" class="px-4 py-2 rounded-lg bg-slate-100 text-slate-700 font-bold">
+                        <button type="button" wire:click="$set('isReassignModalOpen', false)" class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition-colors cursor-pointer">
                             Cancelar
                         </button>
-                        <button type="submit" class="px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold">
-                            Confirmar Reasignación
+                        <button type="submit" class="px-5 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-bold transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer">
+                            <span>⇄</span>
+                            <span>Confirmar Traspaso</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    @endif
+
+    <!-- ========================================================================= -->
+    <!-- MODAL 6.1: TRASPASO MASIVO DE CARGA TÉCNICA (RF-13 CONTINGENCIAS)        -->
+    <!-- ========================================================================= -->
+    @if ($isBulkTransferModalOpen)
+        <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 animate-scaleUp border border-slate-200 dark:border-slate-800">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 flex items-center justify-center font-bold text-sm">
+                            ⚠️
+                        </div>
+                        <div>
+                            <h3 class="text-base font-extrabold text-slate-900 dark:text-white">
+                                Traspaso Masivo de Carga Técnica
+                            </h3>
+                            <p class="text-[11px] text-slate-400">
+                                Contingencias operativas y descansos médicos (RF-13)
+                            </p>
+                        </div>
+                    </div>
+                    <button wire:click="$set('isBulkTransferModalOpen', false)" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-lg cursor-pointer">&times;</button>
+                </div>
+
+                <div class="p-3.5 bg-amber-50 dark:bg-amber-950/30 rounded-xl border border-amber-200/80 dark:border-amber-800/50 space-y-2 text-xs">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-amber-900 dark:text-amber-200">Técnico de Origen:</span>
+                        <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-200/80 dark:bg-amber-900 text-amber-900 dark:text-amber-100">
+                            {{ $bulkTicketsCount }} tickets activos
+                        </span>
+                    </div>
+                    <p class="text-sm font-black text-slate-900 dark:text-white">
+                        {{ $bulkOriginTechnician }}
+                    </p>
+                    <p class="text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed">
+                        Todos los tickets en estado pendiente o en atención asignados a este técnico serán traspasados para evitar la paralización del servicio municipal.
+                    </p>
+                </div>
+
+                <form wire:submit.prevent="executeBulkTransfer" class="space-y-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+                            Modo de Distribución de Carga *
+                        </label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <label class="p-3 rounded-xl border cursor-pointer transition-all flex flex-col justify-between {{ $bulkDestinationMode === 'auto' ? 'border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 dark:border-indigo-500' : 'border-slate-200 dark:border-slate-700' }}">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <input type="radio" value="auto" wire:model.live="bulkDestinationMode" class="text-indigo-600 focus:ring-indigo-500">
+                                    <span class="font-bold text-slate-800 dark:text-slate-100">⚖️ Auto-Balance</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400">
+                                    Distribución equitativa proporcional entre técnicos con menor carga.
+                                </span>
+                            </label>
+
+                            <label class="p-3 rounded-xl border cursor-pointer transition-all flex flex-col justify-between {{ $bulkDestinationMode === 'specific' ? 'border-indigo-600 bg-indigo-50/70 dark:bg-indigo-950/40 dark:border-indigo-500' : 'border-slate-200 dark:border-slate-700' }}">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <input type="radio" value="specific" wire:model.live="bulkDestinationMode" class="text-indigo-600 focus:ring-indigo-500">
+                                    <span class="font-bold text-slate-800 dark:text-slate-100">👤 Técnico Específico</span>
+                                </div>
+                                <span class="text-[10px] text-slate-500 dark:text-slate-400">
+                                    Asignar el 100% de los tickets a un único técnico de relevo.
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    @if ($bulkDestinationMode === 'specific')
+                        <div>
+                            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                Seleccionar Técnico Reemplazante *
+                            </label>
+                            <select wire:model="bulkTargetTechnician" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200" required>
+                                @foreach ($this->getOperationalTechnicians($bulkOriginTechnician) as $tech)
+                                    <option value="{{ $tech['name'] }}">
+                                        {{ $tech['name'] }} ({{ $tech['activeTickets'] }} tickets activos • {{ $tech['status'] }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
+                    <div>
+                        <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
+                            Motivo de la Contingencia *
+                        </label>
+                        <select wire:model="bulkReason" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200 mb-2">
+                            <option value="Descanso médico / Licencia de salud">Descanso médico / Licencia de salud</option>
+                            <option value="Comisión de servicio fuera de sede">Comisión de servicio fuera de sede</option>
+                            <option value="Permiso oficial o vacaciones">Permiso oficial o vacaciones</option>
+                            <option value="Reorganización operativa de la jefatura ODT">Reorganización operativa de la jefatura ODT</option>
+                        </select>
+                    </div>
+
+                    <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <button type="button" wire:click="$set('isBulkTransferModalOpen', false)" class="px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold transition-colors cursor-pointer">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-5 py-2 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-bold transition-colors shadow-xs flex items-center gap-1.5 cursor-pointer">
+                            <span>⇄</span>
+                            <span>Ejecutar Traspaso de Carga</span>
                         </button>
                     </div>
                 </form>

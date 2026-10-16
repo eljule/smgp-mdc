@@ -180,14 +180,29 @@ class Tickets extends Component
 
     public string $formUserFeedback = 'Servicio técnico brindado satisfactoriamente.';
 
-    // 8. Modal Reasignar
+    // 8. Modal Reasignar Individual (RF-13)
     public bool $isReassignModalOpen = false;
 
     public ?int $reassignTicketId = null;
 
     public ?int $reassignUserId = null;
 
+    public string $reassignTechnicianName = '';
+
     public string $reassignNotes = 'Reasignación por especialidad técnica.';
+
+    // 8.1 Modal Traspaso Masivo de Carga (RF-13 Contingencias)
+    public bool $isBulkTransferModalOpen = false;
+
+    public string $bulkOriginTechnician = '';
+
+    public int $bulkTicketsCount = 0;
+
+    public string $bulkDestinationMode = 'auto'; // 'auto' | 'specific'
+
+    public string $bulkTargetTechnician = '';
+
+    public string $bulkReason = 'Descanso médico / Contingencia operativa';
 
     // 9. Modal Base de Conocimientos KB (RF-14)
     public bool $isKbModalOpen = false;
@@ -633,38 +648,236 @@ class Tickets extends Component
     }
 
     // ==========================================
-    // 8. REASIGNAR TÉCNICO
+    // 8. REASIGNAR TÉCNICO Y TRASPASO DE CARGAS (RF-13)
     // ==========================================
+    public function getOperationalTechnicians(?string $excludeName = null): array
+    {
+        $metricsAction = app(GetHelpdeskDashboardMetricsAction::class);
+        $metrics = $metricsAction->handle();
+        $workload = $metrics['techniciansWorkload'] ?? [];
+
+        $result = [];
+        $seen = [];
+
+        foreach ($workload as $w) {
+            $name = $w['technicianName'];
+            if ($excludeName && strtolower(trim($name)) === strtolower(trim($excludeName))) {
+                continue;
+            }
+            $result[] = [
+                'name' => $name,
+                'activeTickets' => $w['inProgressCount'] ?? 0,
+                'status' => $w['status'] ?? 'DISPONIBLE',
+            ];
+            $seen[strtolower(trim($name))] = true;
+        }
+
+        // Also check User table for any technician not yet in workload map
+        $users = User::where('role', 'like', '%Soporte%')->orWhere('role', 'like', '%Administrador%')->get();
+        foreach ($users as $u) {
+            $name = $u->full_name ?: $u->name;
+            $normalized = strtolower(trim($name));
+            if ($excludeName && $normalized === strtolower(trim($excludeName))) {
+                continue;
+            }
+            if (! isset($seen[$normalized])) {
+                $count = Ticket::where('assigned_technician_name', $name)
+                    ->whereNotIn('status', ['RESUELTO', 'CERRADO'])
+                    ->count();
+
+                $result[] = [
+                    'name' => $name,
+                    'activeTickets' => $count,
+                    'status' => $count >= 4 ? 'SOBRECARGADO' : ($count >= 1 ? 'OCUPADO' : 'DISPONIBLE'),
+                ];
+                $seen[$normalized] = true;
+            }
+        }
+
+        usort($result, fn ($a, $b) => $a['activeTickets'] <=> $b['activeTickets']);
+
+        return $result;
+    }
+
     public function openReassignModal(int $ticketId): void
     {
         $this->reassignTicketId = $ticketId;
-        $this->reassignUserId = User::first()?->id;
+        $ticket = Ticket::find($ticketId);
+
+        $currentTech = $ticket?->assigned_technician_name;
+        $available = $this->getOperationalTechnicians($currentTech);
+
+        $this->reassignTechnicianName = ! empty($available) ? $available[0]['name'] : '';
+        $matchedUser = User::where('name', $this->reassignTechnicianName)->orWhere('full_name', $this->reassignTechnicianName)->first();
+        $this->reassignUserId = $matchedUser?->id ?? User::first()?->id;
+        $this->reassignNotes = 'Reasignación por especialidad técnica.';
         $this->isReassignModalOpen = true;
     }
 
     public function saveReassign(): void
     {
         $ticket = Ticket::find($this->reassignTicketId);
-        $user = User::find($this->reassignUserId);
-        if (! $ticket || ! $user) {
+        if (! $ticket) {
+            $this->showAlert('Ticket no encontrado.', 'error');
+
             return;
         }
 
-        $ticket->assigned_technician_id = $user->id;
-        $ticket->assigned_technician_name = $user->full_name;
-        $ticket->status = 'EN_ATENCION';
+        $targetName = $this->reassignTechnicianName;
+        $user = null;
+
+        if (! empty($this->reassignUserId)) {
+            $user = User::find($this->reassignUserId);
+            if (empty($targetName) && $user) {
+                $targetName = $user->full_name ?: $user->name;
+            }
+        }
+
+        if (empty($targetName)) {
+            $this->showAlert('Debe seleccionar un técnico de destino.', 'error');
+
+            return;
+        }
+
+        $prevStatus = $ticket->status;
+        $prevTech = $ticket->assigned_technician_name ?? 'Sin asignar';
+
+        if ($user) {
+            $ticket->assigned_technician_id = $user->id;
+        }
+        $ticket->assigned_technician_name = $targetName;
+        $ticket->assigned_technician_phone = 'Anexo 104';
+
+        if ($ticket->status === 'ABIERTO') {
+            $ticket->status = 'EN_ATENCION';
+            $ticket->started_at = $ticket->started_at ?? now();
+        }
         $ticket->save();
 
         TicketAuditLog::create([
             'ticket_id' => $ticket->id,
-            'new_status' => 'EN_ATENCION',
+            'previous_status' => $prevStatus,
+            'new_status' => $ticket->status,
             'action' => 'REASIGNACION_TECNICO',
-            'performed_by_user_name' => 'Coordinación ODT',
-            'notes' => "Ticket reasignado a {$user->full_name}. {$this->reassignNotes}",
+            'performed_by_user_id' => auth()->id(),
+            'performed_by_user_name' => auth()->user()?->name ?? 'Coordinación ODT',
+            'notes' => "Ticket traspasado de {$prevTech} a {$targetName}. {$this->reassignNotes}",
         ]);
 
+        if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $ticket->id) {
+            $this->selectedTicketForDetail = $ticket->fresh(['office', 'applicant', 'technicalDetail', 'supplies', 'loans', 'auditLogs']);
+        }
+
         $this->isReassignModalOpen = false;
-        $this->showAlert("Ticket {$ticket->ticket_number} reasignado a {$user->full_name}.");
+        $this->showAlert("Ticket {$ticket->ticket_number} traspasado a {$targetName} con éxito.");
+    }
+
+    public function openBulkTransferModal(string $originTechnicianName): void
+    {
+        $this->bulkOriginTechnician = $originTechnicianName;
+        $activeTickets = Ticket::where('assigned_technician_name', $originTechnicianName)
+            ->whereNotIn('status', ['RESUELTO', 'CERRADO'])
+            ->get();
+
+        $this->bulkTicketsCount = $activeTickets->count();
+
+        if ($this->bulkTicketsCount === 0) {
+            $this->showAlert("El técnico {$originTechnicianName} no tiene tickets activos pendientes de traspaso.", 'warning');
+
+            return;
+        }
+
+        $otherTechs = $this->getOperationalTechnicians($originTechnicianName);
+        $this->bulkTargetTechnician = ! empty($otherTechs) ? $otherTechs[0]['name'] : '';
+        $this->bulkDestinationMode = 'auto';
+        $this->bulkReason = 'Descanso médico / Contingencia de personal';
+        $this->isBulkTransferModalOpen = true;
+    }
+
+    public function executeBulkTransfer(): void
+    {
+        $activeTickets = Ticket::where('assigned_technician_name', $this->bulkOriginTechnician)
+            ->whereNotIn('status', ['RESUELTO', 'CERRADO'])
+            ->orderBy('priority', 'asc')
+            ->get();
+
+        if ($activeTickets->isEmpty()) {
+            $this->showAlert("No se encontraron tickets activos para {$this->bulkOriginTechnician}.", 'warning');
+            $this->isBulkTransferModalOpen = false;
+
+            return;
+        }
+
+        $otherTechs = $this->getOperationalTechnicians($this->bulkOriginTechnician);
+        if (empty($otherTechs)) {
+            $this->showAlert('No hay otros técnicos disponibles para recibir la carga.', 'error');
+
+            return;
+        }
+
+        $transferredCount = 0;
+
+        if ($this->bulkDestinationMode === 'specific') {
+            $targetName = $this->bulkTargetTechnician;
+            if (empty($targetName)) {
+                $this->showAlert('Debe seleccionar un técnico de destino.', 'error');
+
+                return;
+            }
+
+            foreach ($activeTickets as $ticket) {
+                $prevStatus = $ticket->status;
+                $ticket->assigned_technician_name = $targetName;
+                $ticket->assigned_technician_phone = 'Anexo 104';
+                $ticket->save();
+
+                TicketAuditLog::create([
+                    'ticket_id' => $ticket->id,
+                    'previous_status' => $prevStatus,
+                    'new_status' => $ticket->status,
+                    'action' => 'TRASPASO_MASIVO_CARGA',
+                    'performed_by_user_id' => auth()->id(),
+                    'performed_by_user_name' => auth()->user()?->name ?? 'Coordinación ODT',
+                    'notes' => "Traspaso masivo de carga desde {$this->bulkOriginTechnician} hacia {$targetName}. Motivo: {$this->bulkReason}",
+                ]);
+                $transferredCount++;
+            }
+
+            $this->showAlert("Se traspasaron con éxito {$transferredCount} tickets de {$this->bulkOriginTechnician} a {$targetName}.");
+        } else {
+            // Balance auto equitativo
+            $workloadMap = [];
+            foreach ($otherTechs as $t) {
+                $workloadMap[$t['name']] = $t['activeTickets'];
+            }
+
+            foreach ($activeTickets as $ticket) {
+                asort($workloadMap);
+                $targetName = array_key_first($workloadMap);
+
+                $prevStatus = $ticket->status;
+                $ticket->assigned_technician_name = $targetName;
+                $ticket->assigned_technician_phone = 'Anexo 104';
+                $ticket->save();
+
+                TicketAuditLog::create([
+                    'ticket_id' => $ticket->id,
+                    'previous_status' => $prevStatus,
+                    'new_status' => $ticket->status,
+                    'action' => 'TRASPASO_MASIVO_BALANCEADO',
+                    'performed_by_user_id' => auth()->id(),
+                    'performed_by_user_name' => auth()->user()?->name ?? 'Coordinación ODT',
+                    'notes' => "Traspaso masivo balanceado desde {$this->bulkOriginTechnician} hacia {$targetName}. Motivo: {$this->bulkReason}",
+                ]);
+
+                $workloadMap[$targetName]++;
+                $transferredCount++;
+            }
+
+            $this->showAlert("Se traspasaron y redistribuyeron con éxito {$transferredCount} tickets de {$this->bulkOriginTechnician} entre el equipo técnico.");
+        }
+
+        $this->isBulkTransferModalOpen = false;
     }
 
     // ==========================================
@@ -923,6 +1136,7 @@ class Tickets extends Component
             'myTickets' => $myTickets,
             'kbArticles' => $kbArticles,
             'technicians' => $technicians,
+            'operationalTechnicians' => $this->getOperationalTechnicians(),
             'offices' => $offices,
             'assets' => $assets,
             'supplies' => $supplies,

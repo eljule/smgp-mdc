@@ -233,4 +233,83 @@ class HelpdeskComponentsTest extends TestCase
         $this->assertNotNull($fresh->assigned_technician_name);
         $this->assertEquals('Téc. Juan Pérez', $fresh->assigned_technician_name);
     }
+
+    public function test_reassign_ticket_modal_and_execution_creates_audit_log(): void
+    {
+        $ticket = Ticket::create([
+            'ticket_number' => 'TCK-2026-TEST-REASSIGN',
+            'applicant_name' => 'Sara Morales',
+            'office_name' => 'Secretaría General',
+            'category' => 'SOFTWARE',
+            'priority' => 'MEDIA',
+            'subject' => 'Instalación de firma digital',
+            'description' => 'Requiere configurar certificado',
+            'status' => 'EN_ATENCION',
+            'assigned_technician_name' => 'Téc. Juan Pérez',
+        ]);
+
+        Livewire::test(TicketsComponent::class)
+            ->call('openReassignModal', $ticket->id)
+            ->assertSet('isReassignModalOpen', true)
+            ->assertSet('reassignTicketId', $ticket->id)
+            ->set('reassignTargetTechnician', 'Téc. Carlos Mendoza')
+            ->set('reassignReason', 'Especialidad técnica requerida')
+            ->call('saveReassign')
+            ->assertSet('isReassignModalOpen', false)
+            ->assertDispatched('toast');
+
+        $fresh = $ticket->fresh();
+        $this->assertEquals('Téc. Carlos Mendoza', $fresh->assigned_technician_name);
+
+        $hasReassignHistory = $fresh->histories()
+            ->where('action', 'REASIGNACION')
+            ->where('details', 'like', '%Especialidad técnica requerida%')
+            ->exists();
+        $this->assertTrue($hasReassignHistory);
+    }
+
+    public function test_bulk_transfer_workload_for_contingency(): void
+    {
+        $t1 = Ticket::create([
+            'ticket_number' => 'TCK-2026-BULK-1',
+            'applicant_name' => 'Luis Ramos',
+            'office_name' => 'Alcaldía',
+            'category' => 'HARDWARE',
+            'priority' => 'ALTA',
+            'subject' => 'Impresora trabada',
+            'description' => 'Atasco de papel',
+            'status' => 'EN_ATENCION',
+            'assigned_technician_name' => 'Téc. Ana Gómez',
+        ]);
+
+        $t2 = Ticket::create([
+            'ticket_number' => 'TCK-2026-BULK-2',
+            'applicant_name' => 'Rosa Flores',
+            'office_name' => 'Logística',
+            'category' => 'RED_INTERNET',
+            'priority' => 'URGENTE',
+            'subject' => 'Punto de red dañado',
+            'description' => 'Cable roto',
+            'status' => 'PENDIENTE',
+            'assigned_technician_name' => 'Téc. Ana Gómez',
+        ]);
+
+        Livewire::test(TicketsComponent::class)
+            ->call('openBulkTransferModal', 'Téc. Ana Gómez')
+            ->assertSet('isBulkTransferModalOpen', true)
+            ->assertSet('bulkOriginTechnician', 'Téc. Ana Gómez')
+            ->assertSet('bulkTicketsCount', 2)
+            ->set('bulkDestinationMode', 'specific')
+            ->set('bulkTargetTechnician', 'Téc. Juan Pérez')
+            ->set('bulkReason', 'Descanso médico / Licencia de salud')
+            ->call('executeBulkTransfer')
+            ->assertSet('isBulkTransferModalOpen', false)
+            ->assertDispatched('toast');
+
+        $this->assertEquals('Téc. Juan Pérez', $t1->fresh()->assigned_technician_name);
+        $this->assertEquals('Téc. Juan Pérez', $t2->fresh()->assigned_technician_name);
+
+        $this->assertTrue($t1->fresh()->histories()->where('action', 'TRASPASO_CONTINGENCIA')->exists());
+        $this->assertTrue($t2->fresh()->histories()->where('action', 'TRASPASO_CONTINGENCIA')->exists());
+    }
 }
