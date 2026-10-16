@@ -403,4 +403,35 @@ class ItamComponentsTest extends TestCase
             ->assertSee('Recepción y Conformidad')
             ->assertSee('Imprimir / Guardar PDF');
     }
+    public function test_asset_modal_datalists_and_custodian_resolution(): void
+    {
+        $person = \App\Models\Person::whereNotNull('office')->first();
+        $this->assertNotNull($person);
+
+        $testComponent = Livewire::test(Dashboard::class)
+            ->call('openAssetModal')
+            ->assertSet('isAssetModalOpen', true)
+            ->assertSee('modal-municipal-offices')
+            ->assertSee('modal-custodians')
+            // 1. Elegir custodio actualiza automáticamente la oficina
+            ->set('formAssignedPersonName', "{$person->full_name} ({$person->document_number})")
+            ->assertSet('formAssignedPersonId', $person->id);
+
+        $resolvedOffice = $testComponent->get('formOffice');
+        $this->assertNotEmpty($resolvedOffice);
+
+        // 2. Elegir oficina actualiza automáticamente el custodio
+        $office = \App\Models\Office::first();
+        if ($office) {
+            $resp = $office->resolveActiveResponsible();
+            if (! empty($resp['person'])) {
+                $testComponent->set('formOffice', "[{$office->acronym}] {$office->name} - {$office->sede}")
+                    ->assertSet('formAssignedPersonId', $resp['person']->id);
+            }
+        }
+
+        // 3. Quitar custodio
+        $testComponent->set('formAssignedPersonName', '-- Sin Custodio Asignado (Almacén TI) --')
+            ->assertSet('formAssignedPersonId', null);
+    }
 }

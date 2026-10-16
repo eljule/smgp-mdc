@@ -184,11 +184,8 @@
                                    class="w-full px-3 py-2 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                                    required />
                             <datalist id="movements-dest-offices">
-                                @foreach ($municipalOffices as $mOffice)
-                                    <option value="{{ $mOffice }}"></option>
-                                @endforeach
                                 @foreach ($offices as $off)
-                                    <option value="{{ $off->name }}"></option>
+                                    <option value="[{{ $off->acronym }}] {{ $off->name }} - {{ $off->sede }}"></option>
                                 @endforeach
                             </datalist>
                         </div>

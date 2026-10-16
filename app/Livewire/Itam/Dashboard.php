@@ -93,11 +93,13 @@ class Dashboard extends Component
 
     public ?int $formOfficeId = null;
 
-    public string $formOffice = 'Oficina de Desarrollo Tecnológico';
+    public string $formOffice = '';
 
     public ?int $formAssignedPersonId = null;
 
     public string $formAssignedPersonName = '';
+
+    protected bool $isSyncingOfficeAndPerson = false;
 
     public string $formColor = '';
 
@@ -515,6 +517,8 @@ class Dashboard extends Component
                 $this->formPhysicalCondition = $asset->physical_condition ?? 'BUENO';
                 $this->formOffice = $asset->office ?? 'Oficina de Desarrollo Tecnológico';
                 $this->formAssignedPersonId = $asset->assigned_person_id;
+                $person = $asset->assigned_person_id ? Person::find($asset->assigned_person_id) : null;
+                $this->formAssignedPersonName = $person ? "{$person->full_name} ({$person->document_number})" : '';
                 $this->formSupplier = $asset->supplier ?? '';
                 $this->formWarrantyEndDate = $asset->warranty_end_date ?? '';
                 $this->formIsLoanable = (bool) $asset->is_loanable;
@@ -535,6 +539,7 @@ class Dashboard extends Component
             $this->formPhysicalCondition = 'BUENO';
             $this->formOffice = 'Oficina de Desarrollo Tecnológico';
             $this->formAssignedPersonId = null;
+            $this->formAssignedPersonName = '';
             $this->formSupplier = '';
             $this->formWarrantyEndDate = '';
             $this->formIsLoanable = false;
@@ -556,6 +561,8 @@ class Dashboard extends Component
             'formBrandId.required' => 'Debe seleccionar una marca para el activo.',
             'formModelId.required' => 'Debe seleccionar un modelo para el activo.',
         ]);
+
+        $this->resolveAssignedPersonFromInput($this->formAssignedPersonName);
 
         $category = AssetCategory::find($this->formCategoryId);
         $catCode = $category?->code ?? 'PC';
@@ -625,6 +632,167 @@ class Dashboard extends Component
             'maintenanceOrders',
         ])->find($id);
         $this->isDetailModalOpen = true;
+    }
+
+
+    public function updatedFormOffice(string $value): void
+    {
+        if ($this->isSyncingOfficeAndPerson) {
+            return;
+        }
+
+        $this->isSyncingOfficeAndPerson = true;
+        try {
+            $this->resolveCustodianFromOffice($value);
+        } finally {
+            $this->isSyncingOfficeAndPerson = false;
+        }
+    }
+
+    protected function resolveCustodianFromOffice(?string $value): void
+    {
+        $clean = trim((string) $value);
+        if ($clean === '') {
+            return;
+        }
+
+        $office = null;
+
+        // 1. Si viene con acrónimo entre corchetes ej. "[ALC] ALCALDÍA..."
+        if (preg_match('/\[([^\]]+)\]/', $clean, $matches)) {
+            $office = Office::where('acronym', $matches[1])->first();
+        }
+
+        // 2. Si no tiene corchetes, buscar por nombre exacto o parcial
+        if (! $office) {
+            $parts = explode('-', $clean);
+            $searchName = trim($parts[0]);
+
+            $office = Office::whereRaw('UPPER(name) = ?', [mb_strtoupper($searchName)])
+                ->orWhereRaw('UPPER(name) LIKE ?', ['%' . mb_strtoupper($searchName) . '%'])
+                ->first();
+        }
+
+        // 3. Intentar por palabras clave significativas si no hubo coincidencia directa
+        if (! $office) {
+            $words = array_values(array_filter(explode(' ', mb_strtoupper($clean)), fn ($w) => mb_strlen($w) >= 4));
+            foreach ($words as $w) {
+                if (in_array($w, ['MUNICIPAL', 'MUNICIPALIDAD', 'SEDE', 'PRINCIPAL', 'OFICINA', 'GERENCIA', 'SUBGERENCIA'])) {
+                    continue;
+                }
+                $office = Office::whereRaw('UPPER(name) LIKE ?', ["%{$w}%"])->first();
+                if ($office) {
+                    break;
+                }
+            }
+        }
+
+        if ($office) {
+            $resp = $office->resolveActiveResponsible();
+            if (! empty($resp['person'])) {
+                $person = $resp['person'];
+                $this->formAssignedPersonId = $person->id;
+                $this->formAssignedPersonName = "{$person->full_name} ({$person->document_number})";
+            }
+        }
+    }
+
+    public function updatedFormAssignedPersonName(string $value): void
+    {
+        if ($this->isSyncingOfficeAndPerson) {
+            return;
+        }
+
+        $this->isSyncingOfficeAndPerson = true;
+        try {
+            $this->resolveAssignedPersonFromInput($value);
+
+            // Si se identificó a la persona, cargar automáticamente su oficina
+            if ($this->formAssignedPersonId) {
+                $person = Person::find($this->formAssignedPersonId);
+                if ($person) {
+                    $this->resolveOfficeFromPerson($person);
+                }
+            }
+        } finally {
+            $this->isSyncingOfficeAndPerson = false;
+        }
+    }
+
+    protected function resolveOfficeFromPerson(Person $person): void
+    {
+        if (empty($person->office)) {
+            return;
+        }
+
+        $officeModel = null;
+
+        // 1. Si la oficina de la persona tiene acrónimo entre corchetes ej. "[GAT]..."
+        if (preg_match('/\[([^\]]+)\]/', $person->office, $matches)) {
+            $officeModel = Office::where('acronym', $matches[1])->first();
+        }
+
+        // 2. Si no, buscar por nombre
+        if (! $officeModel) {
+            $cleanName = trim(preg_replace('/\[[^\]]+\]/', '', $person->office));
+            $officeModel = Office::whereRaw('UPPER(name) = ?', [mb_strtoupper($cleanName)])
+                ->orWhereRaw('UPPER(name) LIKE ?', ['%' . mb_strtoupper($cleanName) . '%'])
+                ->first();
+        }
+
+        if ($officeModel) {
+            $this->formOffice = "[{$officeModel->acronym}] {$officeModel->name} - {$officeModel->sede}";
+        } else {
+            $this->formOffice = $person->office;
+        }
+    }
+
+    protected function resolveAssignedPersonFromInput(?string $value): void
+    {
+        $clean = trim((string) $value);
+
+        if ($clean === '' || str_contains(mb_strtolower($clean), 'sin custodio')) {
+            $this->formAssignedPersonId = null;
+
+            return;
+        }
+
+        // 1. Extraer documento si viene en formato "... (45678912)" o "[45678912]"
+        if (preg_match('/\((\d{8,11})\)/', $clean, $matches) || preg_match('/\[(\d{8,11})\]/', $clean, $matches)) {
+            $person = Person::where('document_number', $matches[1])->first();
+            if ($person) {
+                $this->formAssignedPersonId = $person->id;
+
+                return;
+            }
+        }
+
+        // 2. Si se ingresó directamente un documento de identidad (DNI/RUC)
+        if (ctype_digit($clean)) {
+            $person = Person::where('document_number', $clean)->first();
+            if ($person) {
+                $this->formAssignedPersonId = $person->id;
+
+                return;
+            }
+        }
+
+        // 3. Búsqueda por coincidencia de nombre completo
+        $all = Person::all();
+        $match = $all->first(function ($p) use ($clean) {
+            $fullName = mb_strtoupper($p->full_name);
+            $cleanUpper = mb_strtoupper($clean);
+
+            return $fullName === $cleanUpper
+                || str_contains($fullName, $cleanUpper)
+                || str_contains($cleanUpper, $fullName);
+        });
+
+        if ($match) {
+            $this->formAssignedPersonId = $match->id;
+        } else {
+            $this->formAssignedPersonId = null;
+        }
     }
 
     public function deleteAsset(int $id): void

@@ -2399,31 +2399,40 @@
                                 </label>
                                 <input type="text"
                                        list="modal-municipal-offices"
-                                       wire:model="formOffice"
+                                       wire:model.live.debounce.300ms="formOffice"
                                        placeholder="Oficina de Desarrollo Tecnológico"
                                        class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                                 <datalist id="modal-municipal-offices">
                                     @foreach ($offices as $off)
                                         <option value="[{{ $off->acronym }}] {{ $off->name }} - {{ $off->sede }}"></option>
                                     @endforeach
-                                    @foreach ($municipalOffices as $mOff)
-                                        <option value="{{ $mOff }}"></option>
-                                    @endforeach
                                 </datalist>
                             </div>
 
                             <!-- Custodio Asignado -->
                             <div>
-                                <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
-                                    Custodio Asignado (Personal)
-                                </label>
-                                <select wire:model="formAssignedPersonId"
-                                        class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white cursor-pointer">
-                                    <option value="">-- Sin Custodio Asignado (Almacén TI) --</option>
+                                <div class="flex items-center justify-between mb-1">
+                                    <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 block">
+                                        Custodio Asignado (Personal)
+                                    </label>
+                                    @if ($formAssignedPersonId)
+                                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                            Personal Vinculado
+                                        </span>
+                                    @endif
+                                </div>
+                                <input type="text"
+                                       list="modal-custodians"
+                                       wire:model.live.debounce.300ms="formAssignedPersonName"
+                                       placeholder="Buscar por nombre o DNI (o dejar en blanco para Almacén TI)..."
+                                       class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                <datalist id="modal-custodians">
+                                    <option value="-- Sin Custodio Asignado (Almacén TI) --"></option>
                                     @foreach ($people as $p)
-                                        <option value="{{ $p->id }}">{{ $p->first_name }} {{ $p->paternal_surname }} {{ $p->maternal_surname }} ({{ $p->document_number }})</option>
+                                        <option value="{{ $p->full_name }} ({{ $p->document_number }})">{{ $p->position ? $p->position . ' — ' : '' }}{{ $p->office }}</option>
                                     @endforeach
-                                </select>
+                                </datalist>
                             </div>
 
                             <!-- Proveedor / Contratista -->
@@ -2706,11 +2715,8 @@
                                    class="w-full px-3 py-2 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
                                    required />
                             <datalist id="movement-dest-offices">
-                                @foreach ($municipalOffices as $mOffice)
-                                    <option value="{{ $mOffice }}"></option>
-                                @endforeach
                                 @foreach ($offices as $off)
-                                    <option value="{{ $off->name }}"></option>
+                                    <option value="[{{ $off->acronym }}] {{ $off->name }} - {{ $off->sede }}"></option>
                                 @endforeach
                             </datalist>
                         </div>
