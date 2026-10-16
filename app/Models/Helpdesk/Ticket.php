@@ -99,4 +99,9 @@ class Ticket extends Model
     {
         return $this->hasMany(TicketAuditLog::class, 'ticket_id');
     }
+
+    public function histories(): HasMany
+    {
+        return $this->auditLogs();
+    }
 }

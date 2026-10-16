@@ -244,8 +244,8 @@
                                 </div>
                             </div>
 
-                            <!-- 2. ESCANEO DE CÓDIGO QR DEL EQUIPO (RF-03) -->
-                            <div class="rounded-2xl border border-blue-200/90 dark:border-blue-900/50 bg-blue-50/20 dark:bg-blue-950/20 p-5 space-y-3">
+                            <!-- 2. ESCANEO DE CÓDIGO QR DEL EQUIPO (RF-03) CON CÁMARA MÓVIL Y BÚSQUEDA MANUAL -->
+                            <div x-data="qrScanner($wire)" class="rounded-2xl border border-blue-200/90 dark:border-blue-900/50 bg-blue-50/20 dark:bg-blue-950/20 p-5 space-y-3">
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center gap-1.5">
                                         <span class="text-blue-600 dark:text-blue-400 text-sm font-bold">📷</span>
@@ -253,7 +253,7 @@
                                             2. ESCANEO DE CÓDIGO QR DEL EQUIPO (RF-03)
                                         </span>
                                     </div>
-                                    <span class="text-[11px] text-slate-400 font-medium">
+                                    <span class="text-[11px] text-slate-400 font-medium hidden sm:inline">
                                         Sticker adherido al bien
                                     </span>
                                 </div>
@@ -265,12 +265,24 @@
                                            placeholder="INGRESE CÓDIGO O ESCANEE QR (EJ. MDC-TI-PC-0001)"
                                            class="flex-1 text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-mono placeholder:text-slate-400 uppercase tracking-wide focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
 
-                                    <button type="button"
-                                            wire:click="lookupAsset"
-                                            style="background-color: #556275;"
-                                            class="px-5 py-2.5 text-white hover:opacity-90 active:opacity-100 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
-                                        Buscar
-                                    </button>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button"
+                                                @click="open()"
+                                                class="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 active:scale-[0.98] text-white rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
+                                            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            </svg>
+                                            <span>Escanear Cámara</span>
+                                        </button>
+
+                                        <button type="button"
+                                                wire:click="lookupAsset"
+                                                style="background-color: #556275;"
+                                                class="px-5 py-2.5 text-white hover:opacity-90 active:opacity-100 rounded-xl text-xs font-bold transition shadow-xs cursor-pointer">
+                                            Buscar
+                                        </button>
+                                    </div>
                                 </div>
 
                                 @if ($assetLookupError)
@@ -290,7 +302,145 @@
                                         </button>
                                     </div>
                                 @endif
+
+                                <!-- MODAL ESCÁNER QR CON CÁMARA (MÓVIL / ESCRITORIO) -->
+                                <template x-teleport="body">
+                                    <div x-show="isOpen"
+                                         x-transition:enter="transition ease-out duration-250"
+                                         x-transition:enter-start="opacity-0"
+                                         x-transition:enter-end="opacity-100"
+                                         x-transition:leave="transition ease-in duration-200"
+                                         x-transition:leave-start="opacity-100"
+                                         x-transition:leave-end="opacity-0"
+                                         class="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md"
+                                         style="display: none;"
+                                         @keydown.escape.window="close()">
+
+                                        <div @click.away="close()"
+                                             x-show="isOpen"
+                                             x-transition:enter="transition ease-out duration-250"
+                                             x-transition:enter-start="opacity-0 scale-95 translate-y-3"
+                                             x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave="transition ease-in duration-150"
+                                             x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                             x-transition:leave-end="opacity-0 scale-95 translate-y-3"
+                                             class="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/80 dark:border-slate-800 overflow-hidden flex flex-col">
+
+                                            <!-- Modal Header -->
+                                            <div class="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/70 dark:bg-slate-900/70">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-950/70 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+                                                        </svg>
+                                                    </div>
+                                                    <div>
+                                                        <h3 class="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wide">
+                                                            Escanear Código QR
+                                                        </h3>
+                                                        <p class="text-[11px] text-slate-500 dark:text-slate-400">
+                                                            Sticker del activo municipal
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flex items-center gap-1">
+                                                    <!-- Switch Camera Button -->
+                                                    <button type="button"
+                                                            x-show="hasMultipleCameras"
+                                                            @click="switchCamera()"
+                                                            title="Cambiar Cámara"
+                                                            class="p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                                                        </svg>
+                                                    </button>
+
+                                                    <!-- Close Button -->
+                                                    <button type="button"
+                                                            @click="close()"
+                                                            class="p-2 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer">
+                                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <!-- Modal Body: Viewfinder Area -->
+                                            <div class="p-4 sm:p-5 flex flex-col items-center">
+                                                <div class="relative w-full aspect-square max-w-[320px] bg-slate-950 rounded-2xl overflow-hidden border-2 border-slate-700/60 shadow-inner flex items-center justify-center">
+                                                    <!-- Html5Qrcode attaches here -->
+                                                    <div id="qr-reader-container" class="w-full h-full"></div>
+
+                                                    <!-- Loading Overlay -->
+                                                    <div x-show="isStarting" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center gap-2 text-slate-300 text-xs">
+                                                        <svg class="animate-spin w-8 h-8 text-blue-500" fill="none" viewBox="0 0 24 24">
+                                                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        <span class="font-medium">Iniciando cámara...</span>
+                                                    </div>
+
+                                                    <!-- Custom Viewfinder Overlay & Laser beam -->
+                                                    <div x-show="isScanning && !errorMessage" class="pointer-events-none absolute inset-0 flex items-center justify-center">
+                                                        <!-- Target Frame Corners -->
+                                                        <div class="relative w-[72%] h-[72%] border border-blue-400/30 rounded-xl">
+                                                            <div class="absolute -top-1 -left-1 w-5 h-5 border-t-3 border-l-3 border-blue-400 rounded-tl-lg"></div>
+                                                            <div class="absolute -top-1 -right-1 w-5 h-5 border-t-3 border-r-3 border-blue-400 rounded-tr-lg"></div>
+                                                            <div class="absolute -bottom-1 -left-1 w-5 h-5 border-b-3 border-l-3 border-blue-400 rounded-bl-lg"></div>
+                                                            <div class="absolute -bottom-1 -right-1 w-5 h-5 border-b-3 border-r-3 border-blue-400 rounded-br-lg"></div>
+
+                                                            <!-- Laser Scan Line -->
+                                                            <div class="qr-scan-line absolute left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent shadow-[0_0_12px_#60a5fa]"></div>
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Error Display -->
+                                                    <div x-show="errorMessage" class="absolute inset-0 bg-slate-950/95 p-5 flex flex-col items-center justify-center text-center gap-3">
+                                                        <div class="w-12 h-12 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-xl">⚠️</div>
+                                                        <p class="text-xs text-rose-300 font-medium leading-relaxed" x-text="errorMessage"></p>
+                                                        <button type="button"
+                                                                @click="initScanner()"
+                                                                class="mt-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition">
+                                                            Reintentar
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <p class="mt-4 text-xs text-center text-slate-500 dark:text-slate-400 max-w-xs">
+                                                    Apunte el lente hacia el código QR o código de barras adherido en el equipo municipal.
+                                                </p>
+                                            </div>
+
+                                            <!-- Modal Footer -->
+                                            <div class="p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-900/70 flex justify-end">
+                                                <button type="button"
+                                                        @click="close()"
+                                                        class="w-full sm:w-auto px-5 py-2.5 bg-slate-200 hover:bg-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 rounded-xl text-xs font-bold transition cursor-pointer">
+                                                    Cancelar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </template>
                             </div>
+
+                            <style>
+                                @keyframes qrScanBeam {
+                                    0%, 100% { top: 6%; opacity: 0.9; }
+                                    50% { top: 90%; opacity: 0.9; }
+                                }
+                                .qr-scan-line {
+                                    animation: qrScanBeam 2.2s ease-in-out infinite;
+                                }
+                                #qr-reader-container video {
+                                    border-radius: 0.875rem !important;
+                                    object-fit: cover !important;
+                                    width: 100% !important;
+                                    height: 100% !important;
+                                }
+                            </style>
 
                             <!-- Tipo de Inconveniente o Falla (Categoría) -->
                             <div class="space-y-3">

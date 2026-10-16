@@ -114,4 +114,20 @@ class ScanAssetTest extends TestCase
             ->assertSet('selectedAssetCode', 'MDC-TI-LAP-5555')
             ->assertSet('officeName', 'GERENCIA MUNICIPAL');
     }
+    public function test_new_ticket_renders_camera_qr_scanner_elements_and_resolves_asset(): void
+    {
+        $this->createAssetFixture([
+            'computer_code' => 'MDC-TI-PC-0001',
+            'patrimonial_code' => '740877000123',
+            'office' => 'SUBGERENCIA DE INFORMÁTICA',
+        ]);
+
+        Livewire::test(NewTicket::class)
+            ->assertSee('Escanear Cámara')
+            ->assertSee('qr-reader-container')
+            ->set('qrCodeInput', 'MDC-TI-PC-0001')
+            ->call('lookupAsset')
+            ->assertSet('selectedAssetCode', 'MDC-TI-PC-0001')
+            ->assertSet('officeName', 'SUBGERENCIA DE INFORMÁTICA');
+    }
 }

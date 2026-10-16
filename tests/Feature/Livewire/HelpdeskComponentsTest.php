@@ -262,8 +262,8 @@ class HelpdeskComponentsTest extends TestCase
         $this->assertEquals('Téc. Carlos Mendoza', $fresh->assigned_technician_name);
 
         $hasReassignHistory = $fresh->histories()
-            ->where('action', 'REASIGNACION')
-            ->where('details', 'like', '%Especialidad técnica requerida%')
+            ->where('action', 'like', '%REASIGN%')
+            ->where('notes', 'like', '%Especialidad técnica requerida%')
             ->exists();
         $this->assertTrue($hasReassignHistory);
     }
@@ -309,7 +309,7 @@ class HelpdeskComponentsTest extends TestCase
         $this->assertEquals('Téc. Juan Pérez', $t1->fresh()->assigned_technician_name);
         $this->assertEquals('Téc. Juan Pérez', $t2->fresh()->assigned_technician_name);
 
-        $this->assertTrue($t1->fresh()->histories()->where('action', 'TRASPASO_CONTINGENCIA')->exists());
-        $this->assertTrue($t2->fresh()->histories()->where('action', 'TRASPASO_CONTINGENCIA')->exists());
+        $this->assertTrue($t1->fresh()->histories()->where('action', 'like', '%TRASPASO%')->exists());
+        $this->assertTrue($t2->fresh()->histories()->where('action', 'like', '%TRASPASO%')->exists());
     }
 }

@@ -1,3 +1,4 @@
+import qrScanner from './alpine/qr-scanner';
 import themeSwitcher from './alpine/theme';
 import ticketModal from './alpine/ticket-modal';
 
@@ -20,6 +21,7 @@ const registerAlpineData = () => {
     if (window.Alpine) {
         window.Alpine.data('themeSwitcher', themeSwitcher);
         window.Alpine.data('ticketModal', ticketModal);
+        window.Alpine.data('qrScanner', qrScanner);
     }
 };
 

@@ -189,7 +189,11 @@ class Tickets extends Component
 
     public string $reassignTechnicianName = '';
 
+    public ?string $reassignTargetTechnician = null;
+
     public string $reassignNotes = 'Reasignación por especialidad técnica.';
+
+    public ?string $reassignReason = null;
 
     // 8.1 Modal Traspaso Masivo de Carga (RF-13 Contingencias)
     public bool $isBulkTransferModalOpen = false;
@@ -231,10 +235,21 @@ class Tickets extends Component
         $this->resetPage();
     }
 
+    public function updatedReassignTargetTechnician($value): void
+    {
+        $this->reassignTechnicianName = (string) $value;
+    }
+
+    public function updatedReassignReason($value): void
+    {
+        $this->reassignNotes = (string) $value;
+    }
+
     public function showAlert(string $message, string $type = 'success'): void
     {
         $this->alertMessage = $message;
         $this->alertType = $type;
+        $this->dispatch('toast', message: $message, type: $type);
     }
 
     // ==========================================
@@ -708,9 +723,11 @@ class Tickets extends Component
         $available = $this->getOperationalTechnicians($currentTech);
 
         $this->reassignTechnicianName = ! empty($available) ? $available[0]['name'] : '';
-        $matchedUser = User::where('name', $this->reassignTechnicianName)->orWhere('full_name', $this->reassignTechnicianName)->first();
+        $this->reassignTargetTechnician = $this->reassignTechnicianName;
+        $matchedUser = User::where('full_name', $this->reassignTechnicianName)->orWhere('username', $this->reassignTechnicianName)->first();
         $this->reassignUserId = $matchedUser?->id ?? User::first()?->id;
         $this->reassignNotes = 'Reasignación por especialidad técnica.';
+        $this->reassignReason = $this->reassignNotes;
         $this->isReassignModalOpen = true;
     }
 
@@ -723,20 +740,18 @@ class Tickets extends Component
             return;
         }
 
-        $targetName = $this->reassignTechnicianName;
-        $user = null;
-
-        if (! empty($this->reassignUserId)) {
-            $user = User::find($this->reassignUserId);
-            if (empty($targetName) && $user) {
-                $targetName = $user->full_name ?: $user->name;
-            }
-        }
+        $targetName = $this->reassignTargetTechnician ?: $this->reassignTechnicianName;
+        $notes = $this->reassignReason ?: $this->reassignNotes;
 
         if (empty($targetName)) {
             $this->showAlert('Debe seleccionar un técnico de destino.', 'error');
 
             return;
+        }
+
+        $user = User::where('full_name', $targetName)->orWhere('username', $targetName)->first();
+        if (! $user && ! empty($this->reassignUserId)) {
+            $user = User::find($this->reassignUserId);
         }
 
         $prevStatus = $ticket->status;
@@ -760,8 +775,8 @@ class Tickets extends Component
             'new_status' => $ticket->status,
             'action' => 'REASIGNACION_TECNICO',
             'performed_by_user_id' => auth()->id(),
-            'performed_by_user_name' => auth()->user()?->name ?? 'Coordinación ODT',
-            'notes' => "Ticket traspasado de {$prevTech} a {$targetName}. {$this->reassignNotes}",
+            'performed_by_user_name' => auth()->user()?->full_name ?? auth()->user()?->name ?? 'Coordinación ODT',
+            'notes' => "Ticket traspasado de {$prevTech} a {$targetName}. {$notes}",
         ]);
 
         if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $ticket->id) {
@@ -825,8 +840,12 @@ class Tickets extends Component
                 return;
             }
 
+            $targetUser = User::where('full_name', $targetName)->orWhere('username', $targetName)->first();
             foreach ($activeTickets as $ticket) {
                 $prevStatus = $ticket->status;
+                if ($targetUser) {
+                    $ticket->assigned_technician_id = $targetUser->id;
+                }
                 $ticket->assigned_technician_name = $targetName;
                 $ticket->assigned_technician_phone = 'Anexo 104';
                 $ticket->save();
@@ -854,8 +873,12 @@ class Tickets extends Component
             foreach ($activeTickets as $ticket) {
                 asort($workloadMap);
                 $targetName = array_key_first($workloadMap);
+                $targetUser = User::where('full_name', $targetName)->orWhere('username', $targetName)->first();
 
                 $prevStatus = $ticket->status;
+                if ($targetUser) {
+                    $ticket->assigned_technician_id = $targetUser->id;
+                }
                 $ticket->assigned_technician_name = $targetName;
                 $ticket->assigned_technician_phone = 'Anexo 104';
                 $ticket->save();

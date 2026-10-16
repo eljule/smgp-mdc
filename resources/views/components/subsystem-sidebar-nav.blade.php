@@ -289,9 +289,16 @@
                                 {{ $ticketsCount }}
                             </span>
                         </div>
+                    </a>                    
+                    <!-- 2. Cargas de Trabajo -->
+                    <a href="{{ url('/helpdesk?tab=workload') }}"
+                        class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'workload' ? $activeClass : $inactiveClass }}"
+                        title="Balanceo de Cargas de Trabajo de Técnicos">
+                        <span class="text-lg shrink-0">📊</span>
+                        <span x-show="!sidebarCollapsed" class="truncate">Cargas de Trabajo</span>
                     </a>
 
-                    <!-- 2. Mis Tickets (Usuario) -->
+                    <!-- 3. Mis Tickets (Usuario) -->
                     <a href="{{ url('/helpdesk?tab=my_tickets') }}"
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'my_tickets' ? $activeClass : $inactiveClass }}"
                         title="Seguimiento Ágil y Visto Bueno del Solicitante">
@@ -304,15 +311,7 @@
                             </span>
                         </div>
                     </a>
-
-                    <!-- 3. Cargas de Trabajo -->
-                    <a href="{{ url('/helpdesk?tab=workload') }}"
-                        class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'workload' ? $activeClass : $inactiveClass }}"
-                        title="Balanceo de Cargas de Trabajo de Técnicos">
-                        <span class="text-lg shrink-0">📊</span>
-                        <span x-show="!sidebarCollapsed" class="truncate">Cargas de Trabajo</span>
-                    </a>
-
+                    
                     <!-- 4. Base Conocimientos -->
                     <a href="{{ url('/helpdesk?tab=knowledge') }}"
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'knowledge' || $activeTab === 'kb' ? $activeClass : $inactiveClass }}"
