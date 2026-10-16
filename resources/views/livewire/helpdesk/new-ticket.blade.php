@@ -152,25 +152,74 @@
 
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
-                                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                        <label for="applicant-name-input" class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
                                             Nombre del Funcionario / Custodio *:
                                         </label>
                                         <input type="text"
-                                               wire:model="applicantName"
+                                               id="applicant-name-input"
+                                               wire:model.live.debounce.300ms="applicantName"
+                                               list="custodians_datalist"
                                                required
                                                placeholder="ADMINISTRADOR DEL SISTEMA SIGM"
                                                class="w-full text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+                                        <datalist id="custodians_datalist">
+                                            @foreach($allPeople as $personItem)
+                                                <option value="{{ $personItem->full_name }}">{{ $personItem->position ? $personItem->position . ' — ' : '' }}{{ $personItem->office }}</option>
+                                            @endforeach
+                                        </datalist>
                                     </div>
 
                                     <div>
-                                        <label class="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                            Oficina o Dependencia Municipal *:
-                                        </label>
-                                        <input type="text"
-                                               wire:model.live.debounce.300ms="officeName"
-                                               required
-                                               placeholder="OFICINA DE REGIDORES"
-                                               class="w-full text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
+                                        <div class="flex items-center justify-between mb-1">
+                                            <label for="office-name-select" class="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                Oficina o Dependencia Municipal *:
+                                            </label>
+                                            @if(count($assignedOffices) > 1)
+                                                <span class="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-700">
+                                                    <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                                                    {{ count($assignedOffices) - 1 }} {{ (count($assignedOffices) - 1) === 1 ? 'dependencia encargada sin titular' : 'dependencias encargadas sin titular' }}
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <div class="relative">
+                                            <select id="office-name-select"
+                                                    wire:model.live="officeName"
+                                                    required
+                                                    class="w-full text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white font-medium focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all shadow-sm cursor-pointer">
+                                                @if(count($assignedOffices) > 0)
+                                                    @foreach($assignedOffices as $item)
+                                                        <option value="{{ $item['name'] }}">
+                                                            {{ $item['name'] }} — [{{ $item['badge'] }}]
+                                                        </option>
+                                                    @endforeach
+                                                @else
+                                                    <option value="" disabled>Seleccione una oficina municipal...</option>
+                                                    @foreach($offices as $off)
+                                                        <option value="{{ $off->name }}">{{ $off->name }}</option>
+                                                    @endforeach
+                                                @endif
+                                            </select>
+                                        </div>
+
+                                        @php
+                                            $selectedOfficeInfo = collect($assignedOffices)->firstWhere('name', $officeName);
+                                        @endphp
+                                        @if($selectedOfficeInfo)
+                                            <div class="mt-1.5 flex items-center gap-1.5 text-[11px]">
+                                                @if($selectedOfficeInfo['is_primary'])
+                                                    <span class="inline-flex items-center gap-1 font-semibold text-emerald-600 dark:text-emerald-400">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                                        Oficina Principal Titular
+                                                    </span>
+                                                @elseif($selectedOfficeInfo['is_inherited'])
+                                                    <span class="inline-flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400">
+                                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                                        Encargatura por Jerarquía (Sin responsable titular asignado)
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        @endif
                                     </div>
 
                                     <div>

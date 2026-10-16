@@ -168,4 +168,41 @@ class HelpdeskComponentsTest extends TestCase
         $this->assertTrue((bool) $fresh->user_conformity);
         $this->assertEquals(5, $fresh->user_rating);
     }
+
+    public function test_responsible_with_multiple_hierarchy_offices_shows_offices_in_combo_with_primary_as_default(): void
+    {
+        // Asegurar que las oficinas y jerarquías existan en el entorno de pruebas
+        $gat = \App\Models\Office::firstOrCreate(
+            ['acronym' => 'GAT'],
+            ['name' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA', 'level' => 1, 'is_active' => true]
+        );
+
+        $sgt = \App\Models\Office::firstOrCreate(
+            ['acronym' => 'SGT'],
+            ['name' => 'SUBGERENCIA DE TRIBUTACIÓN', 'parent_id' => $gat->id, 'level' => 2, 'is_active' => true]
+        );
+
+        $person = \App\Models\Person::firstOrCreate(
+            ['document_number' => '42747895'],
+            [
+                'type' => 'PERSONAL',
+                'document_type' => 'DNI',
+                'first_name' => 'CINTHYA KATTY',
+                'paternal_surname' => 'FERRO',
+                'maternal_surname' => 'COLUMBUS',
+                'position' => 'GERENTE DE ADMINISTRACION TRIBUTARIA',
+                'office' => '[GAT] GERENCIA DE ADMINISTRACIÓN TRIBUTARIA',
+                'is_active' => true,
+                'labor_status' => 'ACTIVO',
+            ]
+        );
+
+        \Livewire\Livewire::test(NewTicketComponent::class)
+            ->set('applicantName', 'CINTHYA KATTY FERRO COLUMBUS')
+            ->assertSet('officeName', 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA')
+            ->assertSee('GERENCIA DE ADMINISTRACIÓN TRIBUTARIA')
+            ->assertSee('Principal')
+            ->assertSee('SUBGERENCIA DE TRIBUTACIÓN')
+            ->assertSee('Encargada por jerarquía');
+    }
 }

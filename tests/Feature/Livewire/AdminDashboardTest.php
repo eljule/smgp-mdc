@@ -109,6 +109,22 @@ class AdminDashboardTest extends TestCase
             ->assertDontSee('CARLOS EDUARDO ROJAS MATIAS');
     }
 
+    public function test_people_component_filters_by_office(): void
+    {
+        Livewire::test(PeopleComponent::class)
+            ->assertSee('CARLOS EDUARDO ROJAS MATIAS')
+            ->assertSee('EMMA FLOR SAAVEDRA PACHERREZ')
+            ->set('officeFilter', 'PROCURADURÍA PÚBLICA MUNICIPAL')
+            ->assertSee('CARLOS EDUARDO ROJAS MATIAS')
+            ->assertDontSee('EMMA FLOR SAAVEDRA PACHERREZ')
+            ->call('clearOfficeFilter')
+            ->assertSee('CARLOS EDUARDO ROJAS MATIAS')
+            ->assertSee('EMMA FLOR SAAVEDRA PACHERREZ')
+            ->set('officeFilter', '[OCI] ÓRGANO DE CONTROL INSTITUCIONAL')
+            ->assertSee('EMMA FLOR SAAVEDRA PACHERREZ')
+            ->assertDontSee('CARLOS EDUARDO ROJAS MATIAS');
+    }
+
     public function test_renders_users_table_page_successfully(): void
     {
         $response = $this->get('/admin/usuarios');

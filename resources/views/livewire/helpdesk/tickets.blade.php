@@ -828,139 +828,18 @@
                             </span>
                         </div>
 
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs"
-                             x-data="{
-                                open: false,
-                                search: '',
-                                offices: {{ \Illuminate\Support\Js::from($offices->map(fn($o) => [
-                                    'id' => $o->id,
-                                    'name' => $o->name,
-                                    'sede' => $o->sede,
-                                    'label' => $o->name . ($o->sede ? ' - ' . $o->sede : ''),
-                                    'applicant_name' => $o->applicant_name ?? '',
-                                    'applicant_phone' => $o->applicant_phone ?? 'Anexo 115',
-                                    'applicant_email' => $o->applicant_email ?? 'usuario@castilla.gob.pe',
-                                    'is_inherited' => (bool) ($o->is_inherited ?? false),
-                                    'inherited_from' => $o->inherited_from ?? ''
-                                ])) }},
-                                get selectedOffice() {
-                                    const val = $wire.formOfficeName;
-                                    if (!val) return null;
-                                    return this.offices.find(o => o.name === val) || null;
-                                },
-                                get filteredOffices() {
-                                    if (!this.search || !this.search.trim()) return this.offices;
-                                    const q = this.search.toLowerCase().trim();
-                                    return this.offices.filter(o => 
-                                        o.name.toLowerCase().includes(q) || 
-                                        (o.sede && o.sede.toLowerCase().includes(q)) ||
-                                        o.label.toLowerCase().includes(q)
-                                    );
-                                },
-                                get selectedLabel() {
-                                    const found = this.selectedOffice;
-                                    if (!found) return '-- Seleccione una Oficina o Dependencia --';
-                                    return found.sede ? `${found.name} - ${found.sede}` : found.name;
-                                },
-                                selectOffice(item) {
-                                    $wire.set('formOfficeName', item.name);
-                                    if (item.applicant_name) {
-                                        $wire.set('formApplicantName', item.applicant_name);
-                                    }
-                                    if (item.applicant_phone) {
-                                        $wire.set('formApplicantPhone', item.applicant_phone);
-                                    }
-                                    if (item.applicant_email) {
-                                        $wire.set('formApplicantEmail', item.applicant_email);
-                                    }
-                                    this.open = false;
-                                    this.search = '';
-                                }
-                            }">
-                            <!-- 1. Oficina o Dependencia Municipal (Combo Seleccionable con Búsqueda) -->
-                            <div @click.outside="open = false" 
-                                 @keydown.escape.stop="open = false"
-                                 class="relative">
-                                <label class="block text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-0.5">
-                                    Oficina o Dependencia Municipal *:
-                                </label>
-
-                                <!-- Botón Disparador del Combo con Búsqueda -->
-                                <button type="button"
-                                        @click="open = !open; if(open) { $nextTick(() => $refs.officeSearchInput.focus()) }"
-                                        class="w-full p-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-left flex items-center justify-between focus:ring-2 focus:ring-emerald-500 focus:outline-none transition-all cursor-pointer text-xs"
-                                        :class="{ 'ring-2 ring-emerald-500 border-emerald-500': open }">
-                                    <span class="truncate font-medium text-slate-800 dark:text-white"
-                                          :class="{ 'text-slate-400 dark:text-slate-500': !$wire.formOfficeName }"
-                                          x-text="selectedLabel">
-                                    </span>
-                                    <div class="flex items-center space-x-1 shrink-0 ml-2 text-slate-400">
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                        </svg>
-                                        <svg class="w-4 h-4 transition-transform duration-150"
-                                             :class="{ 'rotate-180 text-emerald-600': open }"
-                                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                        </svg>
-                                    </div>
-                                </button>
-
-                                <input type="hidden" wire:model="formOfficeName" required>
-
-                                <!-- Desplegable Flotante con Buscador Integrado -->
-                                <div x-show="open"
-                                     x-transition:enter="transition ease-out duration-100"
-                                     x-transition:enter-start="opacity-0 -translate-y-1 scale-98"
-                                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
-                                     x-transition:leave="transition ease-in duration-75"
-                                     x-transition:leave-start="opacity-100 translate-y-0 scale-100"
-                                     x-transition:leave-end="opacity-0 -translate-y-1 scale-98"
-                                     style="display: none;"
-                                     class="absolute z-50 mt-1 w-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl overflow-hidden">
-                                    
-                                    <!-- Input de Búsqueda Rápida -->
-                                    <div class="p-2 border-b border-slate-100 dark:border-slate-700/60 bg-slate-50 dark:bg-slate-900/50">
-                                        <div class="relative">
-                                            <input type="text"
-                                                   x-ref="officeSearchInput"
-                                                   x-model="search"
-                                                   placeholder="Escriba para buscar oficina o sede..."
-                                                   class="w-full text-xs pl-7 pr-2 py-1.5 border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:outline-none focus:ring-1 focus:ring-emerald-500">
-                                            <svg class="w-3.5 h-3.5 absolute left-2 top-2 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                            </svg>
-                                        </div>
-                                    </div>
-
-                                    <!-- Lista de Resultados Filtrados -->
-                                    <ul class="max-h-56 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700/40 text-xs">
-                                        <template x-for="item in filteredOffices" :key="item.id">
-                                            <li @click="selectOffice(item)"
-                                                class="px-3 py-2 cursor-pointer hover:bg-emerald-50 dark:hover:bg-emerald-950/40 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors flex items-center justify-between"
-                                                :class="{ 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-800 dark:text-emerald-300 font-semibold': $wire.formOfficeName === item.name }">
-                                                <div>
-                                                    <span class="font-medium" x-text="item.name"></span>
-                                                    <template x-if="item.sede">
-                                                        <span class="text-[10px] text-slate-400 dark:text-slate-400 block" x-text="'Sede: ' + item.sede"></span>
-                                                    </template>
-                                                </div>
-                                                <div class="flex items-center space-x-1">
-                                                    <template x-if="item.is_inherited">
-                                                        <span class="text-[9px] px-1 py-0.5 rounded bg-amber-100 dark:bg-amber-900/60 text-amber-700 dark:text-amber-300 font-medium">Jerarquía</span>
-                                                    </template>
-                                                    <svg x-show="$wire.formOfficeName === item.name" class="w-4 h-4 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                                                    </svg>
-                                                </div>
-                                            </li>
-                                        </template>
-                                        <li x-show="filteredOffices.length === 0" class="p-3 text-center text-slate-400 italic">
-                                            No se encontraron oficinas coincidentes
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                            <!-- 1. Oficina o Dependencia Municipal (Componente Reutilizable de Búsqueda Inteligente) -->
+                            <x-office-search-select
+                                wire:model="formOfficeName"
+                                :offices="$offices"
+                                mode="form"
+                                label="Oficina o Dependencia Municipal *:"
+                                value-field="name"
+                                applicant-autofill
+                                placeholder="-- Seleccione una Oficina o Dependencia --"
+                                required
+                            />
 
                             <!-- 2. Nombres y Apellidos del Solicitante (No editable) -->
                             <div>

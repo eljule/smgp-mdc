@@ -29,13 +29,13 @@
     </div>
 
     <!-- Barra de Filtros y Búsqueda -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
+    <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3 bg-white dark:bg-slate-900 p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs">
         <!-- Pestañas de Tipo / Clasificación -->
-        <div class="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs w-full sm:w-auto">
+        <div class="flex items-center space-x-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-lg text-xs overflow-x-auto shrink-0">
             <button
                 type="button"
                 wire:click="setFilter('TODOS')"
-                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer {{ $filterType === 'TODOS'
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors whitespace-nowrap cursor-pointer {{ $filterType === 'TODOS'
                     ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 shadow-xs font-bold'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }}"
@@ -45,7 +45,7 @@
             <button
                 type="button"
                 wire:click="setFilter('PERSONAL')"
-                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer flex items-center justify-center gap-1.5 {{ $filterType === 'PERSONAL'
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5 {{ $filterType === 'PERSONAL'
                     ? 'bg-white dark:bg-slate-900 text-emerald-800 dark:text-emerald-300 shadow-xs font-bold'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }}"
@@ -56,7 +56,7 @@
             <button
                 type="button"
                 wire:click="setFilter('ADMINISTRADO')"
-                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer flex items-center justify-center gap-1.5 {{ $filterType === 'ADMINISTRADO'
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors whitespace-nowrap cursor-pointer flex items-center justify-center gap-1.5 {{ $filterType === 'ADMINISTRADO'
                     ? 'bg-white dark:bg-slate-900 text-blue-800 dark:text-blue-300 shadow-xs font-bold'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }}"
@@ -66,22 +66,66 @@
             </button>
         </div>
 
-        <!-- Buscador -->
-        <div class="flex items-center space-x-2 w-full sm:w-80">
-            <input
-                type="text"
-                placeholder="Buscar por DNI, RUC, nombre..."
-                wire:model.live.debounce.300ms="search"
-                class="w-full px-3 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-            <button
-                type="button"
-                class="px-3.5 py-1.5 rounded-lg bg-[#00965e] hover:bg-[#007f50] text-white text-xs font-semibold shadow-xs cursor-pointer"
-            >
-                Buscar
-            </button>
+        <!-- Grupo de Filtros y Búsqueda -->
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full xl:w-auto">
+            <!-- Búsqueda Inteligente por Oficinas -->
+            <div class="w-full sm:w-56 md:w-64 shrink-0">
+                <x-office-search-select
+                    wire:model.live="officeFilter"
+                    :offices="$offices"
+                    mode="filter"
+                    align="right"
+                    placeholder="Todas las oficinas..."
+                    allow-clear
+                />
+            </div>
+
+            <!-- Buscador por Texto -->
+            <div class="flex items-center space-x-2 w-full sm:w-60 md:w-64 shrink-0">
+                <div class="relative w-full">
+                    <input
+                        type="text"
+                        placeholder="Buscar por DNI, RUC, nombre..."
+                        wire:model.live.debounce.300ms="search"
+                        class="w-full pl-3 pr-7 py-1.5 text-xs rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                    />
+                    @if ($search)
+                        <button
+                            type="button"
+                            wire:click="$set('search', '')"
+                            class="absolute right-2 top-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs cursor-pointer"
+                            title="Limpiar búsqueda"
+                        >
+                            ✕
+                        </button>
+                    @endif
+                </div>
+                <button
+                    type="button"
+                    class="px-3.5 py-1.5 rounded-lg bg-[#00965e] hover:bg-[#007f50] text-white text-xs font-semibold shadow-xs cursor-pointer shrink-0 transition-colors"
+                >
+                    Buscar
+                </button>
+            </div>
         </div>
     </div>
+
+    @if ($officeFilter)
+        <div class="flex items-center gap-2 px-1 -mt-3">
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300/80 dark:border-emerald-800 font-medium shadow-xs">
+                <span>🏢 Oficina filtrada:</span>
+                <strong class="font-bold">{{ $officeFilter }}</strong>
+                <button
+                    type="button"
+                    wire:click="clearOfficeFilter"
+                    class="ml-1 text-emerald-600 dark:text-emerald-400 hover:text-emerald-900 dark:hover:text-white font-bold cursor-pointer"
+                    title="Quitar filtro de oficina"
+                >
+                    ✕
+                </button>
+            </span>
+        </div>
+    @endif
 
     <!-- Tabla Principal de Personas -->
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs overflow-hidden">

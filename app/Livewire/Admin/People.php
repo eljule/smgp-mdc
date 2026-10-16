@@ -37,6 +37,9 @@ class People extends Component
     #[Url(as: 'buscar')]
     public string $search = '';
 
+    #[Url(as: 'oficina')]
+    public string $officeFilter = '';
+
     #[Url(as: 'pagina')]
     public int $page = 1;
 
@@ -108,6 +111,22 @@ class People extends Component
     public ?string $modalError = null;
 
     public ?string $alertMessage = null;
+
+    public function updatedOfficeFilter(): void
+    {
+        $this->page = 1;
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->page = 1;
+    }
+
+    public function clearOfficeFilter(): void
+    {
+        $this->officeFilter = '';
+        $this->page = 1;
+    }
 
     public function hydrate(): void
     {
@@ -486,6 +505,7 @@ class People extends Component
         $result = $action->handle(
             filterType: $this->filterType,
             search: $this->search,
+            office: $this->officeFilter,
             page: $this->page,
             perPage: $this->perPage
         );

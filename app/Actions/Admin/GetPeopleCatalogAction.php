@@ -664,6 +664,7 @@ final class GetPeopleCatalogAction
     public function handle(
         string $filterType = 'TODOS',
         string $search = '',
+        string $office = '',
         int $page = 1,
         int $perPage = 10
     ): array {
@@ -688,6 +689,21 @@ final class GetPeopleCatalogAction
                         ->orWhere('office', 'like', $s)
                         ->orWhere('business_name', 'like', $s);
                 });
+            }
+
+            $trimmedOffice = trim($office);
+            if ($trimmedOffice !== '') {
+                if (preg_match('/^\[(.*?)\]\s*(.*)$/', $trimmedOffice, $matches)) {
+                    $acronym = trim($matches[1]);
+                    $name = trim($matches[2]);
+                    $query->where(function ($q) use ($trimmedOffice, $acronym, $name) {
+                        $q->where('office', 'like', "%{$trimmedOffice}%")
+                            ->orWhere('office', 'like', "%[{$acronym}]%")
+                            ->orWhere('office', 'like', "%{$name}%");
+                    });
+                } else {
+                    $query->where('office', 'like', "%{$trimmedOffice}%");
+                }
             }
 
             $totalCounts = [
@@ -763,6 +779,23 @@ final class GetPeopleCatalogAction
                     || str_contains(mb_strtolower($person['position'] ?? ''), $trimmedSearch)
                     || str_contains(mb_strtolower($person['office'] ?? ''), $trimmedSearch);
             });
+        }
+
+        $trimmedOffice = mb_strtolower(trim($office));
+        if ($trimmedOffice !== '') {
+            if (preg_match('/^\[(.*?)\]\s*(.*)$/', $trimmedOffice, $matches)) {
+                $acronym = mb_strtolower(trim($matches[1]));
+                $name = mb_strtolower(trim($matches[2]));
+                $filtered = array_filter($filtered, function (array $person) use ($trimmedOffice, $acronym, $name): bool {
+                    $po = mb_strtolower($person['office'] ?? '');
+                    return str_contains($po, $trimmedOffice) || str_contains($po, "[{$acronym}]") || str_contains($po, $name);
+                });
+            } else {
+                $filtered = array_filter($filtered, function (array $person) use ($trimmedOffice): bool {
+                    $po = mb_strtolower($person['office'] ?? '');
+                    return str_contains($po, $trimmedOffice);
+                });
+            }
         }
 
         $total = count($filtered);

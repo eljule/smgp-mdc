@@ -191,22 +191,15 @@
 
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <div class="sm:col-span-2">
-                                <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                    Oficina Asignada *
-                                </label>
-                                <select
+                                <x-office-search-select
                                     wire:model="formOffice"
-                                    class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white text-xs"
-                                >
-                                    @if ($formOffice && ! $offices->contains(fn ($off) => "[{$off->acronym}] {$off->name}" === $formOffice || $off->name === $formOffice))
-                                        <option value="{{ $formOffice }}">{{ $formOffice }}</option>
-                                    @endif
-                                    @foreach ($offices as $off)
-                                        <option value="[{{ $off->acronym }}] {{ $off->name }}">
-                                            {{ $off->code }} - [{{ $off->acronym }}] {{ $off->name }} ({{ $off->sede }})
-                                        </option>
-                                    @endforeach
-                                </select>
+                                    :offices="$offices"
+                                    mode="form"
+                                    label="Oficina Asignada *"
+                                    value-field="full_name"
+                                    placeholder="-- Seleccione o busque una oficina o área municipal --"
+                                    required
+                                />
                             </div>
                             <div>
                                 <label class="block font-bold text-slate-700 dark:text-slate-300 mb-1">

@@ -11,6 +11,7 @@ use App\Models\Itam\Asset;
 use App\Models\Office;
 use App\Models\Person;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -24,7 +25,7 @@ class NewTicket extends Component
 {
     use WithFileUploads;
 
-    // 1. Datos de Identificación (RF-02) - Conservados exactamente iguales
+    // 1. Datos de Identificación (RF-02)
     public string $applicantName = 'ADMINISTRADOR DEL SISTEMA SIGM';
 
     public string $officeName = 'OFICINA DE REGIDORES';
@@ -33,7 +34,14 @@ class NewTicket extends Component
 
     public string $applicantEmail = 'admin@castilla.gob.pe';
 
-    // 2. Escaneo de Código QR (RF-03) - Conservado exactamente igual
+    /**
+     * Lista de dependencias municipales a su cargo (titular y por jerarquía).
+     *
+     * @var array<int, array{id: int, name: string, acronym: ?string, is_primary: bool, is_inherited: bool, badge: string}>
+     */
+    public array $assignedOffices = [];
+
+    // 2. Escaneo de Código QR (RF-03)
     public string $qrCodeInput = '';
 
     public ?int $selectedAssetId = null;
@@ -46,7 +54,7 @@ class NewTicket extends Component
 
     public ?string $assetLookupError = null;
 
-    // 3. Formulario de Incidencia (RF-04) - Conservado exactamente igual
+    // 3. Formulario de Incidencia (RF-04)
     public string $category = 'HARDWARE';
 
     public string $priority = 'MEDIA';
@@ -71,7 +79,7 @@ class NewTicket extends Component
     public string $flashType = 'success';
 
     // =========================================================================
-    // SEGUIMIENTO DE TICKETS DEL ÁREA Y VISTO BUENO (Espacio Derecho Adicionado)
+    // SEGUIMIENTO DE TICKETS DEL ÁREA Y VISTO BUENO (Espacio Derecho)
     // =========================================================================
     public string $trackingStatusFilter = 'TODOS'; // 'TODOS' | 'ACTIVOS' | 'RESUELTOS' | 'CERRADOS'
 
@@ -98,24 +106,18 @@ class NewTicket extends Component
     {
         $user = auth()->user();
         if ($user) {
-            $this->applicantName = $user->name ?? $user->username ?? 'ADMINISTRADOR DEL SISTEMA SIGM';
+            $this->applicantName = $user->full_name ?? $user->name ?? $user->username ?? 'ADMINISTRADOR DEL SISTEMA SIGM';
             $this->applicantEmail = $user->email ?? 'admin@castilla.gob.pe';
         }
 
         $office = request()->query('oficina') ?? request()->query('office');
-        if (! empty($office)) {
-            $this->officeName = trim((string) $office);
-        }
-
         $dni = request()->query('dni');
+
         if (! empty($dni)) {
             $dniStr = trim((string) $dni);
             $person = Person::where('document_number', $dniStr)->first();
             if ($person) {
                 $this->applicantName = $person->full_name;
-                if (empty($office) && ! empty($person->office)) {
-                    $this->officeName = $person->office;
-                }
                 if (! empty($person->email)) {
                     $this->applicantEmail = $person->email;
                 }
@@ -126,9 +128,6 @@ class NewTicket extends Component
                 foreach (GetPeopleCatalogAction::PEOPLE_DATA as $p) {
                     if (($p['documentNumber'] ?? '') === $dniStr) {
                         $this->applicantName = $p['fullName'];
-                        if (empty($office) && ! empty($p['office'])) {
-                            $this->officeName = $p['office'];
-                        }
                         if (! empty($p['email'])) {
                             $this->applicantEmail = $p['email'];
                         }
@@ -141,6 +140,9 @@ class NewTicket extends Component
             }
         }
 
+        $preferredOffice = ! empty($office) ? trim((string) $office) : null;
+        $this->resolveOfficesForApplicant($this->applicantName, $preferredOffice);
+
         $assetCode = $asset ?? request()->query('asset');
         if (! empty($assetCode)) {
             $this->qrCodeInput = (string) $assetCode;
@@ -148,12 +150,187 @@ class NewTicket extends Component
         }
     }
 
+    public function updatedApplicantName(string $value): void
+    {
+        $this->resolveOfficesForApplicant($value);
+    }
+
+    /**
+     * Busca una persona por documento, nombre exacto o palabras clave.
+     */
+    protected function findPersonByNameOrDoc(string $term): ?Person
+    {
+        $clean = trim($term);
+        if ($clean === '') {
+            return null;
+        }
+
+        // Búsqueda directa por documento
+        $byDoc = Person::where('document_number', $clean)->first();
+        if ($byDoc) {
+            return $byDoc;
+        }
+
+        // Búsqueda en memoria por nombre completo exacto
+        $allActive = Person::where('is_active', true)->get();
+        $match = $allActive->first(function ($p) use ($clean) {
+            return mb_strtoupper($p->full_name) === mb_strtoupper($clean);
+        });
+
+        if ($match) {
+            return $match;
+        }
+
+        // Búsqueda por palabras clave relevantes
+        $words = array_values(array_filter(explode(' ', $clean), fn ($w) => mb_strlen($w) >= 3));
+        if (count($words) >= 2) {
+            $like = DB::connection()->getDriverName() === 'pgsql' ? 'ilike' : 'like';
+
+            return Person::where('is_active', true)
+                ->where(function ($q) use ($words, $like) {
+                    foreach ($words as $w) {
+                        $q->where(function ($sub) use ($w, $like) {
+                            $sub->where('first_name', $like, "%{$w}%")
+                                ->orWhere('paternal_surname', $like, "%{$w}%")
+                                ->orWhere('maternal_surname', $like, "%{$w}%");
+                        });
+                    }
+                })->first();
+        }
+
+        return null;
+    }
+
+    /**
+     * Resuelve las dependencias municipales asignadas y encargadas por jerarquía para el funcionario/custodio.
+     */
+    public function resolveOfficesForApplicant(?string $name = null, ?string $preferredOffice = null): void
+    {
+        $applicant = trim((string) ($name ?? $this->applicantName));
+        if (empty($applicant)) {
+            $this->assignedOffices = [];
+
+            return;
+        }
+
+        // 1. Buscar la persona en la base de datos
+        $person = $this->findPersonByNameOrDoc($applicant);
+
+        if (! $person) {
+            $this->assignedOffices = [];
+            if (! empty($preferredOffice)) {
+                $this->officeName = $preferredOffice;
+            }
+
+            return;
+        }
+
+        // Normalizar nombre oficial del funcionario/custodio
+        $this->applicantName = $person->full_name;
+
+        // Actualizar datos de contacto institucionales
+        if (! empty($person->phone)) {
+            $this->applicantPhone = $person->phone;
+        }
+        if (! empty($person->email)) {
+            $this->applicantEmail = $person->email;
+        }
+
+        $allOffices = Office::where('is_active', true)->orderBy('name')->get();
+        $allPeople = Person::where('is_active', true)->get();
+
+        // 2. Determinar la oficina principal de la persona
+        $primaryOffice = null;
+        if (! empty($person->office)) {
+            if (preg_match('/\[(.*?)\]/', $person->office, $matches)) {
+                $acronym = trim($matches[1]);
+                $primaryOffice = $allOffices->firstWhere('acronym', $acronym);
+            }
+            if (! $primaryOffice) {
+                $cleanOffice = trim(preg_replace('/\[.*?\]/', '', $person->office));
+                $primaryOffice = $allOffices->first(fn ($o) => strtoupper(trim($o->name)) === strtoupper($cleanOffice))
+                    ?? $allOffices->first(fn ($o) => ! empty($cleanOffice) && str_contains(strtoupper($o->name), strtoupper($cleanOffice)));
+            }
+        }
+
+        $list = [];
+
+        // Agregar oficina principal
+        if ($primaryOffice) {
+            $list[] = [
+                'id' => $primaryOffice->id,
+                'name' => $primaryOffice->name,
+                'acronym' => $primaryOffice->acronym,
+                'is_primary' => true,
+                'is_inherited' => false,
+                'badge' => 'Principal',
+            ];
+        }
+
+        // 3. Oficinas que actualmente no tienen responsable y recaen en esta persona por jerarquía
+        foreach ($allOffices as $off) {
+            $resp = $off->resolveActiveResponsible($allPeople, $allOffices);
+            $isMatch = ($resp['person']?->id === $person->id)
+                || (strtoupper(trim($resp['name'])) === strtoupper(trim($person->full_name)));
+
+            // Únicamente dependencias donde no hay responsable titular propio (is_inherited = true)
+            if ($resp['is_inherited'] && $isMatch) {
+                if (! collect($list)->contains('id', $off->id)) {
+                    $list[] = [
+                        'id' => $off->id,
+                        'name' => $off->name,
+                        'acronym' => $off->acronym,
+                        'is_primary' => false,
+                        'is_inherited' => true,
+                        'badge' => 'Encargada por jerarquía (Sin titular)',
+                    ];
+                }
+            }
+        }
+
+        $this->assignedOffices = $list;
+
+        // 5. Preseleccionar la oficina: oficina preferida si vino en URL, o la principal por defecto
+        if (! empty($preferredOffice)) {
+            $this->officeName = $preferredOffice;
+        } elseif ($primaryOffice) {
+            $this->officeName = $primaryOffice->name;
+        } elseif (! empty($list)) {
+            $this->officeName = $list[0]['name'];
+        }
+    }
+
     public function autoDetect(): void
     {
+        $user = auth()->user();
+        if ($user) {
+            $person = $user->person;
+            if (! $person && ! empty($user->full_name)) {
+                $person = $this->findPersonByNameOrDoc((string) $user->full_name);
+            }
+
+            if ($person) {
+                $this->applicantName = $person->full_name;
+                $this->applicantEmail = $person->email ?: ($user->email ?? 'admin@castilla.gob.pe');
+                $this->applicantPhone = $person->phone ?: 'Anexo 104';
+                $this->resolveOfficesForApplicant($person->full_name);
+
+                return;
+            }
+
+            $this->applicantName = $user->full_name ?: $user->name;
+            $this->applicantEmail = $user->email ?: 'admin@castilla.gob.pe';
+            $this->applicantPhone = 'Anexo 104';
+            $this->resolveOfficesForApplicant($this->applicantName);
+
+            return;
+        }
+
         $this->applicantName = 'ADMINISTRADOR DEL SISTEMA SIGM';
-        $this->officeName = 'OFICINA DE REGIDORES';
         $this->applicantPhone = 'Anexo 104';
         $this->applicantEmail = 'admin@castilla.gob.pe';
+        $this->officeName = 'OFICINA DE REGIDORES';
+        $this->assignedOffices = [];
     }
 
     public function lookupAsset(): void
@@ -179,12 +356,11 @@ class NewTicket extends Component
             $this->selectedAssetCategory = $asset->category?->name ?? 'Hardware TI';
             $this->selectedAssetName = "{$asset->computer_code} - {$this->selectedAssetCategory}";
 
-            if (! empty($asset->office)) {
-                $this->officeName = $asset->office;
-            }
-
             if ($asset->assignedPerson) {
                 $this->applicantName = $asset->assignedPerson->first_name.' '.$asset->assignedPerson->last_name;
+                $this->resolveOfficesForApplicant($this->applicantName, $asset->office);
+            } elseif (! empty($asset->office)) {
+                $this->officeName = $asset->office;
             }
         } else {
             $this->assetLookupError = 'No se encontró ningún activo tecnológico con este código.';
@@ -362,6 +538,7 @@ class NewTicket extends Component
     public function render(): View
     {
         $offices = Office::orderBy('name')->get();
+        $allPeople = Person::where('is_active', true)->orderBy('first_name')->get();
 
         // Consulta de tickets del área especificada en officeName
         $cleanOffice = trim($this->officeName);
@@ -400,6 +577,7 @@ class NewTicket extends Component
 
         return view('livewire.helpdesk.new-ticket', [
             'offices' => $offices,
+            'allPeople' => $allPeople,
             'officeTickets' => $officeTickets,
             'allCount' => $allCount,
             'activeCount' => $activeCount,
