@@ -10,6 +10,7 @@ use App\Livewire\Helpdesk\Tickets as TicketsComponent;
 use App\Models\Helpdesk\KnowledgeArticle;
 use App\Models\Helpdesk\Ticket;
 use App\Models\Office;
+use App\Models\Person;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -172,17 +173,17 @@ class HelpdeskComponentsTest extends TestCase
     public function test_responsible_with_multiple_hierarchy_offices_shows_offices_in_combo_with_primary_as_default(): void
     {
         // Asegurar que las oficinas y jerarquías existan en el entorno de pruebas
-        $gat = \App\Models\Office::firstOrCreate(
+        $gat = Office::firstOrCreate(
             ['acronym' => 'GAT'],
             ['name' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA', 'level' => 1, 'is_active' => true]
         );
 
-        $sgt = \App\Models\Office::firstOrCreate(
+        $sgt = Office::firstOrCreate(
             ['acronym' => 'SGT'],
             ['name' => 'SUBGERENCIA DE TRIBUTACIÓN', 'parent_id' => $gat->id, 'level' => 2, 'is_active' => true]
         );
 
-        $person = \App\Models\Person::firstOrCreate(
+        $person = Person::firstOrCreate(
             ['document_number' => '42747895'],
             [
                 'type' => 'PERSONAL',
@@ -197,12 +198,39 @@ class HelpdeskComponentsTest extends TestCase
             ]
         );
 
-        \Livewire\Livewire::test(NewTicketComponent::class)
+        Livewire::test(NewTicketComponent::class)
             ->set('applicantName', 'CINTHYA KATTY FERRO COLUMBUS')
             ->assertSet('officeName', 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA')
             ->assertSee('GERENCIA DE ADMINISTRACIÓN TRIBUTARIA')
             ->assertSee('Principal')
             ->assertSee('SUBGERENCIA DE TRIBUTACIÓN')
             ->assertSee('Encargada por jerarquía');
+    }
+
+    public function test_workload_tab_renders_unassigned_tickets_and_assigns_to_least_loaded_technician(): void
+    {
+        $unassigned = Ticket::create([
+            'ticket_number' => 'TCK-2026-TEST-UNASSIGNED',
+            'applicant_name' => 'Mario Vargas',
+            'office_name' => 'Procuraduría',
+            'category' => 'RED_INTERNET',
+            'priority' => 'ALTA',
+            'subject' => 'Corte total de internet en oficina',
+            'description' => 'Ninguna máquina navega',
+            'status' => 'ABIERTO',
+            'assigned_technician_name' => null,
+        ]);
+
+        Livewire::test(TicketsComponent::class)
+            ->call('setTab', 'workload')
+            ->assertSee('Tickets Sin Atender en Cola')
+            ->assertSee('TCK-2026-TEST-UNASSIGNED')
+            ->assertSee('Corte total de internet en oficina')
+            ->call('assignTicketToLeastLoaded', $unassigned->id);
+
+        $fresh = $unassigned->fresh();
+        $this->assertEquals('EN_ATENCION', $fresh->status);
+        $this->assertNotNull($fresh->assigned_technician_name);
+        $this->assertEquals('Téc. Juan Pérez', $fresh->assigned_technician_name);
     }
 }

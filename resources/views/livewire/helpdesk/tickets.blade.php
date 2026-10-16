@@ -413,6 +413,141 @@
                 </p>
             </div>
 
+            <!-- ========================================================================= -->
+            <!-- BANDEJA DE TICKETS SIN ATENDER (RF-13 BALANCEO INTELIGENTE)               -->
+            <!-- ========================================================================= -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-xs border border-slate-200 dark:border-slate-800 relative z-20">
+                <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-amber-500/5 via-slate-50 to-indigo-500/5 dark:from-amber-950/20 dark:via-slate-900 dark:to-indigo-950/20 rounded-t-2xl">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg font-bold shrink-0">
+                            📥
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h3 class="font-bold text-sm text-slate-900 dark:text-white">
+                                    Tickets Sin Atender en Cola
+                                </h3>
+                                @if(count($unassignedTickets) > 0)
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 animate-pulse">
+                                        {{ count($unassignedTickets) }} pendientes
+                                    </span>
+                                @else
+                                    <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+                                        0 pendientes
+                                    </span>
+                                @endif
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                                Incidencias en espera de asignación. Asigne al técnico disponible o con menor carga de trabajo para balancear el equipo.
+                            </p>
+                        </div>
+                    </div>
+
+                    @if(count($unassignedTickets) > 0 && $leastLoadedTechnician)
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button type="button"
+                                    wire:click="autoAssignAllUnattended"
+                                    class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 active:scale-95 transition-all shadow-xs cursor-pointer">
+                                <span>⚡</span>
+                                <span>Balancear Todos Automáticamente</span>
+                            </button>
+                        </div>
+                    @endif
+                </div>
+
+                @if(count($unassignedTickets) > 0)
+                    <div class="divide-y divide-slate-100 dark:divide-slate-800">
+                        @foreach($unassignedTickets as $t)
+                            <div class="p-4 hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition-colors flex flex-col md:flex-row md:items-center justify-between gap-3 {{ $loop->last ? 'rounded-b-2xl' : '' }}">
+                                <div class="space-y-1 min-w-0 flex-1">
+                                    <div class="flex items-center gap-2 flex-wrap">
+                                        <span class="font-mono font-bold text-xs text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-2 py-0.5 rounded">
+                                            {{ $t->ticket_number }}
+                                        </span>
+                                        @php
+                                            $priorityBadge = match($t->priority) {
+                                                'CRITICA' => 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300',
+                                                'ALTA' => 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+                                                'MEDIA' => 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300',
+                                                default => 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300',
+                                            };
+                                        @endphp
+                                        <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded {{ $priorityBadge }}">
+                                            Prioridad: {{ $t->priority ?? 'MEDIA' }}
+                                        </span>
+                                        <span class="text-[11px] text-slate-400">
+                                            • {{ $t->created_at ? $t->created_at->diffForHumans() : 'Reciente' }}
+                                        </span>
+                                    </div>
+                                    <p class="text-xs font-semibold text-slate-900 dark:text-white truncate">
+                                        {{ $t->subject }}
+                                    </p>
+                                    <p class="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                                        📍 {{ $t->office_name ?? $t->office?->name ?? 'Dependencia no especificada' }} • 👤 {{ $t->applicant_name }}
+                                    </p>
+                                </div>
+
+                                <div class="flex items-center gap-2 shrink-0">
+                                    @if($leastLoadedTechnician)
+                                        <button type="button"
+                                                wire:click="assignTicketToLeastLoaded({{ $t->id }})"
+                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 transition-colors shadow-xs cursor-pointer"
+                                                title="Asignar al técnico con menor carga actual ({{ $leastLoadedTechnician['technicianName'] }})">
+                                            <span>⚡ Asignar a {{ $leastLoadedTechnician['technicianName'] }}</span>
+                                            <span class="text-[10px] bg-emerald-800/80 px-1.5 py-0.5 rounded font-mono">
+                                                {{ $leastLoadedTechnician['inProgressCount'] }} activos
+                                            </span>
+                                        </button>
+                                    @endif
+
+                                    <!-- Selector para asignar a otro técnico específico -->
+                                    <div class="relative" x-data="{ open: false, dropUp: false }" x-init="$watch('open', value => { if (value) { const rect = $el.getBoundingClientRect(); dropUp = (window.innerHeight - rect.bottom) < 220; } })">
+                                        <button type="button"
+                                                @click="open = !open"
+                                                class="px-2.5 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 text-xs font-medium transition-colors cursor-pointer flex items-center gap-1">
+                                            <span>Otro</span>
+                                            <span class="text-[10px] transition-transform duration-200" :class="open ? 'rotate-180' : ''">▾</span>
+                                        </button>
+                                        <div x-show="open"
+                                             @click.outside="open = false"
+                                             x-cloak
+                                             :class="dropUp ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
+                                             class="absolute right-0 w-64 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 p-1.5 z-50 text-xs">
+                                            <span class="block px-2.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 mb-1">
+                                                Asignar a:
+                                            </span>
+                                            <div class="space-y-0.5">
+                                                @foreach($metrics['techniciansWorkload'] ?? [] as $tech)
+                                                    <button type="button"
+                                                            wire:click="assignTicketToTechnician({{ $t->id }}, '{{ addslashes($tech['technicianName']) }}')"
+                                                            @click="open = false"
+                                                            class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between cursor-pointer transition-colors">
+                                                        <span class="truncate font-medium text-slate-800 dark:text-slate-200">{{ $tech['technicianName'] }}</span>
+                                                        <span class="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 rounded">
+                                                            {{ $tech['inProgressCount'] }} activos
+                                                        </span>
+                                                    </button>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="p-6 text-center">
+                        <span class="text-2xl block mb-1">🎉</span>
+                        <h4 class="text-xs font-bold text-slate-800 dark:text-slate-200">
+                            No hay tickets sin atender en cola
+                        </h4>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                            Todas las incidencias están debidamente asignadas y en atención por el personal técnico.
+                        </p>
+                    </div>
+                @endif
+            </div>
+
             <!-- Tarjetas por Técnico -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 @foreach ($metrics['techniciansWorkload'] ?? [] as $tech)

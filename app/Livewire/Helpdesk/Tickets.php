@@ -93,7 +93,9 @@ class Tickets extends Component
     public string $formOfficeName = 'Secretaría General y Mesa de Partes';
 
     public ?int $formOfficeId = null;
+
     public bool $formApplicantIsInherited = false;
+
     public ?string $formApplicantInheritedOffice = null;
 
     public ?int $formAssetId = null;
@@ -357,7 +359,7 @@ class Tickets extends Component
             $office = Office::where('name', $this->formOfficeName)->first()
                 ?? Office::where('name', 'like', '%'.$this->formOfficeName.'%')->first();
         }
-        if (!$office && $this->formOfficeId) {
+        if (! $office && $this->formOfficeId) {
             $office = Office::find($this->formOfficeId);
         }
         $officeName = $office?->name ?? ($this->formOfficeName ?: 'Secretaría General y Mesa de Partes');
@@ -666,6 +668,103 @@ class Tickets extends Component
     }
 
     // ==========================================
+    // 8.1 CARGAS DE TRABAJO Y BALANCEO INTELIGENTE (RF-13)
+    // ==========================================
+    public function assignTicketToLeastLoaded(int $ticketId): void
+    {
+        $metricsAction = app(GetHelpdeskDashboardMetricsAction::class);
+        $metrics = $metricsAction->handle();
+        $technicians = $metrics['techniciansWorkload'] ?? [];
+
+        if (empty($technicians)) {
+            $this->showAlert('No hay técnicos disponibles para asignación.', 'error');
+
+            return;
+        }
+
+        // Ordenar por menor carga en proceso
+        usort($technicians, fn ($a, $b) => $a['inProgressCount'] <=> $b['inProgressCount']);
+        $leastLoaded = $technicians[0]['technicianName'];
+
+        $this->assignTicketToTechnician($ticketId, $leastLoaded);
+    }
+
+    public function assignTicketToTechnician(int $ticketId, string $technicianName): void
+    {
+        $ticket = Ticket::find($ticketId);
+        if (! $ticket) {
+            $this->showAlert('El ticket no fue encontrado.', 'error');
+
+            return;
+        }
+
+        $ticket->assigned_technician_name = $technicianName;
+        $ticket->assigned_technician_phone = 'Anexo 104';
+        $ticket->status = 'EN_ATENCION';
+        $ticket->started_at = now();
+        $ticket->save();
+
+        TicketAuditLog::create([
+            'ticket_id' => $ticket->id,
+            'previous_status' => 'ABIERTO',
+            'new_status' => 'EN_ATENCION',
+            'action' => 'ASIGNACION_SUPERVISOR',
+            'performed_by_user_name' => auth()->user()?->name ?? 'Coordinación ODT',
+            'notes' => "Ticket asignado por balanceo a {$technicianName}.",
+        ]);
+
+        $this->showAlert("Ticket {$ticket->ticket_number} asignado exitosamente a {$technicianName}.");
+    }
+
+    public function autoAssignAllUnattended(): void
+    {
+        $unattended = Ticket::where('status', 'ABIERTO')
+            ->orWhereNull('assigned_technician_name')
+            ->orderByRaw("CASE priority WHEN 'CRITICA' THEN 1 WHEN 'ALTA' THEN 2 WHEN 'MEDIA' THEN 3 WHEN 'BAJA' THEN 4 ELSE 5 END")
+            ->orderBy('id', 'asc')
+            ->get();
+
+        if ($unattended->isEmpty()) {
+            $this->showAlert('No hay tickets pendientes por asignar.');
+
+            return;
+        }
+
+        $assignedCount = 0;
+        foreach ($unattended as $ticket) {
+            $metricsAction = app(GetHelpdeskDashboardMetricsAction::class);
+            $metrics = $metricsAction->handle();
+            $technicians = $metrics['techniciansWorkload'] ?? [];
+
+            if (empty($technicians)) {
+                break;
+            }
+
+            usort($technicians, fn ($a, $b) => $a['inProgressCount'] <=> $b['inProgressCount']);
+            $leastLoaded = $technicians[0]['technicianName'];
+
+            $ticket->assigned_technician_name = $leastLoaded;
+            $ticket->assigned_technician_phone = 'Anexo 104';
+            $ticket->status = 'EN_ATENCION';
+            $ticket->started_at = now();
+            $ticket->save();
+
+            TicketAuditLog::create([
+                'ticket_id' => $ticket->id,
+                'previous_status' => 'ABIERTO',
+                'new_status' => 'EN_ATENCION',
+                'action' => 'BALANCEO_AUTOMATICO',
+                'performed_by_user_name' => auth()->user()?->name ?? 'Coordinación ODT',
+                'notes' => "Ticket balanceado automáticamente hacia {$leastLoaded}.",
+            ]);
+
+            $assignedCount++;
+        }
+
+        $this->showAlert("Se balancearon y asignaron {$assignedCount} tickets pendientes con éxito.");
+    }
+
+    // ==========================================
     // 9. BASE DE CONOCIMIENTOS (RF-14)
     // ==========================================
     public function openViewKbModal(int $articleId): void
@@ -795,6 +894,23 @@ class Tickets extends Component
         $supplies = Supply::where('stock', '>', 0)->get();
         $metrics = $metricsAction->handle();
 
+        // Tickets sin atender en cola (RF-13 Balanceo Inteligente)
+        $unassignedTickets = Ticket::with(['office'])
+            ->where(function ($q) {
+                $q->where('status', 'ABIERTO')
+                    ->orWhereNull('assigned_technician_name');
+            })
+            ->orderByRaw("CASE priority WHEN 'CRITICA' THEN 1 WHEN 'ALTA' THEN 2 WHEN 'MEDIA' THEN 3 WHEN 'BAJA' THEN 4 ELSE 5 END")
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        $leastLoadedTechnician = null;
+        if (! empty($metrics['techniciansWorkload'])) {
+            $techsSorted = $metrics['techniciansWorkload'];
+            usort($techsSorted, fn ($a, $b) => $a['inProgressCount'] <=> $b['inProgressCount']);
+            $leastLoadedTechnician = $techsSorted[0];
+        }
+
         $counts = [
             'tickets' => Ticket::count(),
             'my_tickets' => $myTickets->count(),
@@ -811,6 +927,8 @@ class Tickets extends Component
             'assets' => $assets,
             'supplies' => $supplies,
             'metrics' => $metrics,
+            'unassignedTickets' => $unassignedTickets,
+            'leastLoadedTechnician' => $leastLoadedTechnician,
             'counts' => $counts,
         ])->layoutData([
             'counts' => $counts,

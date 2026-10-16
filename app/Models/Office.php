@@ -42,7 +42,7 @@ class Office extends Model
         return $this->hasMany(self::class, 'parent_id');
     }
 
-        public function resolveActiveResponsible(?Collection $people = null, ?Collection $allOffices = null): array
+    public function resolveActiveResponsible(?Collection $people = null, ?Collection $allOffices = null): array
     {
         $currentOffice = $this;
         $traversed = [];
@@ -60,23 +60,23 @@ class Office extends Model
 
             if ($people !== null) {
                 // Modo optimizado en memoria
-                if (!empty($acronym)) {
+                if (! empty($acronym)) {
                     $person = $people->filter(function ($p) use ($acronym) {
                         return ($p->is_active ?? true)
                             && ($p->labor_status === null || $p->labor_status === 'ACTIVO')
-                            && str_contains($p->office ?? '', '[' . $acronym . ']');
-                    })->sortBy(fn($p) => $this->getPositionPriority($p->position ?? ''))->first();
+                            && str_contains($p->office ?? '', '['.$acronym.']');
+                    })->sortBy(fn ($p) => $this->getPositionPriority($p->position ?? ''))->first();
                 }
 
-                if (!$person) {
+                if (! $person) {
                     $person = $people->filter(function ($p) use ($currentOffice) {
                         return ($p->is_active ?? true)
                             && ($p->labor_status === null || $p->labor_status === 'ACTIVO')
                             && str_contains(strtoupper($p->office ?? ''), strtoupper($currentOffice->name));
-                    })->sortBy(fn($p) => $this->getPositionPriority($p->position ?? ''))->first();
+                    })->sortBy(fn ($p) => $this->getPositionPriority($p->position ?? ''))->first();
                 }
 
-                if (!$person) {
+                if (! $person) {
                     $words = array_diff(explode(' ', strtoupper($currentOffice->name)), $stopwords);
                     foreach ($words as $w) {
                         $w = trim($w);
@@ -85,7 +85,7 @@ class Office extends Model
                                 return ($item->is_active ?? true)
                                     && ($item->labor_status === null || $item->labor_status === 'ACTIVO')
                                     && str_contains(strtoupper($item->office ?? ''), $w);
-                            })->sortBy(fn($item) => $this->getPositionPriority($item->position ?? ''))->first();
+                            })->sortBy(fn ($item) => $this->getPositionPriority($item->position ?? ''))->first();
 
                             if ($p) {
                                 $person = $p;
@@ -96,7 +96,7 @@ class Office extends Model
                 }
             } else {
                 // Modo consulta directa a base de datos
-                if (!empty($acronym)) {
+                if (! empty($acronym)) {
                     $person = Person::where('is_active', true)
                         ->where(function ($q) {
                             $q->whereNull('labor_status')->orWhere('labor_status', 'ACTIVO');
@@ -115,7 +115,7 @@ class Office extends Model
                         ->first();
                 }
 
-                if (!$person) {
+                if (! $person) {
                     $person = Person::where('is_active', true)
                         ->where(function ($q) {
                             $q->whereNull('labor_status')->orWhere('labor_status', 'ACTIVO');
@@ -134,7 +134,7 @@ class Office extends Model
                         ->first();
                 }
 
-                if (!$person) {
+                if (! $person) {
                     $words = array_diff(explode(' ', strtoupper($currentOffice->name)), $stopwords);
                     foreach ($words as $w) {
                         $w = trim($w);
@@ -166,11 +166,12 @@ class Office extends Model
 
             if ($person) {
                 $isInherited = ($currentOffice->id !== $this->id);
+
                 return [
                     'person' => $person,
                     'name' => trim("{$person->first_name} {$person->paternal_surname} {$person->maternal_surname}"),
                     'phone' => $person->phone ?: 'Anexo 115',
-                    'email' => $person->email ?: (strtolower(str_replace(' ', '', $person->first_name)) . '@castilla.gob.pe'),
+                    'email' => $person->email ?: (strtolower(str_replace(' ', '', $person->first_name)).'@castilla.gob.pe'),
                     'position' => $person->position,
                     'is_inherited' => $isInherited,
                     'inherited_from' => $isInherited ? $currentOffice->name : null,
@@ -205,14 +206,31 @@ class Office extends Model
     protected function getPositionPriority(string $position): int
     {
         $pos = strtoupper($position);
-        if (str_contains($pos, 'ALCALDE')) return 1;
-        if (str_contains($pos, 'GERENTE MUNICIPAL')) return 2;
-        if (str_contains($pos, 'SECRETARIO GENERAL')) return 3;
-        if (str_contains($pos, 'GERENTE')) return 4;
-        if (str_contains($pos, 'SUBGERENTE')) return 5;
-        if (str_contains($pos, 'JEFE')) return 6;
-        if (str_contains($pos, 'DIRECTOR')) return 7;
-        if (str_contains($pos, 'ENCARGADO') || str_contains($pos, 'SUPERVISOR')) return 8;
+        if (str_contains($pos, 'ALCALDE')) {
+            return 1;
+        }
+        if (str_contains($pos, 'GERENTE MUNICIPAL')) {
+            return 2;
+        }
+        if (str_contains($pos, 'SECRETARIO GENERAL')) {
+            return 3;
+        }
+        if (str_contains($pos, 'GERENTE')) {
+            return 4;
+        }
+        if (str_contains($pos, 'SUBGERENTE')) {
+            return 5;
+        }
+        if (str_contains($pos, 'JEFE')) {
+            return 6;
+        }
+        if (str_contains($pos, 'DIRECTOR')) {
+            return 7;
+        }
+        if (str_contains($pos, 'ENCARGADO') || str_contains($pos, 'SUPERVISOR')) {
+            return 8;
+        }
+
         return 9;
     }
 }
