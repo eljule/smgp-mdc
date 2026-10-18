@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Livewire;
 
-use App\Livewire\Helpdesk\Knowledge as KnowledgeComponent;
 use App\Livewire\Helpdesk\NewTicket as NewTicketComponent;
 use App\Livewire\Helpdesk\Tickets as TicketsComponent;
 use App\Models\Helpdesk\KnowledgeArticle;
@@ -100,15 +99,15 @@ class HelpdeskComponentsTest extends TestCase
         $article = KnowledgeArticle::first();
 
         $response = $this->get('/helpdesk/kb');
-        $response->assertStatus(200);
-        $response->assertSee('Base de Conocimientos TI');
+        $response->assertRedirect('/helpdesk?tab=knowledge');
 
         if ($article) {
             $initialViews = $article->views_count;
-            Livewire::test(KnowledgeComponent::class)
+            Livewire::withQueryParams(['tab' => 'knowledge'])
+                ->test(TicketsComponent::class)
                 ->assertSee($article->title)
-                ->call('selectArticle', $article->id)
-                ->assertSet('selectedArticleId', $article->id);
+                ->call('openViewKbModal', $article->id)
+                ->assertSet('isKbModalOpen', true);
 
             $this->assertEquals($initialViews + 1, $article->fresh()->views_count);
         }

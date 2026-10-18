@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Feature\Livewire;
 
-use App\Livewire\Itam\Assets as AssetsComponent;
 use App\Livewire\Itam\Dashboard;
-use App\Livewire\Itam\Loans as LoansComponent;
-use App\Livewire\Itam\Supplies as SuppliesComponent;
 use App\Models\Itam\Asset;
 use App\Models\Itam\AssetBrand;
 use App\Models\Itam\AssetCategory;
@@ -41,50 +38,19 @@ class ItamComponentsTest extends TestCase
     public function test_renders_itam_assets_page_and_searches(): void
     {
         $response = $this->get('/itam/activos');
-
-        $response->assertStatus(200);
-        $response->assertSee('Catálogo de Activos Tecnológicos');
-        $response->assertSee('MDC-TI-PC-0001');
-
-        Livewire::test(AssetsComponent::class)
-            ->assertSee('MDC-TI-PC-0001')
-            ->set('search', 'NONEXISTENT')
-            ->assertDontSee('MDC-TI-PC-0001')
-            ->set('search', '')
-            ->call('openCreateModal')
-            ->assertSet('showCreateModal', true);
+        $response->assertRedirect('/itam?tab=inventory');
     }
 
     public function test_renders_itam_supplies_and_adjusts_stock(): void
     {
-        $supply = Supply::first();
-
-        Livewire::test(SuppliesComponent::class)
-            ->assertSee($supply->name)
-            ->call('adjustStock', $supply->id, 5)
-            ->assertSee('actualizado');
-
-        $this->assertEquals($supply->stock + 5, $supply->fresh()->stock);
+        $response = $this->get('/itam/insumos');
+        $response->assertRedirect('/itam?tab=supplies');
     }
 
     public function test_renders_itam_loans_and_registers_loan(): void
     {
-        $asset = Asset::first();
-        $asset->update(['is_loanable' => true]);
-
-        Livewire::test(LoansComponent::class)
-            ->assertSee('Préstamos y Reservas de Equipos')
-            ->set('formRequestingOffice', 'ALCALDÍA')
-            ->set('formBorrowerName', 'Juan Carlos')
-            ->set('formEventReason', 'Sesión de Consejo')
-            ->set('formSelectedAssetIds', [$asset->id])
-            ->call('saveLoan')
-            ->assertSee('registrado exitosamente con acta de entrega');
-
-        $this->assertDatabaseHas('itam_asset_loans', [
-            'borrower_name' => 'Juan Carlos',
-            'requesting_office' => 'ALCALDÍA',
-        ]);
+        $response = $this->get('/itam/prestamos');
+        $response->assertRedirect('/itam?tab=loans');
     }
 
     public function test_dashboard_supplies_creation_and_adjustment(): void
@@ -331,10 +297,10 @@ class ItamComponentsTest extends TestCase
 
     public function test_renders_all_other_itam_views(): void
     {
-        $this->get('/itam/mantenimiento')->assertStatus(200)->assertSee('Órdenes de Mantenimiento');
-        $this->get('/itam/movimientos')->assertStatus(200)->assertSee('Movimientos y Actas de Custodia');
-        $this->get('/itam/software')->assertStatus(200)->assertSee('Licencias de Software');
-        $this->get('/itam/auditoria')->assertStatus(200)->assertSee('Auditorías de Inventario Físico');
+        $this->get('/itam/mantenimiento')->assertRedirect('/itam?tab=maintenance');
+        $this->get('/itam/movimientos')->assertRedirect('/itam?tab=movements');
+        $this->get('/itam/software')->assertRedirect('/itam?tab=software');
+        $this->get('/itam/auditoria')->assertRedirect('/itam?tab=audits');
     }
 
     public function test_asset_detail_modal_ficha_tecnica_rendering(): void

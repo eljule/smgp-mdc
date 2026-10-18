@@ -6,15 +6,15 @@
                 </div>
                 <nav class="space-y-1">
                     <!-- 1. Panel General -->
-                    <a href="{{ route('subsystems.central') }}"
-                        class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'dashboard' ? $activeClass : $inactiveClass }}"
+                    <a href="{{ url('/admin?tab=dashboard') }}" wire:navigate
+                        class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'dashboard' || $activeTab === 'overview' ? $activeClass : $inactiveClass }}"
                         title="Panel General">
                         <span class="text-lg shrink-0">📊</span>
                         <span x-show="!sidebarCollapsed" class="truncate">Panel General</span>
                     </a>
 
                     <!-- 2. Personas -->
-                    <a href="{{ route('admin.people') }}"
+                    <a href="{{ url('/admin?tab=people') }}" wire:navigate
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'people' ? $activeClass : $inactiveClass }}"
                         title="Personas">
                         <span class="text-lg shrink-0">👥</span>
@@ -28,7 +28,7 @@
                     </a>
 
                     <!-- 3. Usuarios -->
-                    <a href="{{ route('admin.users') }}"
+                    <a href="{{ url('/admin?tab=users') }}" wire:navigate
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'users' ? $activeClass : $inactiveClass }}"
                         title="Usuarios">
                         <span class="text-lg shrink-0">🔐</span>
@@ -42,7 +42,7 @@
                     </a>
 
                     <!-- 4. Roles -->
-                    <a href="{{ route('admin.roles') }}"
+                    <a href="{{ url('/admin?tab=roles') }}" wire:navigate
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'roles' ? $activeClass : $inactiveClass }}"
                         title="Roles">
                         <span class="text-lg shrink-0">🛒</span>
@@ -56,7 +56,7 @@
                     </a>
 
                     <!-- 5. Permisos -->
-                    <a href="{{ route('admin.permissions') }}"
+                    <a href="{{ url('/admin?tab=permissions') }}" wire:navigate
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'permissions' ? $activeClass : $inactiveClass }}"
                         title="Permisos">
                         <span class="text-lg shrink-0">🔑</span>
@@ -70,7 +70,7 @@
                     </a>
 
                     <!-- 6. Asignar Permisos -->
-                    <a href="{{ route('admin.matrix') }}"
+                    <a href="{{ url('/admin?tab=matrix') }}" wire:navigate
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'assignment' || $activeTab === 'matrix' ? $activeClass : $inactiveClass }}"
                         title="Asignar Permisos">
                         <span class="text-lg shrink-0">⚡</span>
@@ -84,7 +84,7 @@
                     </a>
 
                     <!-- 7. Oficinas & Áreas -->
-                    <a href="{{ route('admin.offices') }}"
+                    <a href="{{ url('/admin?tab=offices') }}" wire:navigate
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'offices' ? $activeClass : $inactiveClass }}"
                         title="Oficinas & Áreas">
                         <span class="text-lg shrink-0">🏛️</span>
@@ -92,7 +92,7 @@
                     </a>
 
                     <!-- 8. Subsistemas SIGM -->
-                    <a href="{{ route('admin.subsystems') }}"
+                    <a href="{{ url('/admin?tab=subsystems') }}" wire:navigate
                         class="w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs sm:text-sm transition-all cursor-pointer {{ $activeTab === 'subsystems' ? $activeClass : $inactiveClass }}"
                         title="Subsistemas SIGM">
                         <span class="text-lg shrink-0">⚙️</span>

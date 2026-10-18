@@ -4,24 +4,9 @@ declare(strict_types=1);
 
 use App\Http\Controllers\Auth\LoginController;
 use App\Livewire\Admin\Dashboard as AdminDashboard;
-use App\Livewire\Admin\Offices as AdminOffices;
-use App\Livewire\Admin\People as AdminPeople;
-use App\Livewire\Admin\PermissionMatrix as AdminPermissionMatrix;
-use App\Livewire\Admin\Permissions as AdminPermissions;
-use App\Livewire\Admin\Roles as AdminRoles;
-use App\Livewire\Admin\Subsystems as AdminSubsystems;
-use App\Livewire\Admin\Users as AdminUsers;
-use App\Livewire\Helpdesk\Knowledge as HelpdeskKnowledge;
 use App\Livewire\Helpdesk\NewTicket as HelpdeskNewTicket;
 use App\Livewire\Helpdesk\Tickets as HelpdeskTickets;
-use App\Livewire\Itam\Assets as ItamAssets;
-use App\Livewire\Itam\Audits as ItamAudits;
 use App\Livewire\Itam\Dashboard as ItamDashboard;
-use App\Livewire\Itam\Loans as ItamLoans;
-use App\Livewire\Itam\Maintenance as ItamMaintenance;
-use App\Livewire\Itam\Movements as ItamMovements;
-use App\Livewire\Itam\Software as ItamSoftware;
-use App\Livewire\Itam\Supplies as ItamSupplies;
 use App\Livewire\Portal\Maintenance as ModuleMaintenance;
 use App\Livewire\Portal\ModuleLauncher;
 use App\Livewire\Transportes\Dashboard as TransportesDashboard;
@@ -58,28 +43,28 @@ Route::get('/mantenimiento', ModuleMaintenance::class)->name('portal.maintenance
 
 // Rutas del Subsistema Central de Administración
 Route::get('/admin', AdminDashboard::class)->name('subsystems.central');
-Route::get('/admin/personas', AdminPeople::class)->name('admin.people');
-Route::get('/admin/usuarios', AdminUsers::class)->name('admin.users');
-Route::get('/admin/roles', AdminRoles::class)->name('admin.roles');
-Route::get('/admin/permisos', AdminPermissions::class)->name('admin.permissions');
-Route::get('/admin/asignar-permisos', AdminPermissionMatrix::class)->name('admin.matrix');
-Route::get('/admin/oficinas', AdminOffices::class)->name('admin.offices');
-Route::get('/admin/subsistemas', AdminSubsystems::class)->name('admin.subsystems');
+Route::get('/admin/personas', AdminDashboard::class)->name('admin.people');
+Route::get('/admin/usuarios', AdminDashboard::class)->name('admin.users');
+Route::get('/admin/roles', AdminDashboard::class)->name('admin.roles');
+Route::get('/admin/permisos', AdminDashboard::class)->name('admin.permissions');
+Route::get('/admin/asignar-permisos', AdminDashboard::class)->name('admin.matrix');
+Route::get('/admin/oficinas', AdminDashboard::class)->name('admin.offices');
+Route::get('/admin/subsistemas', AdminDashboard::class)->name('admin.subsystems');
 
 // Rutas del Subsistema ITAM (Gestión de Infraestructura y Activos TI)
 Route::get('/itam', ItamDashboard::class)->name('subsystems.itam');
-Route::get('/itam/activos', ItamAssets::class)->name('itam.assets');
-Route::get('/itam/insumos', ItamSupplies::class)->name('itam.supplies');
-Route::get('/itam/prestamos', ItamLoans::class)->name('itam.loans');
-Route::get('/itam/mantenimiento', ItamMaintenance::class)->name('itam.maintenance');
-Route::get('/itam/movimientos', ItamMovements::class)->name('itam.movements');
-Route::get('/itam/software', ItamSoftware::class)->name('itam.software');
-Route::get('/itam/auditoria', ItamAudits::class)->name('itam.audits');
+Route::redirect('/itam/activos', '/itam?tab=inventory')->name('itam.assets');
+Route::redirect('/itam/insumos', '/itam?tab=supplies')->name('itam.supplies');
+Route::redirect('/itam/prestamos', '/itam?tab=loans')->name('itam.loans');
+Route::redirect('/itam/mantenimiento', '/itam?tab=maintenance')->name('itam.maintenance');
+Route::redirect('/itam/movimientos', '/itam?tab=movements')->name('itam.movements');
+Route::redirect('/itam/software', '/itam?tab=software')->name('itam.software');
+Route::redirect('/itam/auditoria', '/itam?tab=audits')->name('itam.audits');
 
 // Rutas del Subsistema Helpdesk (Mesa de Ayuda y Soporte TI)
 Route::get('/helpdesk', HelpdeskTickets::class)->name('subsystems.helpdesk');
 Route::get('/helpdesk/tickets', HelpdeskTickets::class)->name('helpdesk.tickets');
-Route::get('/helpdesk/kb', HelpdeskKnowledge::class)->name('helpdesk.kb');
+Route::redirect('/helpdesk/kb', '/helpdesk?tab=knowledge')->name('helpdesk.kb');
 
 // Rutas de Otros Subsistemas Municipales
 Route::get('/transportes', TransportesDashboard::class)->name('subsystems.transportes');

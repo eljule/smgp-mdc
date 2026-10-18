@@ -537,7 +537,7 @@ class Dashboard extends Component
             $this->formAcquisitionDate = now()->format('Y-m-d');
             $this->formStatus = 'OPERATIVO';
             $this->formPhysicalCondition = 'BUENO';
-            $this->formOffice = 'Oficina de Desarrollo Tecnológico';
+            $this->formOffice = '';
             $this->formAssignedPersonId = null;
             $this->formAssignedPersonName = '';
             $this->formSupplier = '';

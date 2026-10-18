@@ -5,13 +5,6 @@ declare(strict_types=1);
 namespace Tests\Feature\Livewire;
 
 use App\Livewire\Admin\Dashboard as AdminDashboard;
-use App\Livewire\Admin\Offices as OfficesComponent;
-use App\Livewire\Admin\People as PeopleComponent;
-use App\Livewire\Admin\PermissionMatrix as PermissionMatrixComponent;
-use App\Livewire\Admin\Permissions as PermissionsComponent;
-use App\Livewire\Admin\Roles as RolesComponent;
-use App\Livewire\Admin\Subsystems as SubsystemsComponent;
-use App\Livewire\Admin\Users as UsersComponent;
 use App\Models\Office;
 use App\Models\Person;
 use App\Models\Sede;
@@ -76,7 +69,7 @@ class AdminDashboardTest extends TestCase
             'is_active' => true,
         ]);
 
-        Livewire::test(PeopleComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'people')
             ->call('openCeaseModal', $person->id)
             ->assertSet('showCeaseModal', true)
             ->assertSet('ceaseReason', 'RENUNCIA VOLUNTARIA')
@@ -97,7 +90,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_people_component_filters_and_searches(): void
     {
-        Livewire::test(PeopleComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'people')
             ->assertSee('CARLOS EDUARDO ROJAS MATIAS')
             ->assertSee('02821801')
             ->set('search', 'ROJAS MATIAS')
@@ -111,7 +104,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_people_component_filters_by_office(): void
     {
-        Livewire::test(PeopleComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'people')
             ->assertSee('CARLOS EDUARDO ROJAS MATIAS')
             ->assertSee('EMMA FLOR SAAVEDRA PACHERREZ')
             ->set('officeFilter', 'PROCURADURÍA PÚBLICA MUNICIPAL')
@@ -150,7 +143,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_users_component_filters_and_searches(): void
     {
-        Livewire::test(UsersComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'users')
             ->assertSee('root')
             ->assertSee('ADMINISTRADOR DEL SISTEMA SIGM')
             ->set('search', 'root')
@@ -204,7 +197,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_roles_component_filters_and_searches(): void
     {
-        Livewire::test(RolesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'roles')
             ->assertSee('Administrador Central')
             ->assertSee('admin_central')
             ->set('search', 'transport')
@@ -246,7 +239,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_permissions_component_filters_and_searches(): void
     {
-        Livewire::test(PermissionsComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'permissions')
             ->assertSee('admin.people.manage')
             ->assertSee('helpdesk.tickets.create')
             ->set('search', 'people.manage')
@@ -279,7 +272,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_permission_matrix_interactive_toggles_and_batch_actions(): void
     {
-        Livewire::test(PermissionMatrixComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'matrix')
             ->assertSee('19 / 19 permisos')
             ->call('selectRole', 'municipal_staff')
             ->assertSee('2 / 19 permisos')
@@ -340,7 +333,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_offices_component_filters_and_actions(): void
     {
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->assertSee('OFICINA DE REGIDORES')
             ->set('search', 'REGIDORES')
             ->assertSee('OFICINA DE REGIDORES')
@@ -358,7 +351,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_offices_component_qr_modal_renders_and_closes(): void
     {
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->assertSee('OFICINA DE REGIDORES')
             ->call('openQrModal', 1)
             ->assertSet('showQrModal', true)
@@ -389,7 +382,7 @@ class AdminDashboardTest extends TestCase
     public function test_subsystems_component_filters_and_maintenance_toggle(): void
     {
         $this->seed();
-        Livewire::test(SubsystemsComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'subsystems')
             ->assertSee('CENTRAL_DASHBOARD')
             ->set('filter', 'operativos')
             ->assertSee('CENTRAL_DASHBOARD')
@@ -408,7 +401,7 @@ class AdminDashboardTest extends TestCase
 
     public function test_offices_component_sede_crud_and_color_management(): void
     {
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->call('openSedesModal')
             ->assertSet('showSedesModal', true)
             ->call('openCreateSedeForm')
@@ -428,7 +421,7 @@ class AdminDashboardTest extends TestCase
         $sede = Sede::where('name', 'NUEVA SEDE PARQUE ZONAL')->first();
         $this->assertNotNull($sede);
 
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->call('openEditSedeForm', $sede->id)
             ->assertSet('selectedSedeId', $sede->id)
             ->assertSet('sedeFormName', 'NUEVA SEDE PARQUE ZONAL')
@@ -438,7 +431,7 @@ class AdminDashboardTest extends TestCase
 
         $this->assertEquals('rose', $sede->fresh()->color);
 
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->call('deleteSede', $sede->id);
 
         $this->assertDatabaseMissing('core_sedes', [
@@ -457,7 +450,7 @@ class AdminDashboardTest extends TestCase
         $this->assertNotNull($oci);
 
         // 1. Edit OCI and set parent to Alcaldía
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->call('openEditModal', $oci->id)
             ->assertSet('showEditModal', true)
             ->assertSet('selectedOfficeId', $oci->id)
@@ -473,7 +466,7 @@ class AdminDashboardTest extends TestCase
         ]);
 
         // 2. Edit OCI and remove parent (set to null / empty string)
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->call('openEditModal', $oci->id)
             ->set('formParentId', '')
             ->call('saveOffice')
@@ -487,7 +480,7 @@ class AdminDashboardTest extends TestCase
         ]);
 
         // 3. Register a new office with a parent
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->call('openCreateModal')
             ->assertSet('showCreateModal', true)
             ->set('formCode', '02.99')
@@ -506,11 +499,55 @@ class AdminDashboardTest extends TestCase
         $this->assertEquals(2, $created->level);
 
         // 4. Delete the test office
-        Livewire::test(OfficesComponent::class)
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
             ->call('deleteOffice', $created->id);
 
         $this->assertDatabaseMissing('core_offices', [
             'id' => $created->id,
         ]);
+    }
+
+    public function test_admin_dashboard_renders_tabs_via_query_parameter(): void
+    {
+        $response = $this->get('/admin?tab=people');
+        $response->assertStatus(200);
+        $response->assertSee('Tabla Maestra de Personas');
+
+        $response = $this->get('/admin?tab=users');
+        $response->assertStatus(200);
+        $response->assertSee('Intuitiva de Usuarios');
+
+        $response = $this->get('/admin?tab=offices');
+        $response->assertStatus(200);
+        $response->assertSee('Estructura Org', false);
+    }
+
+    public function test_overview_buttons_trigger_person_and_user_modals(): void
+    {
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'overview')
+            ->assertSee('+ Registrar Persona')
+            ->assertSee('+ Nuevo Usuario & Permisos', false)
+            ->call('openCreatePersonModal')
+            ->assertSet('showFormModal', true)
+            ->assertSee('Registrar Nueva Persona en el SIGM')
+            ->call('closeModal')
+            ->assertSet('showFormModal', false)
+            ->call('openCreateUserModal')
+            ->assertSet('showUserModal', true)
+            ->assertSee('Crear Usuario y Otorgar Permisos')
+            ->assertDontSee('Crear Nuevo Rol Institucional');
+    }
+
+    public function test_offices_component_pagination(): void
+    {
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
+            ->assertSet('page', 1)
+            ->assertSee('Mostrando', false)
+            ->call('gotoPage', 2)
+            ->assertSet('page', 2)
+            ->call('previousPage')
+            ->assertSet('page', 1)
+            ->call('nextPage')
+            ->assertSet('page', 2);
     }
 }
