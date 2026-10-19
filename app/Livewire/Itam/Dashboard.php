@@ -368,6 +368,8 @@ class Dashboard extends Component
 
     public ?int $selectedChildAssetId = null;
 
+    public string $selectedChildAssetInput = '';
+
     // Esquemas Dinámicos de Categoría Modal
     public bool $isCategorySchemaModalOpen = false;
 
@@ -1717,27 +1719,114 @@ class Dashboard extends Component
     public function openChildModal(int $parentId): void
     {
         $this->isDetailModalOpen = false;
-        $this->parentForChildModal = Asset::with(['childAssets', 'category', 'brand', 'model'])->find($parentId);
+        $this->parentForChildModal = Asset::with([
+            'category',
+            'brand',
+            'model',
+            'childAssets.category',
+            'childAssets.brand',
+            'childAssets.model',
+        ])->find($parentId);
         $this->selectedChildAssetId = null;
+        $this->selectedChildAssetInput = '';
         $this->isChildModalOpen = true;
+    }
+
+    public function updatedSelectedChildAssetInput(string $value): void
+    {
+        $this->resolveChildAssetFromInput($value);
+    }
+
+    protected function resolveChildAssetFromInput(?string $value): void
+    {
+        $clean = trim((string) $value);
+        if ($clean === '') {
+            $this->selectedChildAssetId = null;
+            return;
+        }
+
+        // 1. Extraer código si viene en formato "[MDC-TI-...]"
+        if (preg_match('/\[([^\]]+)\]/', $clean, $matches)) {
+            $code = trim($matches[1]);
+            $asset = Asset::whereRaw('UPPER(computer_code) = ?', [mb_strtoupper($code)])->first();
+            if ($asset) {
+                $this->selectedChildAssetId = $asset->id;
+                return;
+            }
+        }
+
+        // 2. Extraer código si viene en formato "MDC-TI-..."
+        if (preg_match('/(MDC-[A-Z0-9\-]+)/i', $clean, $matches)) {
+            $code = trim($matches[1]);
+            $asset = Asset::whereRaw('UPPER(computer_code) = ?', [mb_strtoupper($code)])->first();
+            if ($asset) {
+                $this->selectedChildAssetId = $asset->id;
+                return;
+            }
+        }
+
+        // 3. Si es numérico directo (ID)
+        if (ctype_digit($clean)) {
+            $asset = Asset::find((int) $clean);
+            if ($asset) {
+                $this->selectedChildAssetId = $asset->id;
+                return;
+            }
+        }
+
+        // 4. Búsqueda por número de serie si contiene S/N
+        if (preg_match('/S\/N:\s*([^)]+)/i', $clean, $matches)) {
+            $sn = trim($matches[1]);
+            if ($sn !== '' && $sn !== 'S/N' && $sn !== 'S/N-PROVISIONAL') {
+                $asset = Asset::where('serial_number', $sn)->first();
+                if ($asset) {
+                    $this->selectedChildAssetId = $asset->id;
+                    return;
+                }
+            }
+        }
+
+        $this->selectedChildAssetId = null;
     }
 
     public function linkChildAsset(): void
     {
-        if (! $this->parentForChildModal || ! $this->selectedChildAssetId) {
+        if (! $this->parentForChildModal) {
+            return;
+        }
+
+        if (! $this->selectedChildAssetId && ! empty($this->selectedChildAssetInput)) {
+            $this->resolveChildAssetFromInput($this->selectedChildAssetInput);
+        }
+
+        if (! $this->selectedChildAssetId) {
+            $this->showAlert('Por favor seleccione un periférico o componente de la lista.', 'warning');
             return;
         }
 
         $child = Asset::find($this->selectedChildAssetId);
         if ($child) {
+            if ($child->id === $this->parentForChildModal->id) {
+                $this->showAlert('No puede vincular un equipo a sí mismo.', 'warning');
+                return;
+            }
+
             $child->parent_asset_id = $this->parentForChildModal->id;
             $child->office = $this->parentForChildModal->office;
             $child->assigned_person_id = $this->parentForChildModal->assigned_person_id;
             $child->save();
 
             $this->showAlert("Periférico {$child->computer_code} vinculado a {$this->parentForChildModal->computer_code}.");
-            $this->parentForChildModal->load('childAssets');
+            $this->parentForChildModal->load([
+                'category',
+                'brand',
+                'model',
+                'childAssets.category',
+                'childAssets.brand',
+                'childAssets.model',
+            ]);
             $this->selectedChildAssetId = null;
+            $this->selectedChildAssetInput = '';
         }
     }
 
@@ -1750,7 +1839,14 @@ class Dashboard extends Component
 
             $this->showAlert("Componente {$child->computer_code} desvinculado.");
             if ($this->parentForChildModal) {
-                $this->parentForChildModal->load('childAssets');
+                $this->parentForChildModal->load([
+                    'category',
+                    'brand',
+                    'model',
+                    'childAssets.category',
+                    'childAssets.brand',
+                    'childAssets.model',
+                ]);
             }
         }
     }
@@ -2097,7 +2193,33 @@ class Dashboard extends Component
             'models' => $models->count(),
         ];
 
-        $candidateChildAssets = Asset::where('status', 'OPERATIVO')
+        if ($this->isChildModalOpen && $this->parentForChildModal) {
+            $this->parentForChildModal->loadMissing([
+                'category',
+                'brand',
+                'model',
+                'childAssets.category',
+                'childAssets.brand',
+                'childAssets.model',
+            ]);
+        }
+
+        if ($this->isDetailModalOpen && $this->selectedAssetForDetail) {
+            $this->selectedAssetForDetail->loadMissing([
+                'category',
+                'brand',
+                'model',
+                'assignedPerson',
+                'childAssets.category',
+                'childAssets.brand',
+                'childAssets.model',
+                'movements',
+                'maintenanceOrders',
+            ]);
+        }
+
+        $candidateChildAssets = Asset::with(['category', 'brand', 'model'])
+            ->where('status', 'OPERATIVO')
             ->whereNull('parent_asset_id')
             ->when($this->parentForChildModal, fn ($q) => $q->where('id', '!=', $this->parentForChildModal->id))
             ->orderBy('computer_code')

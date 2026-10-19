@@ -1140,10 +1140,71 @@ class Dashboard extends Component
         $this->formParentId = $parentId;
         $parent = Office::find($parentId);
         if ($parent) {
-            $this->formParentName = $parent->name;
+            $this->formParentName = "{$parent->code} - [{$parent->acronym}] {$parent->name}";
             $this->formLevel = min(4, ((int) $parent->level) + 1);
         } else {
             $this->formParentName = '';
+            $this->formLevel = 1;
+        }
+    }
+
+    public function updatedFormParentName(mixed $value): void
+    {
+        $this->resolveFormParent((string) $value);
+    }
+
+    public function resolveFormParent(?string $value): void
+    {
+        $clean = trim((string) $value);
+
+        if ($clean === '' || str_contains(mb_strtolower($clean), 'sin dependencia') || str_contains(mb_strtolower($clean), 'ninguna')) {
+            $this->formParentId = null;
+            $this->formParentName = '';
+            $this->formLevel = 1;
+
+            return;
+        }
+
+        $parent = null;
+
+        // 1. Extraer código inicial antes del guion: "02 - [ALC] ..."
+        if (preg_match('/^([0-9\.]+)\s*-/i', $clean, $matches)) {
+            $parent = Office::where('code', trim($matches[1]))->first();
+        }
+
+        // 2. Extraer sigla dentro de corchetes: "[ALC]"
+        if (! $parent && preg_match('/\[([A-Za-z0-9\.\-_]+)\]/i', $clean, $matches)) {
+            $parent = Office::where('acronym', trim($matches[1]))->first();
+        }
+
+        // 3. Buscar por código exacto directo (ej. "02" o "02.01")
+        if (! $parent) {
+            $parent = Office::where('code', $clean)->first();
+        }
+
+        // 4. Buscar por sigla directa
+        if (! $parent) {
+            $parent = Office::whereRaw('LOWER(acronym) = ?', [mb_strtolower($clean)])->first();
+        }
+
+        // 5. Buscar por nombre exacto
+        if (! $parent) {
+            $parent = Office::whereRaw('LOWER(name) = ?', [mb_strtolower($clean)])->first();
+        }
+
+        if ($parent) {
+            if ($this->selectedOfficeId && (int) $parent->id === (int) $this->selectedOfficeId) {
+                $this->addError('formParentName', 'Una dependencia no puede ser su propia dependencia superior.');
+                $this->formParentId = null;
+
+                return;
+            }
+
+            $this->formParentId = (int) $parent->id;
+            $this->formParentName = "{$parent->code} - [{$parent->acronym}] {$parent->name}";
+            $this->formLevel = min(4, ((int) $parent->level) + 1);
+        } else {
+            $this->formParentId = null;
             $this->formLevel = 1;
         }
     }
@@ -1196,7 +1257,7 @@ class Dashboard extends Component
             $this->formSigla = (string) $office->acronym;
             $this->formName = (string) $office->name;
             $this->formParentId = $office->parent_id ? (int) $office->parent_id : null;
-            $this->formParentName = (string) ($office->parent?->name ?? $office->parent_name ?? '');
+            $this->formParentName = $office->parent ? "{$office->parent->code} - [{$office->parent->acronym}] {$office->parent->name}" : (string) ($office->parent_name ?? '');
             $this->formLevel = (int) ($office->level ?? 1);
             $this->formIsActive = (bool) $office->is_active;
             $this->formStatus = $office->is_active ? 'Activo' : 'Inactivo';
@@ -1268,6 +1329,7 @@ class Dashboard extends Component
             Sede::clearColorCache();
         }
 
+        if (empty($this->formParentId) && ! empty($this->formParentName)) { $this->resolveFormParent($this->formParentName); }
         $parentId = (! empty($this->formParentId)) ? (int) $this->formParentId : null;
         $parentOffice = $parentId ? Office::find($parentId) : null;
         $parentName = $parentOffice ? $parentOffice->name : null;

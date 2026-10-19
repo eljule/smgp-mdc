@@ -400,4 +400,67 @@ class ItamComponentsTest extends TestCase
         $testComponent->set('formAssignedPersonName', '-- Sin Custodio Asignado (Almacén TI) --')
             ->assertSet('formAssignedPersonId', null);
     }
+    public function test_child_assets_modal_and_linking_without_lazy_loading_violation(): void
+    {
+        $category = \App\Models\Itam\AssetCategory::firstOrCreate(
+            ['code' => 'TESTCAT'],
+            ['name' => 'Categoría Test', 'icon' => '🖥️']
+        );
+        $brand = \App\Models\Itam\AssetBrand::firstOrCreate(['name' => 'Brand Test']);
+        $model = \App\Models\Itam\AssetModel::firstOrCreate(
+            ['name' => 'Model Test', 'brand_id' => $brand->id],
+            ['category_id' => $category->id]
+        );
+
+        $parent = \App\Models\Itam\Asset::create([
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'model_id' => $model->id,
+            'status' => 'OPERATIVO',
+            'physical_condition' => 'BUENO',
+            'computer_code' => 'PC-TEST-001',
+        ]);
+
+        $child = \App\Models\Itam\Asset::create([
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'model_id' => $model->id,
+            'parent_asset_id' => $parent->id,
+            'status' => 'OPERATIVO',
+            'physical_condition' => 'BUENO',
+            'computer_code' => 'MOU-TEST-001',
+            'serial_number' => 'SN-12345',
+        ]);
+
+        $candidate = \App\Models\Itam\Asset::create([
+            'category_id' => $category->id,
+            'brand_id' => $brand->id,
+            'model_id' => $model->id,
+            'parent_asset_id' => null,
+            'status' => 'OPERATIVO',
+            'physical_condition' => 'BUENO',
+            'computer_code' => 'KEY-TEST-002',
+            'serial_number' => 'SN-99999',
+        ]);
+
+        \Livewire\Livewire::test(Dashboard::class)
+            ->call('openChildModal', $parent->id)
+            ->assertSet('isChildModalOpen', true)
+            ->assertSee('PC-TEST-001')
+            ->assertSee('MOU-TEST-001')
+            ->assertSee('SN-12345')
+            ->assertSee('candidate-child-assets-datalist')
+            // Probar resolución por datalist input
+            ->set('selectedChildAssetInput', "[KEY-TEST-002] {$category->name}: {$brand->name} {$model->name} (S/N: SN-99999)")
+            ->assertSet('selectedChildAssetId', $candidate->id)
+            ->call('linkChildAsset')
+            ->assertSee('Periférico KEY-TEST-002 vinculado')
+            ->assertSet('selectedChildAssetInput', '')
+            ->assertSet('selectedChildAssetId', null)
+            ->call('unlinkChildAsset', $child->id)
+            ->assertSee('Componente MOU-TEST-001 desvinculado.');
+
+        $this->assertNull($child->fresh()->parent_asset_id);
+        $this->assertEquals($parent->id, $candidate->fresh()->parent_asset_id);
+    }
 }

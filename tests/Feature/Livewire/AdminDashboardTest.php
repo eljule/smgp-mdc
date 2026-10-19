@@ -550,4 +550,26 @@ class AdminDashboardTest extends TestCase
             ->call('nextPage')
             ->assertSet('page', 2);
     }
+
+    public function test_office_modal_parent_datalist_resolution(): void
+    {
+        $this->seed();
+        $alcaldia = Office::where('code', '02')->first();
+        $this->assertNotNull($alcaldia);
+
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'offices')
+            ->call('openCreateOfficeModal')
+            ->assertSee('parent-offices-datalist')
+            ->assertSee('list="parent-offices-datalist"', false)
+            ->set('formParentName', '02 - [ALC] ALCALDÍA')
+            ->assertSet('formParentId', $alcaldia->id)
+            ->assertSet('formLevel', 2)
+            ->set('formParentName', 'ALC')
+            ->assertSet('formParentId', $alcaldia->id)
+            ->set('formParentName', '02')
+            ->assertSet('formParentId', $alcaldia->id)
+            ->set('formParentName', '')
+            ->assertSet('formParentId', null)
+            ->assertSet('formLevel', 1);
+    }
 }

@@ -78,24 +78,46 @@
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                            Dependencia Superior (Padre Orgánico)
-                        </label>
-                        <select
-                            wire:model.live="formParentId"
-                            class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800 dark:text-slate-200"
-                        >
-                            <option value="">-- Sin Dependencia Superior (Órgano Raíz / Nivel 1) --</option>
-                            @foreach ($allOfficesCatalog as $o)
-                                @if (! $showEditModal || $o['id'] !== $selectedOfficeId)
-                                    <option value="{{ $o['id'] }}">
-                                        {{ $o['code'] }} - [{{ $o['sigla'] }}] {{ $o['name'] }}
-                                    </option>
-                                @endif
-                            @endforeach
-                        </select>
+                        <div class="flex items-center justify-between mb-1">
+                            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+                                Dependencia Superior (Padre Orgánico)
+                            </label>
+                            @if ($formParentId || !empty($formParentName))
+                                <button
+                                    type="button"
+                                    wire:click="$set('formParentName', ''); $set('formParentId', null); $set('formLevel', 1)"
+                                    class="text-[10px] text-rose-500 hover:text-rose-600 font-semibold cursor-pointer transition-colors"
+                                    title="Quitar dependencia y asignar como órgano raíz"
+                                >
+                                    ✕ Quitar dependencia (Raíz)
+                                </button>
+                            @endif
+                        </div>
+                        <div class="relative">
+                            <input
+                                type="text"
+                                list="parent-offices-datalist"
+                                wire:model.live.debounce.300ms="formParentName"
+                                placeholder="Escriba código, sigla o seleccione dependencia superior..."
+                                class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:outline-none text-slate-800 dark:text-slate-200 placeholder:text-slate-400 font-medium"
+                            />
+                            <datalist id="parent-offices-datalist">
+                                @foreach ($allOfficesCatalog as $o)
+                                    @if (! $showEditModal || $o['id'] !== $selectedOfficeId)
+                                        <option value="{{ $o['code'] }} - [{{ $o['sigla'] }}] {{ $o['name'] }}">
+                                            Nivel {{ $o['level'] }} · {{ $o['sede'] }}
+                                        </option>
+                                    @endif
+                                @endforeach
+                            </datalist>
+                            <input type="hidden" wire:model="formParentId" />
+                        </div>
+                        @error('formParentName') <span class="text-[10px] text-rose-500 block mt-0.5">{{ $message }}</span> @enderror
+                        @error('formParentId') <span class="text-[10px] text-rose-500 block mt-0.5">{{ $message }}</span> @enderror
+                        <p class="text-[10px] mt-1 {{ $formParentId ? 'text-emerald-600 dark:text-emerald-400 font-semibold' : 'text-slate-400 font-medium' }}">
+                            {{ $formParentId ? "✓ Asignado como subordinado (Nivel orgánico resultante: {$formLevel})" : 'Sin dependencia superior (Órgano Raíz / Nivel 1)' }}
+                        </p>
                     </div>
-
                     <!-- Campo Sede Municipal (Requerimiento Específico) -->
                     <div class="p-3 bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800/40 rounded-xl space-y-2">
                         <div class="flex items-center justify-between">
