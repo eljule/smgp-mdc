@@ -43,11 +43,22 @@
                         </div>
                     @endif
 
-                    <!-- 01 Selector y Búsqueda de Activo -->
-                    <div class="p-4 rounded-xl border border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/20 dark:bg-emerald-950/10 space-y-2.5">
-                        <label class="block text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
-                            Activo Informático a Trasladar / Reasignar <span class="text-rose-500">*</span>
-                        </label>
+                    <!-- 01 Selector de Activo con DataList -->
+                    <div class="p-4 rounded-xl border border-emerald-300 dark:border-emerald-800/80 bg-emerald-50/20 dark:bg-emerald-950/10 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <label class="block text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider">
+                                Activo Informático a Trasladar / Reasignar <span class="text-rose-500">*</span>
+                            </label>
+                            @if ($selectedMovementAsset)
+                                <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-300 dark:border-emerald-700">
+                                    <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                    </svg>
+                                    Activo Seleccionado
+                                </span>
+                            @endif
+                        </div>
+
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                                 <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -55,19 +66,20 @@
                                 </svg>
                             </span>
                             <input type="text"
-                                   wire:model.live.debounce.250ms="movementAssetSearch"
-                                   placeholder="Filtrar por código (MDC-TI-...), serie, marca, modelo o custodio..."
-                                   class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none" />
+                                   list="movement-assets-datalist"
+                                   wire:model.live.debounce.300ms="movementAssetInput"
+                                   placeholder="Escriba o seleccione código (MDC-TI-...), serie, marca, modelo o custodio..."
+                                   class="w-full pl-9 pr-3 py-2.5 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                   autocomplete="off" />
                         </div>
-                        <select wire:model.live="movementAssetId"
-                                class="w-full px-3 py-2 text-xs border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none">
-                            <option value="">-- Seleccione un activo informático del inventario --</option>
+
+                        <datalist id="movement-assets-datalist">
                             @foreach ($this->availableMovementAssets as $ast)
-                                <option value="{{ $ast->id }}">
-                                    [{{ $ast->computer_code }}] {{ $ast->brand?->name }} {{ $ast->model?->name }} — {{ $ast->office ?: 'Almacén Central TI' }} ({{ $ast->assignedPerson ? $ast->assignedPerson->full_name : 'Sin Custodio' }})
+                                <option value="[{{ $ast->computer_code }}] {{ $ast->brand?->name }} {{ $ast->model?->name }} — {{ $ast->office ?: 'Almacén Central TI' }} ({{ $ast->assignedPerson ? $ast->assignedPerson->full_name : 'Sin Custodio' }})">
+                                    Serie: {{ $ast->serial_number ?: 'S/N' }} | Patrimonial: {{ $ast->patrimonial_code ?: 'S/C' }}
                                 </option>
                             @endforeach
-                        </select>
+                        </datalist>
                     </div>
 
                     <!-- Tarjeta de Ubicación y Custodio Actual -->

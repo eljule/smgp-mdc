@@ -112,7 +112,7 @@ final class GetUsersCatalogAction
             'primaryRole' => 'TÉCNICO DE SOPORTE E ITAM',
             'subsystems' => ['admin', 'itam', 'helpdesk'],
             'status' => 'Activo',
-            'personId' => 11,
+            'personId' => 35,
         ],
         [
             'id' => 3,
@@ -123,7 +123,7 @@ final class GetUsersCatalogAction
             'primaryRole' => 'TÉCNICO DE SOPORTE E ITAM',
             'subsystems' => ['itam', 'helpdesk'],
             'status' => 'Activo',
-            'personId' => 11,
+            'personId' => 35,
         ],
         [
             'id' => 4,
@@ -134,7 +134,7 @@ final class GetUsersCatalogAction
             'primaryRole' => 'TÉCNICO DE SOPORTE E ITAM',
             'subsystems' => ['itam', 'helpdesk'],
             'status' => 'Activo',
-            'personId' => 11,
+            'personId' => 35,
         ],
         [
             'id' => 5,
@@ -145,7 +145,7 @@ final class GetUsersCatalogAction
             'primaryRole' => 'TÉCNICO DE SOPORTE E ITAM',
             'subsystems' => ['itam', 'helpdesk'],
             'status' => 'Activo',
-            'personId' => 11,
+            'personId' => 35,
         ],
         [
             'id' => 6,
@@ -156,7 +156,7 @@ final class GetUsersCatalogAction
             'primaryRole' => 'TÉCNICO DE SOPORTE E ITAM',
             'subsystems' => ['itam', 'helpdesk'],
             'status' => 'Activo',
-            'personId' => 11,
+            'personId' => 35,
         ],
         [
             'id' => 7,
@@ -672,10 +672,46 @@ final class GetUsersCatalogAction
             $all[] = $user;
         }
 
-        // Merge any database users registered dynamically in core_users
+        // Merge any database users registered dynamically in core_users and sync lock status
         try {
             $existingUsernames = array_column($all, 'username');
             $dbUsers = User::with('person')->get();
+            $dbUsersMap = $dbUsers->keyBy('username');
+
+            foreach ($all as &$u) {
+                if (isset($dbUsersMap[$u['username']])) {
+                    $db = $dbUsersMap[$u['username']];
+                    $u['isLocked'] = (bool) $db->is_locked;
+                    $u['mustChangePassword'] = (bool) $db->must_change_password;
+                    $u['failedAttempts'] = $db->failed_login_attempts ?? 0;
+                    $u['dbId'] = $db->id;
+                    if ($db->is_locked) {
+                        $u['status'] = 'Bloqueado';
+                    }
+                    if ($u['username'] !== 'root') {
+                        if ($db->person_id) {
+                            $u['personId'] = $db->person_id;
+                        }
+                        if ($db->person?->document_number) {
+                            $u['dni'] = $db->person->document_number;
+                        } elseif (is_numeric($db->username) && strlen((string) $db->username) === 8) {
+                            $u['dni'] = (string) $db->username;
+                        }
+                        if (! empty($db->person?->full_name)) {
+                            $u['fullName'] = $db->person->full_name;
+                        } elseif (! empty($db->full_name)) {
+                            $u['fullName'] = $db->full_name;
+                        }
+                    }
+                } else {
+                    $u['isLocked'] = false;
+                    $u['mustChangePassword'] = false;
+                    $u['failedAttempts'] = 0;
+                    $u['dbId'] = null;
+                }
+            }
+            unset($u);
+
             foreach ($dbUsers as $dbUser) {
                 if (! in_array($dbUser->username, $existingUsernames, true)) {
                     $all[] = [
@@ -686,9 +722,13 @@ final class GetUsersCatalogAction
                         'email' => $dbUser->email,
                         'primaryRole' => $dbUser->role ?: 'Usuario Municipal',
                         'subsystems' => $dbUser->allowed_modules ?: ['helpdesk'],
-                        'status' => $dbUser->is_active ? 'Activo' : 'Inactivo',
+                        'status' => $dbUser->is_locked ? 'Bloqueado' : ($dbUser->is_active ? 'Activo' : 'Inactivo'),
                         'personId' => $dbUser->person_id,
                         'dni' => $dbUser->person?->document_number ?: (is_numeric($dbUser->username) && strlen((string) $dbUser->username) === 8 ? $dbUser->username : null),
+                        'isLocked' => (bool) $dbUser->is_locked,
+                        'mustChangePassword' => (bool) $dbUser->must_change_password,
+                        'failedAttempts' => $dbUser->failed_login_attempts ?? 0,
+                        'dbId' => $dbUser->id,
                     ];
                 }
             }
@@ -761,7 +801,7 @@ final class GetUsersCatalogAction
     {
         $res = $this->handle(perPage: 9999);
         foreach ($res['items'] as $user) {
-            if ($user['id'] === $id) {
+            if ($user['id'] === $id || ($user['dbId'] ?? null) === $id) {
                 return $user;
             }
         }

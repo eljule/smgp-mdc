@@ -75,6 +75,12 @@
                         </div>
                     </div>
 
+                    <!-- Botón Cambiar Contraseña -->
+                    <a href="{{ route('password.change') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-xs font-medium text-emerald-100 hover:text-white border border-emerald-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white" title="Cambiar mi contraseña">
+                        <span>🔑</span>
+                        <span class="hidden sm:inline">Cambiar Clave</span>
+                    </a>
+
                     <!-- Botón Cerrar Sesión (Redirige al controlador de logout institucional) -->
                     <a href="{{ route('logout') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-900/70 hover:bg-emerald-900 text-xs font-medium text-emerald-100 hover:text-white border border-emerald-700/70 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white" title="Cerrar sesión actual">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

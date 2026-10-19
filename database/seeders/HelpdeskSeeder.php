@@ -19,12 +19,61 @@ class HelpdeskSeeder extends Seeder
             Schema::disableForeignKeyConstraints();
         }
 
+        // Asegurar seeders previos si se corre de forma aislada
+        if (DB::table('core_offices')->count() === 0) {
+            $this->call(OfficeSeeder::class);
+        }
+        if (DB::table('core_people')->count() === 0) {
+            $this->call(PersonSeeder::class);
+        }
+        if (DB::table('core_users')->count() === 0) {
+            $this->call(UserSeeder::class);
+        }
+        if (DB::table('itam_assets')->count() === 0) {
+            $this->call([ItamSeeder::class, DemoItamSeeder::class]);
+        }
+
         DB::table('helpdesk_ticket_supplies')->delete();
         DB::table('helpdesk_ticket_loans')->delete();
         DB::table('helpdesk_ticket_audit_logs')->delete();
         DB::table('helpdesk_ticket_technical_details')->delete();
         DB::table('helpdesk_tickets')->delete();
         DB::table('helpdesk_knowledge_articles')->delete();
+
+        // 1. Mapeo dinámico de oficinas reales (core_offices)
+        $findOfficeId = function (string $acronym, string $fallbackName, int $defaultId): int {
+            $office = DB::table('core_offices')
+                ->where('acronym', $acronym)
+                ->orWhere('name', 'like', "%{$fallbackName}%")
+                ->first();
+
+            return $office ? (int) $office->id : $defaultId;
+        };
+
+        $officeGspId = $findOfficeId('GSP', 'SERVICIOS PÚBLICOS', 56);
+        $officeSrcppsId = $findOfficeId('SRCPPS', 'REGISTRO CIVIL', 54);
+        $officeOmapedId = $findOfficeId('OMAPED', 'DISCAPACIDAD', 52);
+        $officeUleId = $findOfficeId('ULE', 'EMPADRONAMIENTO', 55);
+        $officeSttvId = $findOfficeId('STTV', 'TRANSPORTE', 62);
+        $officeOgdacId = $findOfficeId('OGDAC', 'GESTIÓN DOCUMENTARIA', 6);
+        $officeOrId = $findOfficeId('OR', 'REGIDORES', 1);
+
+        // 2. Mapeo de técnicos de soporte (core_users)
+        $tech1 = DB::table('core_users')->where('username', 'soporte1')->first();
+        $tech2 = DB::table('core_users')->where('username', 'soporte2')->first();
+        $tech3 = DB::table('core_users')->where('username', 'soporte3')->first();
+        $tech4 = DB::table('core_users')->where('username', 'soporte4')->first();
+
+        $tech1Id = $tech1 ? (int) $tech1->id : 2;
+        $tech2Id = $tech2 ? (int) $tech2->id : 3;
+        $tech3Id = $tech3 ? (int) $tech3->id : 4;
+        $tech4Id = $tech4 ? (int) $tech4->id : 5;
+
+        $tech1Name = $tech1 ? (string) $tech1->full_name : 'JAIME HENRY SANDOVAL NIEVES';
+
+        // 3. Mapeo de usuarios por persona para auditoría
+        $userPerson9 = DB::table('core_users')->where('person_id', 9)->first();
+        $userPerson10 = DB::table('core_users')->where('person_id', 10)->first();
 
         $articles = [
             [
@@ -33,15 +82,15 @@ class HelpdeskSeeder extends Seeder
                 'category' => 'HARDWARE',
                 'summary' => 'Guía rápida para solucionar error de atasco de papel o arrastre múltiple en bandejas ADF y frontal.',
                 'symptoms' => 'La impresora emite alerta lumínica de papel atascado o no jala la hoja de oficio.',
-                'solution_steps' => '1. Apagar el equipo y desconectar el cable de poder.
+                'solution_steps' => "1. Apagar el equipo y desconectar el cable de poder.
 2. Abrir la compuerta trasera y retirar cualquier resto de papel trabado jalando suavemente con ambas manos.
 3. Humedecer un paño con alcohol isopropílico y limpiar los rodillos de alimentación.
-4. Reconectar, encender y realizar prueba de impresión.',
+4. Reconectar, encender y realizar prueba de impresión.",
                 'tags' => '["Impresoras", "EcoTank", "Atasco", "Hardware"]',
                 'source_ticket_id' => null,
                 'source_ticket_number' => null,
-                'author_technician_id' => 1,
-                'author_technician_name' => 'Ing. Carlos Mendoza (Soporte TI)',
+                'author_technician_id' => $tech1Id,
+                'author_technician_name' => "{$tech1Name} (Soporte TI)",
                 'views_count' => 42,
                 'helpful_count' => 18,
                 'created_at' => '2026-10-15 02:12:58',
@@ -53,17 +102,17 @@ class HelpdeskSeeder extends Seeder
                 'category' => 'RED_INTERNET',
                 'summary' => 'Pasos para restablecer conexión de red cuando el ícono de red muestra "Sin acceso a Internet".',
                 'symptoms' => 'No se puede acceder al SIGM, ni a internet ni a carpetas compartidas de la municipalidad.',
-                'solution_steps' => '1. Verificar conexión física del conector RJ-45 (LED verde/ámbar parpadeando).
+                'solution_steps' => "1. Verificar conexión física del conector RJ-45 (LED verde/ámbar parpadeando).
 2. Abrir consola cmd como Administrador y ejecutar:
    ipconfig /release
    ipconfig /renew
    ipconfig /flushdns
-3. Si persiste el error, verificar que la tarjeta esté configurada en DHCP o en el rango 192.168.1.X.',
+3. Si persiste el error, verificar que la tarjeta esté configurada en DHCP o en el rango 192.168.1.X.",
                 'tags' => '["Redes", "DHCP", "Conectividad", "Ethernet"]',
                 'source_ticket_id' => null,
                 'source_ticket_number' => null,
-                'author_technician_id' => 1,
-                'author_technician_name' => 'Téc. Roberto Valdiviezo',
+                'author_technician_id' => $tech1Id,
+                'author_technician_name' => "{$tech1Name} (Soporte TI)",
                 'views_count' => 85,
                 'helpful_count' => 34,
                 'created_at' => '2026-10-15 02:12:58',
@@ -75,16 +124,16 @@ class HelpdeskSeeder extends Seeder
                 'category' => 'HARDWARE',
                 'summary' => 'Procedimiento de descarte de memorias RAM sucias y sobrecalentamiento de procesador.',
                 'symptoms' => 'La computadora se reinicia inesperadamente al cabo de unos minutos de uso o muestra pantalla azul.',
-                'solution_steps' => '1. Desconectar de la corriente y abrir la tapa lateral del gabinete.
+                'solution_steps' => "1. Desconectar de la corriente y abrir la tapa lateral del gabinete.
 2. Retirar los módulos de memoria RAM.
 3. Limpiar los contactos dorados con borrador blanco y brocha antiestática.
 4. Comprobar ventilador de procesador; aplicar pasta térmica si es necesario.
-5. Volver a colocar la RAM y probar.',
+5. Volver a colocar la RAM y probar.",
                 'tags' => '["BSOD", "RAM", "Mantenimiento", "PC"]',
                 'source_ticket_id' => null,
                 'source_ticket_number' => null,
-                'author_technician_id' => 1,
-                'author_technician_name' => 'Ing. Carlos Mendoza (Soporte TI)',
+                'author_technician_id' => $tech1Id,
+                'author_technician_name' => "{$tech1Name} (Soporte TI)",
                 'views_count' => 64,
                 'helpful_count' => 22,
                 'created_at' => '2026-10-15 02:12:58',
@@ -95,16 +144,16 @@ class HelpdeskSeeder extends Seeder
                 'title' => 'Asignación de permisos de acceso a carpetas compartidas departamentales',
                 'category' => 'PERMISOS',
                 'summary' => 'Flujo para dar acceso de lectura/escritura a las carpetas en el servidor de archivos municipal.',
-                'symptoms' => 'El usuario recibe el mensaje "Acceso denegado. No tiene permisos para acceder a \\\\SERVER_MDC\\Documentos".',
-                'solution_steps' => '1. Validar autorización del Jefe de Área o Gerente mediante correo o papeleta.
+                'symptoms' => 'El usuario recibe el mensaje "Acceso denegado. No tiene permisos para acceder a \\SERVER_MDC\Documentos".',
+                'solution_steps' => "1. Validar autorización del Jefe de Área o Gerente mediante correo o papeleta.
 2. En el servidor Active Directory, agregar al usuario al grupo de seguridad correspondiente.
 3. En el cliente, cerrar sesión de Windows y volver a iniciar para refrescar credenciales.
-4. Mapear la unidad de red: net use Z: \\\\SERVER_MDC\\Fiscalizacion /persistent:yes.',
+4. Mapear la unidad de red: net use Z: \\SERVER_MDC\Fiscalizacion /persistent:yes.",
                 'tags' => '["Permisos", "Red", "ActiveDirectory", "Carpetas"]',
                 'source_ticket_id' => null,
                 'source_ticket_number' => null,
-                'author_technician_id' => 1,
-                'author_technician_name' => 'Téc. Roberto Valdiviezo',
+                'author_technician_id' => $tech1Id,
+                'author_technician_name' => "{$tech1Name} (Soporte TI)",
                 'views_count' => 30,
                 'helpful_count' => 15,
                 'created_at' => '2026-10-15 02:12:58',
@@ -122,20 +171,20 @@ class HelpdeskSeeder extends Seeder
                 'applicant_id' => 9,
                 'applicant_name' => 'LUIS RICARDO LLACSAHUANGA TIMOTEO',
                 'applicant_phone' => 'Anexo 115',
-                'applicant_email' => 'usuario@castilla.gob.pe',
-                'office_id' => null,
+                'applicant_email' => 'lllacsahuanga@castilla.gob.pe',
+                'office_id' => $officeGspId,
                 'office_name' => '[GSP] GERENCIA DE SERVICIOS PÚBLICOS',
                 'asset_id' => 7,
                 'asset_computer_code' => 'MDC-TI-PRN-0001',
-                'asset_category' => 'Impresora y Multifuncional',
+                'asset_category' => 'Equipo Multifuncional de Impresión',
                 'category' => 'HARDWARE',
                 'priority' => 'MEDIA',
                 'subject' => 'Impresora Epson se atasca constantemente al imprimir resoluciones',
                 'description' => 'Desde ayer en la tarde las hojas membretadas gruesas de mesa de partes no ingresan y se arrugan en el alimentador superior trabando la cola.',
                 'evidence_photo_url' => null,
                 'status' => 'CERRADO',
-                'assigned_technician_id' => 2,
-                'assigned_technician_name' => 'Juan Alberto Pérez Morales',
+                'assigned_technician_id' => $tech1Id,
+                'assigned_technician_name' => $tech1Name,
                 'assigned_technician_phone' => 'Anexo 104',
                 'started_at' => '2026-10-12 02:12:58',
                 'resolved_at' => '2026-10-13 02:12:58',
@@ -154,20 +203,20 @@ class HelpdeskSeeder extends Seeder
                 'applicant_id' => 11,
                 'applicant_name' => 'JACK TERREROS GARAY',
                 'applicant_phone' => 'Anexo 111',
-                'applicant_email' => 'usuario@castilla.gob.pe',
-                'office_id' => null,
+                'applicant_email' => 'jterreros@castilla.gob.pe',
+                'office_id' => $officeSrcppsId,
                 'office_name' => '[SRCPPS] SUBGERENCIA DE REGISTRO CIVIL, POBLACIÓN Y PROMOCIÓN DE LA SALUD',
                 'asset_id' => 2,
                 'asset_computer_code' => 'MDC-TI-MON-0001',
-                'asset_category' => 'Monitor de Video',
+                'asset_category' => 'Monitor',
                 'category' => 'HARDWARE',
                 'priority' => 'ALTA',
                 'subject' => 'Monitor de videovigilancia parpadea y muestra líneas horizontales negras',
                 'description' => 'La pantalla del puesto de monitoreo de cámaras de serenazgo se apaga intermitentemente cada 2 minutos impidiendo el seguimiento.',
                 'evidence_photo_url' => null,
                 'status' => 'EN_LABORATORIO',
-                'assigned_technician_id' => 2,
-                'assigned_technician_name' => 'Téc. Roberto Valdiviezo',
+                'assigned_technician_id' => $tech2Id,
+                'assigned_technician_name' => $tech1Name,
                 'assigned_technician_phone' => 'Anexo 104',
                 'started_at' => '2026-10-14 02:12:58',
                 'resolved_at' => null,
@@ -176,7 +225,7 @@ class HelpdeskSeeder extends Seeder
                 'user_rating' => null,
                 'user_feedback' => null,
                 'is_locked' => true,
-                'locked_by' => 'Téc. Roberto Valdiviezo',
+                'locked_by' => $tech1Name,
                 'created_at' => '2026-10-15 02:12:58',
                 'updated_at' => '2026-10-15 02:12:58',
             ],
@@ -186,20 +235,20 @@ class HelpdeskSeeder extends Seeder
                 'applicant_id' => 12,
                 'applicant_name' => 'KAREN STHEFANY FEBRE ZEGARRA',
                 'applicant_phone' => 'Anexo 112',
-                'applicant_email' => 'usuario@castilla.gob.pe',
-                'office_id' => null,
+                'applicant_email' => 'kfebre@castilla.gob.pe',
+                'office_id' => $officeOmapedId,
                 'office_name' => '[OMAPED] OFICINA MUNICIPAL DE ATENCIÓN A LA PERSONA CON DISCAPACIDAD',
                 'asset_id' => 1,
                 'asset_computer_code' => 'MDC-TI-PC-0001',
-                'asset_category' => 'PC de Escritorio',
+                'asset_category' => 'Computadora de Escritorio',
                 'category' => 'RED_INTERNET',
                 'priority' => 'CRITICA',
                 'subject' => 'Sin acceso a la red de Gerencia Municipal tras remodelación de oficina',
                 'description' => 'El conector que viene de la canaleta de red se rompió en la pestaña al mover el escritorio y no engancha.',
                 'evidence_photo_url' => null,
                 'status' => 'EN_ATENCION',
-                'assigned_technician_id' => 2,
-                'assigned_technician_name' => 'Juan Alberto Pérez Morales',
+                'assigned_technician_id' => $tech1Id,
+                'assigned_technician_name' => $tech1Name,
                 'assigned_technician_phone' => 'Anexo 104',
                 'started_at' => '2026-10-15 00:12:58',
                 'resolved_at' => null,
@@ -208,7 +257,7 @@ class HelpdeskSeeder extends Seeder
                 'user_rating' => null,
                 'user_feedback' => null,
                 'is_locked' => true,
-                'locked_by' => 'Juan Alberto Pérez Morales',
+                'locked_by' => $tech1Name,
                 'created_at' => '2026-10-15 02:12:58',
                 'updated_at' => '2026-10-15 02:12:58',
             ],
@@ -218,8 +267,8 @@ class HelpdeskSeeder extends Seeder
                 'applicant_id' => 10,
                 'applicant_name' => 'DORIS LOPEZ GARCIA',
                 'applicant_phone' => 'Anexo 110',
-                'applicant_email' => 'usuario@castilla.gob.pe',
-                'office_id' => null,
+                'applicant_email' => 'dlopez@castilla.gob.pe',
+                'office_id' => $officeUleId,
                 'office_name' => '[ULE] OFICINA DE LA UNIDAD LOCAL DE EMPADRONAMIENTO',
                 'asset_id' => null,
                 'asset_computer_code' => null,
@@ -250,20 +299,20 @@ class HelpdeskSeeder extends Seeder
                 'applicant_id' => 5,
                 'applicant_name' => 'GUSTAVO ADOLFO PAREDES SHIMOKAWA',
                 'applicant_phone' => 'Anexo 105',
-                'applicant_email' => 'usuario@castilla.gob.pe',
-                'office_id' => null,
+                'applicant_email' => 'gparedes@castilla.gob.pe',
+                'office_id' => $officeSttvId,
                 'office_name' => '[STTV] SUBGERENCIA DE TRANSPORTE, TRÁNSITO Y VIALIDAD',
                 'asset_id' => 5,
                 'asset_computer_code' => 'MDC-TI-EST-0012',
-                'asset_category' => 'Estabilizador de Voltaje',
+                'asset_category' => 'Estabilizador',
                 'category' => 'HARDWARE',
                 'priority' => 'ALTA',
                 'subject' => 'Estabilizador emitió humo y chispas con olor a quemado',
                 'description' => 'Durante la tormenta eléctrica el estabilizador sufrió una sobrecarga y ya no entrega energía al plotter.',
                 'evidence_photo_url' => null,
                 'status' => 'EN_PAUSA',
-                'assigned_technician_id' => 2,
-                'assigned_technician_name' => 'Téc. Roberto Valdiviezo',
+                'assigned_technician_id' => $tech2Id,
+                'assigned_technician_name' => $tech1Name,
                 'assigned_technician_phone' => 'Anexo 104',
                 'started_at' => '2026-10-14 02:12:58',
                 'resolved_at' => null,
@@ -283,19 +332,19 @@ class HelpdeskSeeder extends Seeder
                 'applicant_name' => 'CESAR IVAN MAZA SEMINARIO',
                 'applicant_phone' => '968741258',
                 'applicant_email' => 'cmaza@castilla.gob.pe',
-                'office_id' => null,
-                'office_name' => 'Oficina de Gestión Documentaria y Atención al Ciudadano',
+                'office_id' => $officeOgdacId,
+                'office_name' => '[OGDAC] OFICINA DE GESTIÓN DOCUMENTARIA Y ATENCIÓN AL CIUDADANO',
                 'asset_id' => null,
                 'asset_computer_code' => 'MDC-TI-PC-0004',
-                'asset_category' => 'PC de Escritorio',
+                'asset_category' => 'Computadora de Escritorio',
                 'category' => 'HARDWARE',
                 'priority' => 'MEDIA',
                 'subject' => 'CPU antiguo de módulo 3 emite humo y olor a quemado',
                 'description' => 'El equipo no soportó el encendido matutino y se apagó con olor a quemado.',
                 'evidence_photo_url' => null,
                 'status' => 'RESUELTO',
-                'assigned_technician_id' => 2,
-                'assigned_technician_name' => 'Juan Alberto Pérez Morales',
+                'assigned_technician_id' => $tech1Id,
+                'assigned_technician_name' => $tech1Name,
                 'assigned_technician_phone' => 'Anexo 104',
                 'started_at' => '2026-10-13 02:12:58',
                 'resolved_at' => '2026-10-14 02:12:58',
@@ -314,9 +363,9 @@ class HelpdeskSeeder extends Seeder
                 'applicant_id' => 40,
                 'applicant_name' => 'GUILLERMO MARTÍN RODRIGUEZ PALACIOS',
                 'applicant_phone' => 'Anexo 104',
-                'applicant_email' => 'admin@castilla.gob.pe',
-                'office_id' => null,
-                'office_name' => 'OFICINA DE REGIDORES',
+                'applicant_email' => 'grodriguez@castilla.gob.pe',
+                'office_id' => $officeOrId,
+                'office_name' => '[OR] OFICINA DE REGIDORES',
                 'asset_id' => null,
                 'asset_computer_code' => null,
                 'asset_category' => null,
@@ -326,8 +375,8 @@ class HelpdeskSeeder extends Seeder
                 'description' => 'La impresora multifuncional de la oficina de regidores no enciende tras corte de luz.',
                 'evidence_photo_url' => null,
                 'status' => 'EN_ATENCION',
-                'assigned_technician_id' => 2,
-                'assigned_technician_name' => 'Téc. Roberto Valdiviezo',
+                'assigned_technician_id' => $tech3Id,
+                'assigned_technician_name' => $tech1Name,
                 'assigned_technician_phone' => 'Anexo 104',
                 'started_at' => '2026-10-15 00:12:59',
                 'resolved_at' => null,
@@ -346,9 +395,9 @@ class HelpdeskSeeder extends Seeder
                 'applicant_id' => 40,
                 'applicant_name' => 'GUILLERMO MARTÍN RODRIGUEZ PALACIOS',
                 'applicant_phone' => 'Anexo 104',
-                'applicant_email' => 'admin@castilla.gob.pe',
-                'office_id' => null,
-                'office_name' => 'OFICINA DE REGIDORES',
+                'applicant_email' => 'grodriguez@castilla.gob.pe',
+                'office_id' => $officeOrId,
+                'office_name' => '[OR] OFICINA DE REGIDORES',
                 'asset_id' => null,
                 'asset_computer_code' => null,
                 'asset_category' => null,
@@ -358,8 +407,8 @@ class HelpdeskSeeder extends Seeder
                 'description' => 'Se completó la actualización de versión del aplicativo SIGM en terminal de consulta.',
                 'evidence_photo_url' => null,
                 'status' => 'RESUELTO',
-                'assigned_technician_id' => 2,
-                'assigned_technician_name' => 'Juan Alberto Pérez Morales',
+                'assigned_technician_id' => $tech1Id,
+                'assigned_technician_name' => $tech1Name,
                 'assigned_technician_phone' => 'Anexo 104',
                 'started_at' => '2026-10-14 02:12:59',
                 'resolved_at' => '2026-10-14 23:12:59',
@@ -378,9 +427,9 @@ class HelpdeskSeeder extends Seeder
                 'applicant_id' => 40,
                 'applicant_name' => 'GUILLERMO MARTÍN RODRIGUEZ PALACIOS',
                 'applicant_phone' => 'Anexo 104',
-                'applicant_email' => 'admin@castilla.gob.pe',
-                'office_id' => null,
-                'office_name' => 'OFICINA DE REGIDORES',
+                'applicant_email' => 'grodriguez@castilla.gob.pe',
+                'office_id' => $officeOrId,
+                'office_name' => '[OR] OFICINA DE REGIDORES',
                 'asset_id' => null,
                 'asset_computer_code' => null,
                 'asset_category' => null,
@@ -390,7 +439,7 @@ class HelpdeskSeeder extends Seeder
                 'description' => 'Reemplazo de conector RJ45 y prueba de enlace al rack del segundo piso.',
                 'evidence_photo_url' => null,
                 'status' => 'RESUELTO',
-                'assigned_technician_id' => 2,
+                'assigned_technician_id' => $tech4Id,
                 'assigned_technician_name' => 'Téc. Juan Pérez',
                 'assigned_technician_phone' => 'Anexo 104',
                 'started_at' => '2026-10-12 02:12:59',
@@ -407,11 +456,11 @@ class HelpdeskSeeder extends Seeder
             [
                 'id' => 10,
                 'ticket_number' => 'TCK-2026-0010',
-                'applicant_id' => null,
+                'applicant_id' => 10,
                 'applicant_name' => 'DORIS LOPEZ GARCIA',
-                'applicant_phone' => 'Anexo 104',
-                'applicant_email' => 'admin@castilla.gob.pe',
-                'office_id' => null,
+                'applicant_phone' => 'Anexo 110',
+                'applicant_email' => 'dlopez@castilla.gob.pe',
+                'office_id' => $officeUleId,
                 'office_name' => '[ULE] OFICINA DE LA UNIDAD LOCAL DE EMPADRONAMIENTO',
                 'asset_id' => null,
                 'asset_computer_code' => null,
@@ -510,7 +559,7 @@ class HelpdeskSeeder extends Seeder
                 'previous_status' => 'RESUELTO',
                 'new_status' => 'CERRADO',
                 'action' => 'CIERRE_CONFORMIDAD',
-                'performed_by_user_id' => 2,
+                'performed_by_user_id' => $userPerson9 ? (int) $userPerson9->id : null,
                 'performed_by_user_name' => 'LUIS RICARDO LLACSAHUANGA TIMOTEO',
                 'notes' => 'Usuario emitió conformidad con calificación 5 estrellas.',
                 'timestamp' => '2026-10-13 03:12:58',
@@ -523,8 +572,8 @@ class HelpdeskSeeder extends Seeder
                 'previous_status' => 'ABIERTO',
                 'new_status' => 'EN_ATENCION',
                 'action' => 'EN_ATENCION',
-                'performed_by_user_id' => 2,
-                'performed_by_user_name' => 'Juan Alberto Pérez Morales',
+                'performed_by_user_id' => $tech1Id,
+                'performed_by_user_name' => $tech1Name,
                 'notes' => 'Técnico presente en Gerencia Municipal para crimpeado de cable de red.',
                 'timestamp' => '2026-10-15 01:12:58',
                 'created_at' => '2026-10-15 02:12:58',
@@ -536,7 +585,7 @@ class HelpdeskSeeder extends Seeder
                 'previous_status' => null,
                 'new_status' => 'ABIERTO',
                 'action' => 'TICKET_REGISTRADO',
-                'performed_by_user_id' => null,
+                'performed_by_user_id' => $userPerson10 ? (int) $userPerson10->id : null,
                 'performed_by_user_name' => 'DORIS LOPEZ GARCIA',
                 'notes' => 'Ticket registrado desde el portal directo de incidencias TI.',
                 'timestamp' => '2026-10-15 21:17:39',

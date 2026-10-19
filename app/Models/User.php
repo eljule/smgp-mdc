@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 
 class User extends Authenticatable
 {
@@ -24,6 +25,11 @@ class User extends Authenticatable
         'allowed_modules',
         'is_active',
         'person_id',
+        'must_change_password',
+        'password_changed_at',
+        'failed_login_attempts',
+        'is_locked',
+        'locked_at',
     ];
 
     protected $hidden = [
@@ -34,6 +40,11 @@ class User extends Authenticatable
     protected $casts = [
         'allowed_modules' => 'array',
         'is_active' => 'boolean',
+        'must_change_password' => 'boolean',
+        'is_locked' => 'boolean',
+        'failed_login_attempts' => 'integer',
+        'password_changed_at' => 'datetime',
+        'locked_at' => 'datetime',
     ];
 
     public function person(): BelongsTo
@@ -51,6 +62,9 @@ class User extends Authenticatable
         $u = strtolower(trim((string) $this->username));
         if ($u === 'root') {
             return 'RO';
+        }
+        if (str_starts_with($u, 'soporte')) {
+            return 'SO';
         }
         if ($u === 'jperez') {
             return 'JP';
@@ -83,5 +97,78 @@ class User extends Authenticatable
     public function getDisplayRoleAttribute(): string
     {
         return $this->role ?: 'Usuario Municipal';
+    }
+
+    public function isLocked(): bool
+    {
+        return (bool) $this->is_locked;
+    }
+
+    public function mustChangePassword(): bool
+    {
+        return (bool) $this->must_change_password;
+    }
+
+    /**
+     * Record a failed login attempt and lock the account if max attempts are exceeded.
+     */
+    public function recordFailedLogin(int $maxAttempts = 5): bool
+    {
+        $this->failed_login_attempts = ($this->failed_login_attempts ?? 0) + 1;
+
+        if ($this->failed_login_attempts >= $maxAttempts) {
+            $this->is_locked = true;
+            $this->locked_at = now();
+            $this->save();
+
+            return true;
+        }
+
+        $this->save();
+
+        return false;
+    }
+
+    /**
+     * Reset the failed login counter.
+     */
+    public function resetFailedLogins(): void
+    {
+        if ($this->failed_login_attempts > 0) {
+            $this->failed_login_attempts = 0;
+            $this->save();
+        }
+    }
+
+    /**
+     * Unlock the user account and reset failed login attempts.
+     */
+    public function unlock(): void
+    {
+        $this->is_locked = false;
+        $this->locked_at = null;
+        $this->failed_login_attempts = 0;
+        $this->save();
+    }
+
+    /**
+     * Mark that the user must change password on their next login.
+     */
+    public function requirePasswordChange(): void
+    {
+        $this->must_change_password = true;
+        $this->save();
+    }
+
+    /**
+     * Update password, clear provisional status, and reset failed attempts.
+     */
+    public function updatePassword(string $newPassword): void
+    {
+        $this->password = Hash::make($newPassword);
+        $this->must_change_password = false;
+        $this->password_changed_at = now();
+        $this->failed_login_attempts = 0;
+        $this->save();
     }
 }

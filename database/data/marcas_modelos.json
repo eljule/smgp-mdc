@@ -1,0 +1,1272 @@
+{
+  "total_marcas": 18,
+  "total_modelos": 58,
+  "marcas": [
+    {
+      "id": "a3f01025-c8a1-4a12-978a-243be63b9d7f",
+      "nombre": "Advance",
+      "descripcion": "Fabricante de computadoras portátiles y equipos de cómputo.",
+      "activo": true,
+      "total_modelos": 1,
+      "modelos": [
+        {
+          "id": "e33db795-5134-467b-9fb9-048af5d93885",
+          "nombre": "Vision VS7097",
+          "categoria": "Computadora Portátil",
+          "codigo_categoria": "LAP",
+          "descripcion": "Computadora Portátil Advance Vision VS7097",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "eb26d494-1854-4e1c-8e59-263486b2f7e9",
+      "nombre": "Brother",
+      "descripcion": "Equipos multifuncionales de impresión, escaneo y consumibles.",
+      "activo": true,
+      "total_modelos": 6,
+      "modelos": [
+        {
+          "id": "8e8cc51b-ddec-42b6-9f6d-4833a6bb313e",
+          "nombre": "DCP-L5650DN",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Brother DCP-L5650DN",
+          "activo": true
+        },
+        {
+          "id": "da3e60a5-a488-46bb-9372-8df1e3695119",
+          "nombre": "DCP-L5660DN",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Brother DCP-L5660DN",
+          "activo": true
+        },
+        {
+          "id": "403c1a75-5f44-4e31-b855-33deb9243353",
+          "nombre": "MFC-L6900DW",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Brother MFC-L6900DW",
+          "activo": true
+        },
+        {
+          "id": "f3f9cbee-46e3-4e1e-bd7d-ab6b888882df",
+          "nombre": "MFC-L6915DW",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Brother MFC-L6915DW",
+          "activo": true
+        },
+        {
+          "id": "94c55a53-11a3-4d31-b7e8-a45f0a01d06c",
+          "nombre": "MFC-L8900CDW",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Brother MFC-L8900CDW",
+          "activo": true
+        },
+        {
+          "id": "e93d5c6a-5de7-4b4f-9298-ce67e5fe3949",
+          "nombre": "MFC-T4500DW",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Brother MFC-T4500DW",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "7efa268d-5843-45d0-a85e-cf0d9389191b",
+      "nombre": "Dell",
+      "descripcion": "Sistemas informáticos empresariales, computadoras y monitores.",
+      "activo": true,
+      "total_modelos": 1,
+      "modelos": [
+        {
+          "id": "ef8fba2b-3666-4002-bda0-d83c23973344",
+          "nombre": "OptiPlex Small Form Factor 7010",
+          "categoria": "Computadora de Escritorio",
+          "codigo_categoria": "PC",
+          "descripcion": "Computadora de Escritorio Dell OptiPlex Small Form Factor 7010",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "88d11e03-eee0-418d-9b8f-44aaf3fa3244",
+      "nombre": "Elise",
+      "descripcion": "Fabricante de estabilizadores de voltaje y soluciones de protección eléctrica.",
+      "activo": true,
+      "total_modelos": 3,
+      "modelos": [
+        {
+          "id": "944805c3-9506-41aa-8f13-5d7349ec9976",
+          "nombre": "AVR PRO 1000 VI",
+          "categoria": "Estabilizador",
+          "codigo_categoria": "EST",
+          "descripcion": "Estabilizador Elise AVR PRO 1000 VI",
+          "activo": true
+        },
+        {
+          "id": "3d15625a-f5de-441c-8fc5-de840a711010",
+          "nombre": "FES-10",
+          "categoria": "Estabilizador",
+          "codigo_categoria": "EST",
+          "descripcion": "Estabilizador Elise FES-10",
+          "activo": true
+        },
+        {
+          "id": "2b0c9306-3f7f-4f92-a0b8-2a1b8a9510e9",
+          "nombre": "IEDA Power Safe LCR-15",
+          "categoria": "Estabilizador",
+          "codigo_categoria": "EST",
+          "descripcion": "Estabilizador Elise IEDA Power Safe LCR-15",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "392fe83c-162d-4655-9380-08c007eb8826",
+      "nombre": "Epson",
+      "descripcion": "Impresoras EcoTank, multifuncionales y soluciones de inyección de tinta.",
+      "activo": true,
+      "total_modelos": 4,
+      "modelos": [
+        {
+          "id": "933bc3f4-fa5f-46f3-8d8c-75dd0cb2a6c9",
+          "nombre": "EcoTank L3250",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Epson EcoTank L3250",
+          "activo": true
+        },
+        {
+          "id": "79c71fe6-54a9-4278-9386-6e392790dc75",
+          "nombre": "EcoTank L395",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Epson EcoTank L395",
+          "activo": true
+        },
+        {
+          "id": "f5ac81e8-2fff-4263-955e-17eefc7239be",
+          "nombre": "WorkForce Pro WF-C5710",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Epson WorkForce Pro WF-C5710",
+          "activo": true
+        },
+        {
+          "id": "89e75d27-e08e-46c6-a20c-367758c57bef",
+          "nombre": "WorkForce Pro WF-C5810",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Epson WorkForce Pro WF-C5810",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "02877e90-bb56-46a5-975c-0efb35ba8c79",
+      "nombre": "Forza",
+      "descripcion": "Sistemas de protección eléctrica, estabilizadores y supresores de picos.",
+      "activo": true,
+      "total_modelos": 3,
+      "modelos": [
+        {
+          "id": "98962a7d-5247-4099-8ba4-9bf19882f297",
+          "nombre": "FPS-005B",
+          "categoria": "Supresor de Picos",
+          "codigo_categoria": "SUP",
+          "descripcion": "Supresor de Picos Forza FPS-005B",
+          "activo": true
+        },
+        {
+          "id": "abce3dac-078b-4fdf-a106-e24e1004f8dc",
+          "nombre": "FVR-1202USB",
+          "categoria": "Estabilizador",
+          "codigo_categoria": "EST",
+          "descripcion": "Estabilizador Forza FVR-1202USB",
+          "activo": true
+        },
+        {
+          "id": "d91ddefd-e06f-4805-ac30-53a3af8422d9",
+          "nombre": "FVR-1222USB",
+          "categoria": "Estabilizador",
+          "codigo_categoria": "EST",
+          "descripcion": "Estabilizador Forza FVR-1222USB",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "df0dbf83-208a-4447-bb17-19f419fca62c",
+      "nombre": "GENÉRICO / POR DETERMINAR",
+      "descripcion": "Equipos ensamblados, clones, compatibles o sin rotulado/marca visible a simple vista.",
+      "activo": true,
+      "total_modelos": 2,
+      "modelos": [
+        {
+          "id": "d38e8a83-8236-49d2-bde7-795717dfeadb",
+          "nombre": "COMPATIBLE / ENSAMBLADO",
+          "categoria": null,
+          "codigo_categoria": null,
+          "descripcion": "Equipo modular ensamblado o compatible genérico.",
+          "activo": true
+        },
+        {
+          "id": "ff4554f7-b713-4785-b32d-3758455ffcfd",
+          "nombre": "POR VERIFICAR (DIAGNÓSTICO PENDIENTE)",
+          "categoria": null,
+          "codigo_categoria": null,
+          "descripcion": "Equipo provisional pendiente de auditoría técnica interna de hardware.",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "nombre": "HP",
+      "descripcion": "Hewlett-Packard, computadoras de escritorio, portátiles, monitores e impresoras.",
+      "activo": true,
+      "total_modelos": 14,
+      "modelos": [
+        {
+          "id": "a3ee09a3-60be-49db-86db-04710e390196",
+          "nombre": "Compaq Pro 6300",
+          "categoria": "Computadora de Escritorio",
+          "codigo_categoria": "PC",
+          "descripcion": "Computadora de Escritorio HP Compaq Pro 6300",
+          "activo": true
+        },
+        {
+          "id": "b3e97f27-c390-4487-831c-f69f207da3c9",
+          "nombre": "E24 G4",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor HP E24 G4",
+          "activo": true
+        },
+        {
+          "id": "cdf4ab98-c6d1-463e-8fb7-5e8b499434f1",
+          "nombre": "E24-G5",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor HP E24-G5",
+          "activo": true
+        },
+        {
+          "id": "fb4d60cc-9364-419d-880d-751d539e9d70",
+          "nombre": "E24mv G4",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor HP E24mv G4",
+          "activo": true
+        },
+        {
+          "id": "8711b87b-4db8-4a57-a549-dc77eb1cb6ba",
+          "nombre": "HP 450",
+          "categoria": "Computadora Portátil",
+          "codigo_categoria": "LAP",
+          "descripcion": "Computadora Portátil HP HP 450",
+          "activo": true
+        },
+        {
+          "id": "8114e680-a477-491a-86c7-8cc349bf2532",
+          "nombre": "HP ProDesk",
+          "categoria": "Computadora de Escritorio",
+          "codigo_categoria": "PC",
+          "descripcion": "Computadora de Escritorio HP HP ProDesk",
+          "activo": true
+        },
+        {
+          "id": "682abe66-7713-4891-8b1c-26406c5b4a02",
+          "nombre": "LaserJet Enterprise 600",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión HP LaserJet Enterprise 600",
+          "activo": true
+        },
+        {
+          "id": "fbe80f12-c2bf-45a6-b8eb-2b065b0428e4",
+          "nombre": "LaserJet M1212nf",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión HP LaserJet M1212nf",
+          "activo": true
+        },
+        {
+          "id": "35f5ea78-2156-421c-90cf-956792bd532c",
+          "nombre": "LaserJet M1536dnf MFP",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión HP LaserJet M1536dnf MFP",
+          "activo": true
+        },
+        {
+          "id": "82c95d4f-e22d-481a-a78b-bdf9788c76d0",
+          "nombre": "LaserJet P1102w",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión HP LaserJet P1102w",
+          "activo": true
+        },
+        {
+          "id": "a6d0a384-2ba2-4e3a-bffb-9e83cc4340f1",
+          "nombre": "LaserJet P3015",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión HP LaserJet P3015",
+          "activo": true
+        },
+        {
+          "id": "52cd31d8-59ab-4881-86d4-1f6cb12c7c61",
+          "nombre": "LaserJet Pro MFP M1132",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión HP LaserJet Pro MFP M1132",
+          "activo": true
+        },
+        {
+          "id": "36374e6d-cc69-4120-a066-078cc86a534e",
+          "nombre": "LaserJet Pro MFP M428fdw",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión HP LaserJet Pro MFP M428fdw",
+          "activo": true
+        },
+        {
+          "id": "ec150c65-c8c9-4047-8e3e-bc5254e9558e",
+          "nombre": "ProBook 4320s",
+          "categoria": "Computadora Portátil",
+          "codigo_categoria": "LAP",
+          "descripcion": "Computadora Portátil HP ProBook 4320s",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "3b0754ce-61c6-4a4b-9e9b-873bb60a2384",
+      "nombre": "Halion",
+      "descripcion": "Periféricos de cómputo, combos de teclado y ratón.",
+      "activo": true,
+      "total_modelos": 1,
+      "modelos": [
+        {
+          "id": "06a92ab1-0a79-4658-a4c7-3c99d9d99049",
+          "nombre": "HS224HB",
+          "categoria": "Teclado / Mouse",
+          "codigo_categoria": "KBM",
+          "descripcion": "Teclado / Mouse Halion HS224HB",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "28449429-9914-499c-9429-2380facc7dc9",
+      "nombre": "LG",
+      "descripcion": "Monitores de visualización y pantallas LED de oficina.",
+      "activo": true,
+      "total_modelos": 2,
+      "modelos": [
+        {
+          "id": "3798707e-5db0-4147-8123-bc2532f71aee",
+          "nombre": "E1941ST",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor LG E1941ST",
+          "activo": true
+        },
+        {
+          "id": "52b58cbd-33dd-4ba2-a60e-2b129a2738a8",
+          "nombre": "E2051S",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor LG E2051S",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "7002dfdd-fcd4-43ee-ace0-e474a78a16e6",
+      "nombre": "Lenovo",
+      "descripcion": "Equipos corporativos ThinkCentre, portátiles ThinkPad y monitores ThinkVision.",
+      "activo": true,
+      "total_modelos": 7,
+      "modelos": [
+        {
+          "id": "c9da0a68-7e95-4655-964b-19e890156f49",
+          "nombre": "D19-10",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor Lenovo D19-10",
+          "activo": true
+        },
+        {
+          "id": "adbb1c46-c909-4aa6-a09b-bcbd16136437",
+          "nombre": "SM-8823 (MOJU-U00)",
+          "categoria": "Mouse",
+          "codigo_categoria": "MOU",
+          "descripcion": "Mouse Lenovo SM-8823 (MOJU-U00)",
+          "activo": true
+        },
+        {
+          "id": "cb30eebf-ebbd-4ff3-8a84-1ae2bfe9a1fa",
+          "nombre": "ThinkCentre M70s",
+          "categoria": "Computadora de Escritorio",
+          "codigo_categoria": "PC",
+          "descripcion": "Computadora de Escritorio Lenovo ThinkCentre M70s",
+          "activo": true
+        },
+        {
+          "id": "8bfc51d0-dda4-4c0d-b797-7c30a4cb6ca4",
+          "nombre": "ThinkCentre M710s",
+          "categoria": "Computadora de Escritorio",
+          "codigo_categoria": "PC",
+          "descripcion": "Computadora de Escritorio Lenovo ThinkCentre M710s",
+          "activo": true
+        },
+        {
+          "id": "4a0f4cc1-2a88-4c2f-b153-600d93d84e07",
+          "nombre": "ThinkCentre M720s",
+          "categoria": "Computadora de Escritorio",
+          "codigo_categoria": "PC",
+          "descripcion": "Computadora de Escritorio Lenovo ThinkCentre M720s",
+          "activo": true
+        },
+        {
+          "id": "59c41efa-6c96-421c-adf0-47e149958c5b",
+          "nombre": "ThinkCentre M900",
+          "categoria": "Computadora de Escritorio",
+          "codigo_categoria": "PC",
+          "descripcion": "Computadora de Escritorio Lenovo ThinkCentre M900",
+          "activo": true
+        },
+        {
+          "id": "d1e51158-485d-45c1-ba17-ddb6e0cf7fbf",
+          "nombre": "ThinkVision T2224DA",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor Lenovo ThinkVision T2224DA",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "047d834d-bd8d-479f-b492-88ac1c327e68",
+      "nombre": "Logitech",
+      "descripcion": "Periféricos ergonómicos, teclados y ratones de oficina.",
+      "activo": true,
+      "total_modelos": 2,
+      "modelos": [
+        {
+          "id": "46648af7-3baa-4059-996f-9d84c7627ebe",
+          "nombre": "B100 (M-U0026)",
+          "categoria": "Mouse",
+          "codigo_categoria": "MOU",
+          "descripcion": "Mouse Logitech B100 (M-U0026)",
+          "activo": true
+        },
+        {
+          "id": "2337ca18-ea56-4d40-9001-792ddec10346",
+          "nombre": "K120",
+          "categoria": "Teclado",
+          "codigo_categoria": "TEC",
+          "descripcion": "Teclado Logitech K120",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "ab1dc4f2-e145-42fe-9230-b3cdaccd2861",
+      "nombre": "Sagemcom",
+      "descripcion": "Equipos de telecomunicaciones, módems y enrutadores de red.",
+      "activo": true,
+      "total_modelos": 1,
+      "modelos": [
+        {
+          "id": "d5da5808-091e-4d89-ab67-c5314667d705",
+          "nombre": "FAST 3890V3",
+          "categoria": "Módem / Router",
+          "codigo_categoria": "MOD",
+          "descripcion": "Módem / Router Sagemcom FAST 3890V3",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "b220d5e2-86e7-48da-bff8-81dace66ffe6",
+      "nombre": "Samsung",
+      "descripcion": "Monitores de visualización y pantallas LED profesionales.",
+      "activo": true,
+      "total_modelos": 1,
+      "modelos": [
+        {
+          "id": "bd0cb84f-f890-43ed-a8f9-b1e494cdce85",
+          "nombre": "732NW",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor Samsung 732NW",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "7f4e0cc4-9c80-4abe-bad3-0296998c725a",
+      "nombre": "Sharp",
+      "descripcion": "Equipos multifuncionales de oficina y soluciones de copiado de alto volumen.",
+      "activo": true,
+      "total_modelos": 1,
+      "modelos": [
+        {
+          "id": "bfb425ab-6249-4814-a091-fb679bdd51b6",
+          "nombre": "MX-6070",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Sharp MX-6070",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "69dc03bb-3ac9-4413-b0a9-fa5242098db2",
+      "nombre": "TP-Link",
+      "descripcion": "Equipos de conectividad de red, switches, routers y adaptadores inalámbricos.",
+      "activo": true,
+      "total_modelos": 5,
+      "modelos": [
+        {
+          "id": "ba49e0da-3224-49cf-9a71-115c734e49b1",
+          "nombre": "Archer C50",
+          "categoria": "Access Point / Router",
+          "codigo_categoria": "APR",
+          "descripcion": "Access Point / Router TP-Link Archer C50",
+          "activo": true
+        },
+        {
+          "id": "b01b88ba-a83a-42d3-874f-27bd7472cd1d",
+          "nombre": "TL-SF1008BD",
+          "categoria": "Switch",
+          "codigo_categoria": "SWT",
+          "descripcion": "Switch TP-Link TL-SF1008BD",
+          "activo": true
+        },
+        {
+          "id": "d7a4ed77-a6d3-477e-b833-d4588eda2fb0",
+          "nombre": "TL-SF1008D",
+          "categoria": "Switch",
+          "codigo_categoria": "SWT",
+          "descripcion": "Switch TP-Link TL-SF1008D",
+          "activo": true
+        },
+        {
+          "id": "3f8d84fc-2408-44f0-be76-43a65d49b563",
+          "nombre": "TL-SF1024",
+          "categoria": "Switch",
+          "codigo_categoria": "SWT",
+          "descripcion": "Switch TP-Link TL-SF1024",
+          "activo": true
+        },
+        {
+          "id": "f985effb-a3b9-4ea4-a79f-3f1b0ee43484",
+          "nombre": "TL-WN8200ND",
+          "categoria": "Adaptador Inalámbrico",
+          "codigo_categoria": "WIF",
+          "descripcion": "Adaptador Inalámbrico TP-Link TL-WN8200ND",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "fa32e6ad-ab39-40af-82e2-6f62378037bb",
+      "nombre": "Toshiba",
+      "descripcion": "Sistemas de copiado e impresión multifuncional e-STUDIO.",
+      "activo": true,
+      "total_modelos": 1,
+      "modelos": [
+        {
+          "id": "897a2526-2f1d-46b5-a9e2-152a7fcff107",
+          "nombre": "e-STUDIO 4508A",
+          "categoria": "Equipo Multifuncional de Impresión",
+          "codigo_categoria": "IMP",
+          "descripcion": "Equipo Multifuncional de Impresión Toshiba e-STUDIO 4508A",
+          "activo": true
+        }
+      ]
+    },
+    {
+      "id": "2062cb90-f6e6-4d01-9c66-2783a81754fa",
+      "nombre": "Vastec",
+      "descripcion": "Equipos de cómputo, monitores y periféricos de oficina.",
+      "activo": true,
+      "total_modelos": 3,
+      "modelos": [
+        {
+          "id": "0e58f9e7-cd4c-48c8-a715-a7dcdb9b11f0",
+          "nombre": "KM105K",
+          "categoria": "Teclado",
+          "codigo_categoria": "TEC",
+          "descripcion": "Teclado Vastec KM105K",
+          "activo": true
+        },
+        {
+          "id": "ba0cdddc-f7ed-42f2-8703-347813fcf0a8",
+          "nombre": "KM105M",
+          "categoria": "Mouse",
+          "codigo_categoria": "MOU",
+          "descripcion": "Mouse Vastec KM105M",
+          "activo": true
+        },
+        {
+          "id": "2f27cc4b-eafe-48a8-8b28-68c28a7bcd0d",
+          "nombre": "VA-MF24",
+          "categoria": "Monitor",
+          "codigo_categoria": "MON",
+          "descripcion": "Monitor Vastec VA-MF24",
+          "activo": true
+        }
+      ]
+    }
+  ],
+  "modelos": [
+    {
+      "id": "e33db795-5134-467b-9fb9-048af5d93885",
+      "nombre": "Vision VS7097",
+      "marca_id": "a3f01025-c8a1-4a12-978a-243be63b9d7f",
+      "marca": "Advance",
+      "categoria_id": "86ff7e8a-2978-497b-8343-c7e7c90f7bbd",
+      "categoria": "Computadora Portátil",
+      "codigo_categoria": "LAP",
+      "descripcion": "Computadora Portátil Advance Vision VS7097",
+      "activo": true
+    },
+    {
+      "id": "8e8cc51b-ddec-42b6-9f6d-4833a6bb313e",
+      "nombre": "DCP-L5650DN",
+      "marca_id": "eb26d494-1854-4e1c-8e59-263486b2f7e9",
+      "marca": "Brother",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Brother DCP-L5650DN",
+      "activo": true
+    },
+    {
+      "id": "da3e60a5-a488-46bb-9372-8df1e3695119",
+      "nombre": "DCP-L5660DN",
+      "marca_id": "eb26d494-1854-4e1c-8e59-263486b2f7e9",
+      "marca": "Brother",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Brother DCP-L5660DN",
+      "activo": true
+    },
+    {
+      "id": "403c1a75-5f44-4e31-b855-33deb9243353",
+      "nombre": "MFC-L6900DW",
+      "marca_id": "eb26d494-1854-4e1c-8e59-263486b2f7e9",
+      "marca": "Brother",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Brother MFC-L6900DW",
+      "activo": true
+    },
+    {
+      "id": "f3f9cbee-46e3-4e1e-bd7d-ab6b888882df",
+      "nombre": "MFC-L6915DW",
+      "marca_id": "eb26d494-1854-4e1c-8e59-263486b2f7e9",
+      "marca": "Brother",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Brother MFC-L6915DW",
+      "activo": true
+    },
+    {
+      "id": "94c55a53-11a3-4d31-b7e8-a45f0a01d06c",
+      "nombre": "MFC-L8900CDW",
+      "marca_id": "eb26d494-1854-4e1c-8e59-263486b2f7e9",
+      "marca": "Brother",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Brother MFC-L8900CDW",
+      "activo": true
+    },
+    {
+      "id": "e93d5c6a-5de7-4b4f-9298-ce67e5fe3949",
+      "nombre": "MFC-T4500DW",
+      "marca_id": "eb26d494-1854-4e1c-8e59-263486b2f7e9",
+      "marca": "Brother",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Brother MFC-T4500DW",
+      "activo": true
+    },
+    {
+      "id": "ef8fba2b-3666-4002-bda0-d83c23973344",
+      "nombre": "OptiPlex Small Form Factor 7010",
+      "marca_id": "7efa268d-5843-45d0-a85e-cf0d9389191b",
+      "marca": "Dell",
+      "categoria_id": "9fa7f9e0-a855-4c39-b99c-96b6c989f697",
+      "categoria": "Computadora de Escritorio",
+      "codigo_categoria": "PC",
+      "descripcion": "Computadora de Escritorio Dell OptiPlex Small Form Factor 7010",
+      "activo": true
+    },
+    {
+      "id": "944805c3-9506-41aa-8f13-5d7349ec9976",
+      "nombre": "AVR PRO 1000 VI",
+      "marca_id": "88d11e03-eee0-418d-9b8f-44aaf3fa3244",
+      "marca": "Elise",
+      "categoria_id": "1c58d3d4-fd98-4d3e-9631-8171668c71aa",
+      "categoria": "Estabilizador",
+      "codigo_categoria": "EST",
+      "descripcion": "Estabilizador Elise AVR PRO 1000 VI",
+      "activo": true
+    },
+    {
+      "id": "3d15625a-f5de-441c-8fc5-de840a711010",
+      "nombre": "FES-10",
+      "marca_id": "88d11e03-eee0-418d-9b8f-44aaf3fa3244",
+      "marca": "Elise",
+      "categoria_id": "1c58d3d4-fd98-4d3e-9631-8171668c71aa",
+      "categoria": "Estabilizador",
+      "codigo_categoria": "EST",
+      "descripcion": "Estabilizador Elise FES-10",
+      "activo": true
+    },
+    {
+      "id": "2b0c9306-3f7f-4f92-a0b8-2a1b8a9510e9",
+      "nombre": "IEDA Power Safe LCR-15",
+      "marca_id": "88d11e03-eee0-418d-9b8f-44aaf3fa3244",
+      "marca": "Elise",
+      "categoria_id": "1c58d3d4-fd98-4d3e-9631-8171668c71aa",
+      "categoria": "Estabilizador",
+      "codigo_categoria": "EST",
+      "descripcion": "Estabilizador Elise IEDA Power Safe LCR-15",
+      "activo": true
+    },
+    {
+      "id": "933bc3f4-fa5f-46f3-8d8c-75dd0cb2a6c9",
+      "nombre": "EcoTank L3250",
+      "marca_id": "392fe83c-162d-4655-9380-08c007eb8826",
+      "marca": "Epson",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Epson EcoTank L3250",
+      "activo": true
+    },
+    {
+      "id": "79c71fe6-54a9-4278-9386-6e392790dc75",
+      "nombre": "EcoTank L395",
+      "marca_id": "392fe83c-162d-4655-9380-08c007eb8826",
+      "marca": "Epson",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Epson EcoTank L395",
+      "activo": true
+    },
+    {
+      "id": "f5ac81e8-2fff-4263-955e-17eefc7239be",
+      "nombre": "WorkForce Pro WF-C5710",
+      "marca_id": "392fe83c-162d-4655-9380-08c007eb8826",
+      "marca": "Epson",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Epson WorkForce Pro WF-C5710",
+      "activo": true
+    },
+    {
+      "id": "89e75d27-e08e-46c6-a20c-367758c57bef",
+      "nombre": "WorkForce Pro WF-C5810",
+      "marca_id": "392fe83c-162d-4655-9380-08c007eb8826",
+      "marca": "Epson",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Epson WorkForce Pro WF-C5810",
+      "activo": true
+    },
+    {
+      "id": "98962a7d-5247-4099-8ba4-9bf19882f297",
+      "nombre": "FPS-005B",
+      "marca_id": "02877e90-bb56-46a5-975c-0efb35ba8c79",
+      "marca": "Forza",
+      "categoria_id": "37f5ee45-4835-441b-82eb-a5223e10eafa",
+      "categoria": "Supresor de Picos",
+      "codigo_categoria": "SUP",
+      "descripcion": "Supresor de Picos Forza FPS-005B",
+      "activo": true
+    },
+    {
+      "id": "abce3dac-078b-4fdf-a106-e24e1004f8dc",
+      "nombre": "FVR-1202USB",
+      "marca_id": "02877e90-bb56-46a5-975c-0efb35ba8c79",
+      "marca": "Forza",
+      "categoria_id": "1c58d3d4-fd98-4d3e-9631-8171668c71aa",
+      "categoria": "Estabilizador",
+      "codigo_categoria": "EST",
+      "descripcion": "Estabilizador Forza FVR-1202USB",
+      "activo": true
+    },
+    {
+      "id": "d91ddefd-e06f-4805-ac30-53a3af8422d9",
+      "nombre": "FVR-1222USB",
+      "marca_id": "02877e90-bb56-46a5-975c-0efb35ba8c79",
+      "marca": "Forza",
+      "categoria_id": "1c58d3d4-fd98-4d3e-9631-8171668c71aa",
+      "categoria": "Estabilizador",
+      "codigo_categoria": "EST",
+      "descripcion": "Estabilizador Forza FVR-1222USB",
+      "activo": true
+    },
+    {
+      "id": "d38e8a83-8236-49d2-bde7-795717dfeadb",
+      "nombre": "COMPATIBLE / ENSAMBLADO",
+      "marca_id": "df0dbf83-208a-4447-bb17-19f419fca62c",
+      "marca": "GENÉRICO / POR DETERMINAR",
+      "categoria_id": null,
+      "categoria": null,
+      "codigo_categoria": null,
+      "descripcion": "Equipo modular ensamblado o compatible genérico.",
+      "activo": true
+    },
+    {
+      "id": "ff4554f7-b713-4785-b32d-3758455ffcfd",
+      "nombre": "POR VERIFICAR (DIAGNÓSTICO PENDIENTE)",
+      "marca_id": "df0dbf83-208a-4447-bb17-19f419fca62c",
+      "marca": "GENÉRICO / POR DETERMINAR",
+      "categoria_id": null,
+      "categoria": null,
+      "codigo_categoria": null,
+      "descripcion": "Equipo provisional pendiente de auditoría técnica interna de hardware.",
+      "activo": true
+    },
+    {
+      "id": "a3ee09a3-60be-49db-86db-04710e390196",
+      "nombre": "Compaq Pro 6300",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "9fa7f9e0-a855-4c39-b99c-96b6c989f697",
+      "categoria": "Computadora de Escritorio",
+      "codigo_categoria": "PC",
+      "descripcion": "Computadora de Escritorio HP Compaq Pro 6300",
+      "activo": true
+    },
+    {
+      "id": "b3e97f27-c390-4487-831c-f69f207da3c9",
+      "nombre": "E24 G4",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor HP E24 G4",
+      "activo": true
+    },
+    {
+      "id": "cdf4ab98-c6d1-463e-8fb7-5e8b499434f1",
+      "nombre": "E24-G5",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor HP E24-G5",
+      "activo": true
+    },
+    {
+      "id": "fb4d60cc-9364-419d-880d-751d539e9d70",
+      "nombre": "E24mv G4",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor HP E24mv G4",
+      "activo": true
+    },
+    {
+      "id": "8711b87b-4db8-4a57-a549-dc77eb1cb6ba",
+      "nombre": "HP 450",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "86ff7e8a-2978-497b-8343-c7e7c90f7bbd",
+      "categoria": "Computadora Portátil",
+      "codigo_categoria": "LAP",
+      "descripcion": "Computadora Portátil HP HP 450",
+      "activo": true
+    },
+    {
+      "id": "8114e680-a477-491a-86c7-8cc349bf2532",
+      "nombre": "HP ProDesk",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "9fa7f9e0-a855-4c39-b99c-96b6c989f697",
+      "categoria": "Computadora de Escritorio",
+      "codigo_categoria": "PC",
+      "descripcion": "Computadora de Escritorio HP HP ProDesk",
+      "activo": true
+    },
+    {
+      "id": "682abe66-7713-4891-8b1c-26406c5b4a02",
+      "nombre": "LaserJet Enterprise 600",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión HP LaserJet Enterprise 600",
+      "activo": true
+    },
+    {
+      "id": "fbe80f12-c2bf-45a6-b8eb-2b065b0428e4",
+      "nombre": "LaserJet M1212nf",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión HP LaserJet M1212nf",
+      "activo": true
+    },
+    {
+      "id": "35f5ea78-2156-421c-90cf-956792bd532c",
+      "nombre": "LaserJet M1536dnf MFP",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión HP LaserJet M1536dnf MFP",
+      "activo": true
+    },
+    {
+      "id": "82c95d4f-e22d-481a-a78b-bdf9788c76d0",
+      "nombre": "LaserJet P1102w",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión HP LaserJet P1102w",
+      "activo": true
+    },
+    {
+      "id": "a6d0a384-2ba2-4e3a-bffb-9e83cc4340f1",
+      "nombre": "LaserJet P3015",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión HP LaserJet P3015",
+      "activo": true
+    },
+    {
+      "id": "52cd31d8-59ab-4881-86d4-1f6cb12c7c61",
+      "nombre": "LaserJet Pro MFP M1132",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión HP LaserJet Pro MFP M1132",
+      "activo": true
+    },
+    {
+      "id": "36374e6d-cc69-4120-a066-078cc86a534e",
+      "nombre": "LaserJet Pro MFP M428fdw",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión HP LaserJet Pro MFP M428fdw",
+      "activo": true
+    },
+    {
+      "id": "ec150c65-c8c9-4047-8e3e-bc5254e9558e",
+      "nombre": "ProBook 4320s",
+      "marca_id": "368d47f6-f14f-47ad-b7ef-cd3eac8bd6b4",
+      "marca": "HP",
+      "categoria_id": "86ff7e8a-2978-497b-8343-c7e7c90f7bbd",
+      "categoria": "Computadora Portátil",
+      "codigo_categoria": "LAP",
+      "descripcion": "Computadora Portátil HP ProBook 4320s",
+      "activo": true
+    },
+    {
+      "id": "06a92ab1-0a79-4658-a4c7-3c99d9d99049",
+      "nombre": "HS224HB",
+      "marca_id": "3b0754ce-61c6-4a4b-9e9b-873bb60a2384",
+      "marca": "Halion",
+      "categoria_id": "eccaf3f4-31c6-4046-bd4a-ec26ddbca908",
+      "categoria": "Teclado / Mouse",
+      "codigo_categoria": "KBM",
+      "descripcion": "Teclado / Mouse Halion HS224HB",
+      "activo": true
+    },
+    {
+      "id": "3798707e-5db0-4147-8123-bc2532f71aee",
+      "nombre": "E1941ST",
+      "marca_id": "28449429-9914-499c-9429-2380facc7dc9",
+      "marca": "LG",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor LG E1941ST",
+      "activo": true
+    },
+    {
+      "id": "52b58cbd-33dd-4ba2-a60e-2b129a2738a8",
+      "nombre": "E2051S",
+      "marca_id": "28449429-9914-499c-9429-2380facc7dc9",
+      "marca": "LG",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor LG E2051S",
+      "activo": true
+    },
+    {
+      "id": "c9da0a68-7e95-4655-964b-19e890156f49",
+      "nombre": "D19-10",
+      "marca_id": "7002dfdd-fcd4-43ee-ace0-e474a78a16e6",
+      "marca": "Lenovo",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor Lenovo D19-10",
+      "activo": true
+    },
+    {
+      "id": "adbb1c46-c909-4aa6-a09b-bcbd16136437",
+      "nombre": "SM-8823 (MOJU-U00)",
+      "marca_id": "7002dfdd-fcd4-43ee-ace0-e474a78a16e6",
+      "marca": "Lenovo",
+      "categoria_id": "640d12c6-d3fb-4c4e-afa4-9bf729c87e93",
+      "categoria": "Mouse",
+      "codigo_categoria": "MOU",
+      "descripcion": "Mouse Lenovo SM-8823 (MOJU-U00)",
+      "activo": true
+    },
+    {
+      "id": "cb30eebf-ebbd-4ff3-8a84-1ae2bfe9a1fa",
+      "nombre": "ThinkCentre M70s",
+      "marca_id": "7002dfdd-fcd4-43ee-ace0-e474a78a16e6",
+      "marca": "Lenovo",
+      "categoria_id": "9fa7f9e0-a855-4c39-b99c-96b6c989f697",
+      "categoria": "Computadora de Escritorio",
+      "codigo_categoria": "PC",
+      "descripcion": "Computadora de Escritorio Lenovo ThinkCentre M70s",
+      "activo": true
+    },
+    {
+      "id": "8bfc51d0-dda4-4c0d-b797-7c30a4cb6ca4",
+      "nombre": "ThinkCentre M710s",
+      "marca_id": "7002dfdd-fcd4-43ee-ace0-e474a78a16e6",
+      "marca": "Lenovo",
+      "categoria_id": "9fa7f9e0-a855-4c39-b99c-96b6c989f697",
+      "categoria": "Computadora de Escritorio",
+      "codigo_categoria": "PC",
+      "descripcion": "Computadora de Escritorio Lenovo ThinkCentre M710s",
+      "activo": true
+    },
+    {
+      "id": "4a0f4cc1-2a88-4c2f-b153-600d93d84e07",
+      "nombre": "ThinkCentre M720s",
+      "marca_id": "7002dfdd-fcd4-43ee-ace0-e474a78a16e6",
+      "marca": "Lenovo",
+      "categoria_id": "9fa7f9e0-a855-4c39-b99c-96b6c989f697",
+      "categoria": "Computadora de Escritorio",
+      "codigo_categoria": "PC",
+      "descripcion": "Computadora de Escritorio Lenovo ThinkCentre M720s",
+      "activo": true
+    },
+    {
+      "id": "59c41efa-6c96-421c-adf0-47e149958c5b",
+      "nombre": "ThinkCentre M900",
+      "marca_id": "7002dfdd-fcd4-43ee-ace0-e474a78a16e6",
+      "marca": "Lenovo",
+      "categoria_id": "9fa7f9e0-a855-4c39-b99c-96b6c989f697",
+      "categoria": "Computadora de Escritorio",
+      "codigo_categoria": "PC",
+      "descripcion": "Computadora de Escritorio Lenovo ThinkCentre M900",
+      "activo": true
+    },
+    {
+      "id": "d1e51158-485d-45c1-ba17-ddb6e0cf7fbf",
+      "nombre": "ThinkVision T2224DA",
+      "marca_id": "7002dfdd-fcd4-43ee-ace0-e474a78a16e6",
+      "marca": "Lenovo",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor Lenovo ThinkVision T2224DA",
+      "activo": true
+    },
+    {
+      "id": "46648af7-3baa-4059-996f-9d84c7627ebe",
+      "nombre": "B100 (M-U0026)",
+      "marca_id": "047d834d-bd8d-479f-b492-88ac1c327e68",
+      "marca": "Logitech",
+      "categoria_id": "640d12c6-d3fb-4c4e-afa4-9bf729c87e93",
+      "categoria": "Mouse",
+      "codigo_categoria": "MOU",
+      "descripcion": "Mouse Logitech B100 (M-U0026)",
+      "activo": true
+    },
+    {
+      "id": "2337ca18-ea56-4d40-9001-792ddec10346",
+      "nombre": "K120",
+      "marca_id": "047d834d-bd8d-479f-b492-88ac1c327e68",
+      "marca": "Logitech",
+      "categoria_id": "82dc7f6d-7584-4977-86e9-4299de7c124c",
+      "categoria": "Teclado",
+      "codigo_categoria": "TEC",
+      "descripcion": "Teclado Logitech K120",
+      "activo": true
+    },
+    {
+      "id": "d5da5808-091e-4d89-ab67-c5314667d705",
+      "nombre": "FAST 3890V3",
+      "marca_id": "ab1dc4f2-e145-42fe-9230-b3cdaccd2861",
+      "marca": "Sagemcom",
+      "categoria_id": "000f83dd-a095-4fb0-be17-dde0a7b711fc",
+      "categoria": "Módem / Router",
+      "codigo_categoria": "MOD",
+      "descripcion": "Módem / Router Sagemcom FAST 3890V3",
+      "activo": true
+    },
+    {
+      "id": "bd0cb84f-f890-43ed-a8f9-b1e494cdce85",
+      "nombre": "732NW",
+      "marca_id": "b220d5e2-86e7-48da-bff8-81dace66ffe6",
+      "marca": "Samsung",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor Samsung 732NW",
+      "activo": true
+    },
+    {
+      "id": "bfb425ab-6249-4814-a091-fb679bdd51b6",
+      "nombre": "MX-6070",
+      "marca_id": "7f4e0cc4-9c80-4abe-bad3-0296998c725a",
+      "marca": "Sharp",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Sharp MX-6070",
+      "activo": true
+    },
+    {
+      "id": "ba49e0da-3224-49cf-9a71-115c734e49b1",
+      "nombre": "Archer C50",
+      "marca_id": "69dc03bb-3ac9-4413-b0a9-fa5242098db2",
+      "marca": "TP-Link",
+      "categoria_id": "cde03127-e38e-419f-ba1e-4db0d8989c8a",
+      "categoria": "Access Point / Router",
+      "codigo_categoria": "APR",
+      "descripcion": "Access Point / Router TP-Link Archer C50",
+      "activo": true
+    },
+    {
+      "id": "b01b88ba-a83a-42d3-874f-27bd7472cd1d",
+      "nombre": "TL-SF1008BD",
+      "marca_id": "69dc03bb-3ac9-4413-b0a9-fa5242098db2",
+      "marca": "TP-Link",
+      "categoria_id": "295d0015-7f8f-4b9c-9770-6f5155197525",
+      "categoria": "Switch",
+      "codigo_categoria": "SWT",
+      "descripcion": "Switch TP-Link TL-SF1008BD",
+      "activo": true
+    },
+    {
+      "id": "d7a4ed77-a6d3-477e-b833-d4588eda2fb0",
+      "nombre": "TL-SF1008D",
+      "marca_id": "69dc03bb-3ac9-4413-b0a9-fa5242098db2",
+      "marca": "TP-Link",
+      "categoria_id": "295d0015-7f8f-4b9c-9770-6f5155197525",
+      "categoria": "Switch",
+      "codigo_categoria": "SWT",
+      "descripcion": "Switch TP-Link TL-SF1008D",
+      "activo": true
+    },
+    {
+      "id": "3f8d84fc-2408-44f0-be76-43a65d49b563",
+      "nombre": "TL-SF1024",
+      "marca_id": "69dc03bb-3ac9-4413-b0a9-fa5242098db2",
+      "marca": "TP-Link",
+      "categoria_id": "295d0015-7f8f-4b9c-9770-6f5155197525",
+      "categoria": "Switch",
+      "codigo_categoria": "SWT",
+      "descripcion": "Switch TP-Link TL-SF1024",
+      "activo": true
+    },
+    {
+      "id": "f985effb-a3b9-4ea4-a79f-3f1b0ee43484",
+      "nombre": "TL-WN8200ND",
+      "marca_id": "69dc03bb-3ac9-4413-b0a9-fa5242098db2",
+      "marca": "TP-Link",
+      "categoria_id": "263fd5ef-922a-4e33-a427-d3c83c4ca004",
+      "categoria": "Adaptador Inalámbrico",
+      "codigo_categoria": "WIF",
+      "descripcion": "Adaptador Inalámbrico TP-Link TL-WN8200ND",
+      "activo": true
+    },
+    {
+      "id": "897a2526-2f1d-46b5-a9e2-152a7fcff107",
+      "nombre": "e-STUDIO 4508A",
+      "marca_id": "fa32e6ad-ab39-40af-82e2-6f62378037bb",
+      "marca": "Toshiba",
+      "categoria_id": "f7f49bfb-ae8f-4020-87d3-139739df1a88",
+      "categoria": "Equipo Multifuncional de Impresión",
+      "codigo_categoria": "IMP",
+      "descripcion": "Equipo Multifuncional de Impresión Toshiba e-STUDIO 4508A",
+      "activo": true
+    },
+    {
+      "id": "0e58f9e7-cd4c-48c8-a715-a7dcdb9b11f0",
+      "nombre": "KM105K",
+      "marca_id": "2062cb90-f6e6-4d01-9c66-2783a81754fa",
+      "marca": "Vastec",
+      "categoria_id": "82dc7f6d-7584-4977-86e9-4299de7c124c",
+      "categoria": "Teclado",
+      "codigo_categoria": "TEC",
+      "descripcion": "Teclado Vastec KM105K",
+      "activo": true
+    },
+    {
+      "id": "ba0cdddc-f7ed-42f2-8703-347813fcf0a8",
+      "nombre": "KM105M",
+      "marca_id": "2062cb90-f6e6-4d01-9c66-2783a81754fa",
+      "marca": "Vastec",
+      "categoria_id": "640d12c6-d3fb-4c4e-afa4-9bf729c87e93",
+      "categoria": "Mouse",
+      "codigo_categoria": "MOU",
+      "descripcion": "Mouse Vastec KM105M",
+      "activo": true
+    },
+    {
+      "id": "2f27cc4b-eafe-48a8-8b28-68c28a7bcd0d",
+      "nombre": "VA-MF24",
+      "marca_id": "2062cb90-f6e6-4d01-9c66-2783a81754fa",
+      "marca": "Vastec",
+      "categoria_id": "b2a97375-cc0c-451f-ad4e-148f80bb16a3",
+      "categoria": "Monitor",
+      "codigo_categoria": "MON",
+      "descripcion": "Monitor Vastec VA-MF24",
+      "activo": true
+    }
+  ]
+}

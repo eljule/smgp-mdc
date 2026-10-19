@@ -19,6 +19,20 @@ class DemoItamSeeder extends Seeder
             Schema::disableForeignKeyConstraints();
         }
 
+        // Asegurar seeders previos si se corre de forma aislada
+        if (DB::table('core_offices')->count() === 0) {
+            $this->call(OfficeSeeder::class);
+        }
+        if (DB::table('core_people')->count() === 0) {
+            $this->call(PersonSeeder::class);
+        }
+        if (DB::table('core_users')->count() === 0) {
+            $this->call(UserSeeder::class);
+        }
+        if (DB::table('itam_asset_categories')->count() === 0) {
+            $this->call(ItamSeeder::class);
+        }
+
         DB::table('itam_maintenance_supplies')->delete();
         DB::table('itam_maintenance_orders')->delete();
         DB::table('itam_audit_verifications')->delete();
@@ -29,6 +43,40 @@ class DemoItamSeeder extends Seeder
         DB::table('itam_asset_software')->delete();
         DB::table('itam_software')->delete();
         DB::table('itam_assets')->delete();
+
+        // 1. Obtener identificadores y nombres reales de core_people y core_offices
+        $odtBoss = DB::table('core_people')->where('document_number', '10783864')->first()
+            ?? DB::table('core_people')->where('office', 'like', '%DESARROLLO TECNOL%')->first();
+        $odtBossId = $odtBoss?->id ?? 35;
+        $odtOffice = '[ODT] OFICINA DE DESARROLLO TECNOLÓGICO';
+
+        $alcalde = DB::table('core_people')->where('office', 'like', '%ALCALD%')->first();
+        $alcaldeId = $alcalde?->id ?? 46;
+        $alcOffice = '[ALC] ALCALDÍA';
+
+        $gatBoss = DB::table('core_people')->where('office', 'like', '%ADMINISTRACIÓN TRIBUTARIA%')->first();
+        $gatBossId = $gatBoss?->id ?? 31;
+        $gatOffice = '[GAT] GERENCIA DE ADMINISTRACIÓN TRIBUTARIA';
+
+        $transporteBoss = DB::table('core_people')->where('office', 'like', '%TRANSPORTE%')->first();
+        $transporteBossId = $transporteBoss?->id ?? 5;
+        $transporteOffice = '[STTV] SUBGERENCIA DE TRANSPORTE, TRÁNSITO Y VIALIDAD';
+
+        $gspBoss = DB::table('core_people')->where('office', 'like', '%SERVICIOS PÚBLICOS%')->first();
+        $gspBossId = $gspBoss?->id ?? 9;
+        $gspOffice = '[GSP] GERENCIA DE SERVICIOS PÚBLICOS';
+        $gspBossName = $gspBoss ? trim($gspBoss->first_name . ' ' . $gspBoss->paternal_surname . ' ' . $gspBoss->maternal_surname) : 'LUIS RICARDO LLACSAHUANGA TIMOTEO';
+
+        $almacenBoss = DB::table('core_people')->where('office', 'like', '%ALMACEN%')->first();
+        $almacenBossId = $almacenBoss?->id ?? 38;
+        $almacenOffice = '[OACG] OFICINA DE ALMACEN CENTRAL GENERAL';
+
+        $planeamientoBoss = DB::table('core_people')->where('office', 'like', '%PLANEAMIENTO%')->first();
+        $planeamientoBossId = $planeamientoBoss?->id ?? 33;
+        $planeamientoOffice = '[OGPP] OFICINA GENERAL DE PLANEAMIENTO Y PRESUPUESTO';
+
+        $techUser = DB::table('core_users')->where('username', 'soporte1')->first();
+        $techName = $techUser?->full_name ?? 'JAIME HENRY SANDOVAL NIEVES';
 
         $assets = [
             [
@@ -43,8 +91,8 @@ class DemoItamSeeder extends Seeder
                 'color' => 'Negro',
                 'status' => 'OPERATIVO',
                 'physical_condition' => 'BUENO',
-                'office' => 'OFICINA DE DESARROLLO TECNOLÓGICO (ODT)',
-                'assigned_person_id' => 1,
+                'office' => $odtOffice,
+                'assigned_person_id' => $odtBossId,
                 'acquisition_date' => '2023-01-15',
                 'supplier' => 'CORPORACIÓN TECNOLÓGICA DEL NORTE S.A.C.',
                 'warranty_end_date' => '2026-01-15',
@@ -61,14 +109,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => '7408770002',
                 'serial_number' => 'CN-0ABC12-74261',
                 'category_id' => 3,
-                'brand_id' => 3,
-                'model_id' => 17,
+                'brand_id' => 8,
+                'model_id' => 22,
                 'parent_asset_id' => 1,
                 'color' => 'Negro',
                 'status' => 'OPERATIVO',
                 'physical_condition' => 'BUENO',
-                'office' => 'OFICINA DE DESARROLLO TECNOLÓGICO (ODT)',
-                'assigned_person_id' => 1,
+                'office' => $odtOffice,
+                'assigned_person_id' => $odtBossId,
                 'acquisition_date' => null,
                 'supplier' => null,
                 'warranty_end_date' => null,
@@ -85,14 +133,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => '7408770003',
                 'serial_number' => '2145SC9812',
                 'category_id' => 5,
-                'brand_id' => 5,
-                'model_id' => 12,
+                'brand_id' => 12,
+                'model_id' => 46,
                 'parent_asset_id' => 1,
                 'color' => 'Negro',
                 'status' => 'OPERATIVO',
                 'physical_condition' => 'BUENO',
-                'office' => 'OFICINA DE DESARROLLO TECNOLÓGICO (ODT)',
-                'assigned_person_id' => 1,
+                'office' => $odtOffice,
+                'assigned_person_id' => $odtBossId,
                 'acquisition_date' => null,
                 'supplier' => null,
                 'warranty_end_date' => null,
@@ -109,14 +157,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => '7408770004',
                 'serial_number' => '1934LZ0012',
                 'category_id' => 6,
-                'brand_id' => 5,
-                'model_id' => 13,
+                'brand_id' => 12,
+                'model_id' => 45,
                 'parent_asset_id' => 1,
                 'color' => 'Negro',
                 'status' => 'OPERATIVO',
                 'physical_condition' => 'BUENO',
-                'office' => 'OFICINA DE DESARROLLO TECNOLÓGICO (ODT)',
-                'assigned_person_id' => 1,
+                'office' => $odtOffice,
+                'assigned_person_id' => $odtBossId,
                 'acquisition_date' => null,
                 'supplier' => null,
                 'warranty_end_date' => null,
@@ -133,14 +181,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => '7408770005',
                 'serial_number' => 'FZ1202-99881',
                 'category_id' => 7,
-                'brand_id' => 7,
-                'model_id' => 16,
+                'brand_id' => 6,
+                'model_id' => 17,
                 'parent_asset_id' => 1,
                 'color' => 'Negro',
                 'status' => 'OPERATIVO',
                 'physical_condition' => 'BUENO',
-                'office' => 'OFICINA DE DESARROLLO TECNOLÓGICO (ODT)',
-                'assigned_person_id' => 1,
+                'office' => $odtOffice,
+                'assigned_person_id' => $odtBossId,
                 'acquisition_date' => null,
                 'supplier' => null,
                 'warranty_end_date' => null,
@@ -157,14 +205,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => '7408770010',
                 'serial_number' => 'PF-389102',
                 'category_id' => 2,
-                'brand_id' => 2,
-                'model_id' => 7,
+                'brand_id' => 8,
+                'model_id' => 34,
                 'parent_asset_id' => null,
                 'color' => 'Negro Grafito',
                 'status' => 'EN_PRESTAMO',
                 'physical_condition' => 'BUENO',
-                'office' => 'ALCALDÍA / SALA DE CONCEJO',
-                'assigned_person_id' => 2,
+                'office' => $alcOffice,
+                'assigned_person_id' => $alcaldeId,
                 'acquisition_date' => '2023-04-10',
                 'supplier' => 'LENOVO PERÚ S.A.',
                 'warranty_end_date' => '2026-04-10',
@@ -181,14 +229,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => '7408770020',
                 'serial_number' => 'X9K8712390',
                 'category_id' => 4,
-                'brand_id' => 4,
-                'model_id' => 10,
+                'brand_id' => 5,
+                'model_id' => 12,
                 'parent_asset_id' => null,
                 'color' => 'Negro',
                 'status' => 'OPERATIVO',
                 'physical_condition' => 'BUENO',
-                'office' => 'GERENCIA DE ADMINISTRACIÓN TRIBUTARIA (RENTAS)',
-                'assigned_person_id' => 3,
+                'office' => $gatOffice,
+                'assigned_person_id' => $gatBossId,
                 'acquisition_date' => '2023-02-20',
                 'supplier' => 'EPSON DEL PERÚ S.A.',
                 'warranty_end_date' => '2025-02-20',
@@ -205,14 +253,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => '7408770021',
                 'serial_number' => 'VNB3400192',
                 'category_id' => 4,
-                'brand_id' => 1,
-                'model_id' => 4,
+                'brand_id' => 8,
+                'model_id' => 33,
                 'parent_asset_id' => null,
                 'color' => 'Blanco / Gris',
                 'status' => 'EN_MANTENIMIENTO',
                 'physical_condition' => 'REGULAR',
-                'office' => 'OFICINA DE DESARROLLO TECNOLÓGICO (ODT)',
-                'assigned_person_id' => 1,
+                'office' => $odtOffice,
+                'assigned_person_id' => $odtBossId,
                 'acquisition_date' => '2022-09-14',
                 'supplier' => 'HP DIRECTO PERÚ',
                 'warranty_end_date' => null,
@@ -229,14 +277,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => '7408770030',
                 'serial_number' => '2194870021',
                 'category_id' => 8,
-                'brand_id' => 6,
-                'model_id' => 14,
+                'brand_id' => 16,
+                'model_id' => 53,
                 'parent_asset_id' => null,
                 'color' => 'Gris Oscuro',
                 'status' => 'OPERATIVO',
                 'physical_condition' => 'BUENO',
-                'office' => 'DATA CENTER / RACK PRINCIPAL ODT',
-                'assigned_person_id' => 1,
+                'office' => $odtOffice,
+                'assigned_person_id' => $odtBossId,
                 'acquisition_date' => '2021-11-05',
                 'supplier' => null,
                 'warranty_end_date' => null,
@@ -253,14 +301,14 @@ class DemoItamSeeder extends Seeder
                 'patrimonial_code' => null,
                 'serial_number' => 'S/N-PROVISIONAL',
                 'category_id' => 1,
-                'brand_id' => 8,
-                'model_id' => 18,
+                'brand_id' => 7,
+                'model_id' => 19,
                 'parent_asset_id' => null,
                 'color' => 'Negro',
                 'status' => 'OPERATIVO',
                 'physical_condition' => 'REGULAR',
-                'office' => 'SUBGERENCIA DE TRANSPORTES',
-                'assigned_person_id' => 2,
+                'office' => $transporteOffice,
+                'assigned_person_id' => $transporteBossId,
                 'acquisition_date' => '2020-05-12',
                 'supplier' => null,
                 'warranty_end_date' => null,
@@ -370,16 +418,16 @@ class DemoItamSeeder extends Seeder
                 'id' => 1,
                 'loan_code' => 'PREST-2026-0001',
                 'loan_number' => 'PREST-2026-0001',
-                'requesting_office' => 'GERENCIA DE SERVICIOS PÚBLICOS',
-                'requesting_person_id' => 2,
-                'borrower_name' => 'EMMA FLOR SAAVEDRA PACHERREZ',
+                'requesting_office' => $gspOffice,
+                'requesting_person_id' => $gspBossId,
+                'borrower_name' => $gspBossName,
                 'start_date' => '2026-10-01',
                 'expected_return_date' => '2026-10-05',
                 'actual_return_date' => null,
                 'event_reason' => 'Sustentación de Plan Distrital de Manejo de Residuos Sólidos ante el Concejo Municipal.',
                 'status' => 'ACTIVO',
                 'return_condition' => null,
-                'technician_name' => 'Téc. Marco Aurelio Vargas (ODT)',
+                'technician_name' => "Téc. {$techName} (ODT)",
                 'notes' => 'Préstamo con cargador y mouse inalámbrico. Se emitió recordatorio de devolución.',
                 'created_at' => '2026-10-15 02:12:58',
                 'updated_at' => '2026-10-15 02:12:58',
@@ -403,14 +451,14 @@ class DemoItamSeeder extends Seeder
                 'id' => 1,
                 'acta_number' => 'ACTA-ASIG-2026-0001',
                 'asset_id' => 1,
-                'from_office' => 'Almacén Central ODT',
-                'to_office' => 'OFICINA DE DESARROLLO TECNOLÓGICO (ODT)',
-                'from_person_id' => null,
-                'to_person_id' => 1,
+                'from_office' => $almacenOffice,
+                'to_office' => $odtOffice,
+                'from_person_id' => $almacenBossId,
+                'to_person_id' => $odtBossId,
                 'movement_date' => '2026-01-15 09:30:00',
                 'movement_type' => 'ASIGNACION',
                 'reason' => 'Asignación oficial de equipamiento informático para funciones de desarrollo de sistemas.',
-                'technician_name' => 'Ing. Juan Carlos Morales (ODT)',
+                'technician_name' => "Ing. {$techName} (ODT)",
                 'notes' => 'Entrega de equipo informático completo con periféricos y estabilizador.',
                 'include_children_in_transfer' => true,
                 'created_at' => '2026-10-15 02:12:58',
@@ -420,14 +468,14 @@ class DemoItamSeeder extends Seeder
                 'id' => 2,
                 'acta_number' => 'ACTA-TRAS-2026-0002',
                 'asset_id' => 1,
-                'from_office' => 'Oficina de Planeamiento',
-                'to_office' => 'OFICINA DE DESARROLLO TECNOLÓGICO (ODT)',
-                'from_person_id' => 2,
-                'to_person_id' => 1,
+                'from_office' => $planeamientoOffice,
+                'to_office' => $odtOffice,
+                'from_person_id' => $planeamientoBossId,
+                'to_person_id' => $odtBossId,
                 'movement_date' => '2026-02-10 11:15:00',
                 'movement_type' => 'TRASLADO',
                 'reason' => 'Reestructuración interna y redistribución de recursos informáticos de alta capacidad.',
-                'technician_name' => 'Téc. Marco Aurelio Vargas (Soporte TI)',
+                'technician_name' => "Téc. {$techName} (Soporte TI)",
                 'notes' => 'Traslado efectuado con conformidad de ambas jefaturas.',
                 'include_children_in_transfer' => true,
                 'created_at' => '2026-10-15 02:12:58',
@@ -463,7 +511,7 @@ class DemoItamSeeder extends Seeder
                 'priority' => 'ALTA',
                 'scheduled_date' => '2026-10-08',
                 'completed_date' => null,
-                'technician_name' => 'Téc. Roberto Ruiz (ODT)',
+                'technician_name' => "Téc. {$techName} (ODT)",
                 'diagnosis' => 'Rodillo de alimentación desgastado provoca atasco frecuente de papel bond 75g.',
                 'activities_performed' => 'Desmontaje de bandeja 2, limpieza de sensor óptico de paso de papel.',
                 'total_cost' => '85.00',
@@ -481,7 +529,7 @@ class DemoItamSeeder extends Seeder
                 'priority' => 'MEDIA',
                 'scheduled_date' => '2026-09-15',
                 'completed_date' => '2026-09-15',
-                'technician_name' => 'Ing. Juan Carlos Morales (ODT)',
+                'technician_name' => "Ing. {$techName} (ODT)",
                 'diagnosis' => 'Mantenimiento preventivo programado trimestral. Acumulación leve de polvo en cooler.',
                 'activities_performed' => 'Sopleteado de fuente de poder, aplicación de pasta térmica Arctic MX-4, verificación de discos SMART.',
                 'total_cost' => '35.00',

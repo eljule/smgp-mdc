@@ -19,12 +19,18 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
+use App\Http\Controllers\Auth\PasswordChangeController;
+
 // Rutas de Autenticación Institucional Segura (POST /login sin exponer credenciales en URL)
 Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
 Route::get('/login', [LoginController::class, 'showLoginForm']);
 Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout.post');
+
+// Cambio de Contraseña (Provisional Obligatorio y Voluntario desde Terminal)
+Route::get('/cambiar-password', [PasswordChangeController::class, 'showChangePasswordForm'])->name('password.change');
+Route::post('/cambiar-password', [PasswordChangeController::class, 'updatePassword'])->name('password.update');
 
 // Consulta Pública de DNI y Códigos QR de Oficinas para Mesa de Ayuda
 Route::get('/api/helpdesk/dni-lookup', [LoginController::class, 'lookupDni'])->name('helpdesk.dni.lookup');

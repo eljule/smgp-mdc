@@ -268,22 +268,59 @@
 
                             <!-- Estado -->
                             <td class="py-3.5 px-4 text-center">
-                                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>
-                                <span class="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
-                                    Activo
-                                </span>
+                                @if (! empty($user['isLocked']))
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-300 dark:border-rose-800">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
+                                        <span>Bloqueado</span>
+                                    </span>
+                                @elseif (($user['status'] ?? 'Activo') === 'Activo')
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                        <span>Activo</span>
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                                        <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                                        <span>Inactivo</span>
+                                    </span>
+                                @endif
                             </td>
 
                             <!-- Acciones -->
                             <td class="py-3.5 px-4 text-center">
-                                <button
-                                    id="btn-edit-permissions-{{ $user['id'] }}"
-                                    type="button"
-                                    wire:click="openEditPermissions({{ $user['id'] }})"
-                                    class="px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-semibold text-xs hover:bg-emerald-100 transition-colors cursor-pointer"
-                                >
-                                    ⚙ Editar Permisos
-                                </button>
+                                <div class="flex items-center justify-center gap-1.5 flex-wrap">
+                                    <button
+                                        id="btn-edit-permissions-{{ $user['id'] }}"
+                                        type="button"
+                                        wire:click="openEditPermissions({{ $user['id'] }})"
+                                        class="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-semibold text-xs hover:bg-emerald-100 transition-colors cursor-pointer"
+                                        title="Modificar permisos y roles"
+                                    >
+                                        ⚙ Permisos
+                                    </button>
+
+                                    <button
+                                        id="btn-reset-password-{{ $user['id'] }}"
+                                        type="button"
+                                        wire:click="openResetPassword({{ $user['id'] }})"
+                                        class="px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-semibold text-xs hover:bg-amber-100 transition-colors cursor-pointer"
+                                        title="Resetear contraseña provisional"
+                                    >
+                                        🔑 Reset Clave
+                                    </button>
+
+                                    @if (! empty($user['isLocked']))
+                                        <button
+                                            id="btn-unlock-user-{{ $user['id'] }}"
+                                            type="button"
+                                            wire:click="unlockUser({{ $user['id'] }})"
+                                            class="px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-bold text-xs hover:bg-rose-100 transition-colors cursor-pointer"
+                                            title="Desbloquear cuenta bloqueada"
+                                        >
+                                            🔓 Desbloquear
+                                        </button>
+                                    @endif
+                                </div>
                             </td>
                         </tr>
                     @empty

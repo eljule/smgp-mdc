@@ -175,16 +175,32 @@ class LoginController
             return back()->withInput()->with('error', 'El usuario ingresado no existe o se encuentra inactivo.');
         }
 
+        if ($user->is_locked) {
+            return back()->withInput()->with('error', 'Su cuenta se encuentra bloqueada por seguridad tras superar el límite de intentos fallidos. Comuníquese con el administrador de TI para su desbloqueo.');
+        }
+
         // Verificamos contraseña contra hash en BD o contraseñas demo válidas
         $passwordValid = Hash::check($password, $user->password)
             || in_array($password, ['admin123', 'password123'], true);
 
         if (! $passwordValid) {
-            return back()->withInput()->with('error', 'Contraseña incorrecta. Verifique sus credenciales.');
+            $locked = $user->recordFailedLogin(5);
+            if ($locked) {
+                return back()->withInput()->with('error', 'Ha superado el límite de 5 intentos fallidos permitidos. Su cuenta ha sido bloqueada por seguridad. Comuníquese con el administrador de TI para su desbloqueo.');
+            }
+            $remaining = 5 - ($user->failed_login_attempts ?? 0);
+
+            return back()->withInput()->with('error', "Contraseña incorrecta. Le quedan {$remaining} intento(s) antes del bloqueo de su cuenta.");
         }
+
+        $user->resetFailedLogins();
 
         Auth::login($user, $remember);
         $request->session()->regenerate();
+
+        if ($user->must_change_password) {
+            return redirect()->route('password.change')->with('warning', 'Bienvenido al sistema. Por políticas de seguridad institucional, debe cambiar su contraseña provisional antes de continuar.');
+        }
 
         return redirect()->route('portal.launcher');
     }

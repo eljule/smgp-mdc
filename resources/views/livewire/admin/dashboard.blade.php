@@ -30,6 +30,7 @@
     @include('livewire.admin.modals.person-cease-detail-modal')
     @include('livewire.admin.modals.user-form-modal')
     @include('livewire.admin.modals.user-permissions-modal')
+    @include('livewire.admin.modals.reset-password-modal')
     @include('livewire.admin.modals.role-form-modal')
     @include('livewire.admin.modals.office-form-modal')
     @include('livewire.admin.modals.sedes-modal')

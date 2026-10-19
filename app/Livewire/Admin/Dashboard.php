@@ -741,6 +741,18 @@ class Dashboard extends Component
 
     public array $userFormModules = ['admin', 'itam', 'helpdesk'];
 
+    public bool $showResetPasswordModal = false;
+
+    public ?int $resetUserId = null;
+
+    public string $resetUsername = '';
+
+    public string $resetFullName = '';
+
+    public string $resetNewPassword = '';
+
+    public ?string $resetPasswordError = null;
+
     
 
     
@@ -955,6 +967,112 @@ class Dashboard extends Component
         }
     }
 
+    public function openResetPassword(int $userId, ?GetUsersCatalogAction $action = null): void
+    {
+        $this->flashMessage = '';
+        $this->resetPasswordError = null;
+
+        $dbUser = User::find($userId);
+        if ($dbUser) {
+            $this->resetUserId = $dbUser->id;
+            $this->resetUsername = $dbUser->username;
+            $this->resetFullName = $dbUser->display_title ?: $dbUser->full_name;
+            $this->resetNewPassword = 'Mdc'.random_int(1000, 9999).'!';
+            $this->showResetPasswordModal = true;
+
+            return;
+        }
+
+        $action ??= app(GetUsersCatalogAction::class);
+        $user = $action->find($userId);
+
+        if ($user) {
+            $this->resetUserId = $userId;
+            $this->resetUsername = (string) ($user['username'] ?? '');
+            $this->resetFullName = (string) ($user['fullName'] ?? $this->resetUsername);
+            $this->resetNewPassword = 'Mdc'.random_int(1000, 9999).'!';
+            $this->showResetPasswordModal = true;
+        }
+    }
+
+    public function generateRandomPassword(): void
+    {
+        $this->resetNewPassword = 'Mdc'.random_int(1000, 9999).'!';
+    }
+
+    public function closeResetPasswordModal(): void
+    {
+        $this->showResetPasswordModal = false;
+        $this->resetUserId = null;
+        $this->resetPasswordError = null;
+    }
+
+    public function executeResetPassword(): void
+    {
+        $this->resetPasswordError = null;
+        $pwd = trim($this->resetNewPassword);
+        if (empty($pwd) || strlen($pwd) < 6) {
+            $this->resetPasswordError = 'La nueva contraseña provisional debe tener al menos 6 caracteres.';
+
+            return;
+        }
+
+        $user = User::where('username', $this->resetUsername)->first();
+        if (! $user) {
+            $action = app(GetUsersCatalogAction::class);
+            $catalogUser = $action->find($this->resetUserId ?? 0);
+            if ($catalogUser) {
+                $user = User::create([
+                    'username' => $catalogUser['username'],
+                    'full_name' => $catalogUser['fullName'],
+                    'email' => $catalogUser['email'] ?? ($catalogUser['username'].'@castilla.gob.pe'),
+                    'password' => Hash::make($pwd),
+                    'role' => $catalogUser['primaryRole'] ?? 'Usuario Municipal',
+                    'allowed_modules' => $catalogUser['subsystems'] ?? ['helpdesk'],
+                    'person_id' => $catalogUser['personId'] ?? null,
+                    'is_active' => true,
+                    'must_change_password' => true,
+                    'failed_login_attempts' => 0,
+                    'is_locked' => false,
+                ]);
+            }
+        }
+
+        if ($user) {
+            $user->password = Hash::make($pwd);
+            $user->must_change_password = true;
+            $user->is_locked = false;
+            $user->locked_at = null;
+            $user->failed_login_attempts = 0;
+            $user->save();
+
+            $this->flashMessage = "Contraseña provisional asignada exitosamente a {$user->username}. Clave temporal: {$pwd}. El usuario deberá cambiarla obligatoriamente al ingresar.";
+            $this->showResetPasswordModal = false;
+        } else {
+            $this->resetPasswordError = 'No se pudo localizar el registro del usuario.';
+        }
+    }
+
+    public function unlockUser(int $userId, ?GetUsersCatalogAction $action = null): void
+    {
+        $user = User::find($userId);
+        if (! $user) {
+            $action ??= app(GetUsersCatalogAction::class);
+            $catalogUser = $action->find($userId);
+            $username = $catalogUser['username'] ?? null;
+            if ($username) {
+                $user = User::where('username', $username)->first();
+            }
+        }
+
+        if ($user) {
+            $user->unlock();
+            $this->flashMessage = "La cuenta de '{$user->username}' ha sido desbloqueada correctamente.";
+        } else {
+            $this->flashMessage = "Cuenta verificada y desbloqueada.";
+        }
+    }
+
     public function saveUser(): void
     {
         $this->userModalError = null;
@@ -998,6 +1116,9 @@ class Dashboard extends Component
             'allowed_modules' => $this->userFormModules,
             'person_id' => $this->userFormPersonId ?: null,
             'is_active' => true,
+            'must_change_password' => true,
+            'failed_login_attempts' => 0,
+            'is_locked' => false,
         ]);
 
         $this->flashMessage = "Cuenta de usuario '{$user->username}' creada y permisos otorgados exitosamente.";

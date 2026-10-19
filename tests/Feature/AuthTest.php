@@ -24,7 +24,7 @@ class AuthTest extends TestCase
     public function test_login_authenticates_user_and_redirects_cleanly_to_portal(): void
     {
         $response = $this->post('/login', [
-            'username' => 'jperez',
+            'username' => 'soporte1',
             'password' => 'admin123',
         ]);
 
@@ -33,9 +33,9 @@ class AuthTest extends TestCase
 
         $user = auth()->user();
         $this->assertNotNull($user);
-        $this->assertSame('jperez', $user->username);
-        $this->assertSame('JP', $user->initials);
-        $this->assertSame('JUAN ALBERTO PÉREZ MORALES', $user->display_title);
+        $this->assertSame('soporte1', $user->username);
+        $this->assertSame('SO', $user->initials);
+        $this->assertSame('JAIME HENRY SANDOVAL NIEVES', $user->display_title);
         $this->assertSame('Técnico de Soporte e ITAM', $user->display_role);
     }
 
@@ -54,7 +54,7 @@ class AuthTest extends TestCase
     public function test_login_with_invalid_credentials_fails(): void
     {
         $response = $this->post('/login', [
-            'username' => 'jperez',
+            'username' => 'soporte1',
             'password' => 'wrong_pass',
         ]);
 
@@ -64,38 +64,38 @@ class AuthTest extends TestCase
 
     public function test_portal_renders_authenticated_user_in_navbar_header(): void
     {
-        $user = User::where('username', 'jperez')->first();
+        $user = User::where('username', 'soporte1')->first();
         $this->actingAs($user);
 
         $response = $this->get('/portal');
 
         $response->assertStatus(200);
         // Debe mostrar las iniciales y rol del usuario autenticado en el header
-        $response->assertSee('JP');
-        $response->assertSee('JUAN ALBERTO PÉREZ MORALES');
+        $response->assertSee('SO');
+        $response->assertSee('JAIME HENRY SANDOVAL NIEVES');
         $response->assertSee('Técnico de Soporte e ITAM');
         // No debe mostrar las credenciales en la URL ni el administrador si es jperez
-        $response->assertDontSee('user=jperez');
+        $response->assertDontSee('user=soporte1');
         $response->assertDontSee('password=');
     }
 
     public function test_subsystem_header_renders_authenticated_user_profile(): void
     {
-        $user = User::where('username', 'jperez')->first();
+        $user = User::where('username', 'soporte1')->first();
         $this->actingAs($user);
 
         $response = $this->get('/admin');
 
         $response->assertStatus(200);
-        $response->assertSee('JP');
-        $response->assertSee('JUAN ALBERTO PÉREZ MORALES');
+        $response->assertSee('SO');
+        $response->assertSee('JAIME HENRY SANDOVAL NIEVES');
         $response->assertSee('Técnico de Soporte e ITAM');
         $response->assertSee('Cerrar Sesión');
     }
 
     public function test_logout_clears_session_and_redirects_to_login(): void
     {
-        $user = User::where('username', 'jperez')->first();
+        $user = User::where('username', 'soporte1')->first();
         $this->actingAs($user);
 
         $response = $this->get('/logout');

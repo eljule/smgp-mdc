@@ -158,6 +158,8 @@ class Dashboard extends Component
 
     public string $movementAssetSearch = '';
 
+    public string $movementAssetInput = '';
+
     public ?Asset $selectedMovementAsset = null;
 
     public string $movementType = 'TRASLADO';
@@ -826,10 +828,14 @@ class Dashboard extends Component
     {
         $this->isDetailModalOpen = false;
         $this->movementAssetId = $assetId;
-        $this->movementAssetSearch = '';
         $this->selectedMovementAsset = $assetId
             ? Asset::with(['category', 'brand', 'model', 'assignedPerson', 'childAssets'])->find($assetId)
             : null;
+        $ast = $this->selectedMovementAsset;
+        $this->movementAssetInput = $ast
+            ? "[{$ast->computer_code}] {$ast->brand?->name} {$ast->model?->name} — ".($ast->office ?: 'Almacén Central TI').' ('.($ast->assignedPerson ? $ast->assignedPerson->full_name : 'Sin Custodio').')'
+            : '';
+        $this->movementAssetSearch = '';
         $this->movementType = 'TRASLADO';
         $this->movementToOffice = '';
         $this->movementTargetPersonId = null;
@@ -848,41 +854,91 @@ class Dashboard extends Component
         $this->isMovementModalOpen = false;
         $this->selectedMovementAsset = null;
         $this->movementAssetId = null;
+        $this->movementAssetInput = '';
         $this->movementAssetSearch = '';
         $this->resetValidation();
     }
 
-    public function getAvailableMovementAssetsProperty()
+    public function updatedMovementAssetInput(string $value): void
     {
-        $query = Asset::with(['brand', 'model', 'assignedPerson'])
-            ->where('is_active', true);
+        $this->resolveAssetFromMovementInput($value);
+    }
 
-        if (! empty(trim($this->movementAssetSearch))) {
-            $s = '%'.trim($this->movementAssetSearch).'%';
-            $query->where(function ($q) use ($s) {
-                $q->where('computer_code', 'ILIKE', $s)
-                    ->orWhere('patrimonial_code', 'ILIKE', $s)
-                    ->orWhere('serial_number', 'ILIKE', $s)
-                    ->orWhereHas('brand', fn ($b) => $b->where('name', 'ILIKE', $s))
-                    ->orWhereHas('model', fn ($m) => $m->where('name', 'ILIKE', $s))
-                    ->orWhereHas('assignedPerson', fn ($p) => $p->whereRaw("CONCAT(first_name, ' ', paternal_surname, ' ', maternal_surname) ILIKE ?", [$s]));
-            });
+    protected function resolveAssetFromMovementInput(?string $value): void
+    {
+        $clean = trim((string) $value);
+
+        if ($clean === '') {
+            $this->movementAssetId = null;
+            $this->selectedMovementAsset = null;
+
+            return;
         }
 
-        $assets = $query->orderBy('computer_code')->take(50)->get();
+        // 1. Extraer código informático entre corchetes ej. "[MDC-TI-PC-0001]..."
+        if (preg_match('/\[([^\]]+)\]/', $clean, $matches)) {
+            $code = trim($matches[1]);
+            $asset = Asset::with(['category', 'brand', 'model', 'assignedPerson', 'childAssets'])
+                ->where('computer_code', $code)
+                ->first();
 
-        if ($this->movementAssetId && ! $assets->contains('id', $this->movementAssetId)) {
-            $selected = Asset::with(['brand', 'model', 'assignedPerson'])->find($this->movementAssetId);
-            if ($selected) {
-                $assets->prepend($selected);
+            if ($asset) {
+                $this->movementAssetId = $asset->id;
+                $this->selectedMovementAsset = $asset;
+
+                return;
             }
         }
 
-        return $assets;
+        // 2. Búsqueda directa por código de computadora, patrimonial o serie
+        $asset = Asset::with(['category', 'brand', 'model', 'assignedPerson', 'childAssets'])
+            ->where('computer_code', $clean)
+            ->orWhere('patrimonial_code', $clean)
+            ->orWhere('serial_number', $clean)
+            ->first();
+
+        if ($asset) {
+            $this->movementAssetId = $asset->id;
+            $this->selectedMovementAsset = $asset;
+
+            return;
+        }
+
+        // 3. Búsqueda por coincidencia en colección de activos activos
+        $all = Asset::with(['category', 'brand', 'model', 'assignedPerson', 'childAssets'])
+            ->where('is_active', true)
+            ->get();
+
+        $cleanUpper = mb_strtoupper($clean);
+        $match = $all->first(function ($a) use ($cleanUpper) {
+            return str_contains(mb_strtoupper($a->computer_code), $cleanUpper)
+                || ($a->patrimonial_code && str_contains(mb_strtoupper($a->patrimonial_code), $cleanUpper))
+                || ($a->serial_number && str_contains(mb_strtoupper($a->serial_number), $cleanUpper));
+        });
+
+        if ($match) {
+            $this->movementAssetId = $match->id;
+            $this->selectedMovementAsset = $match;
+        } else {
+            $this->movementAssetId = null;
+            $this->selectedMovementAsset = null;
+        }
+    }
+
+    public function getAvailableMovementAssetsProperty()
+    {
+        return Asset::with(['brand', 'model', 'assignedPerson'])
+            ->where('is_active', true)
+            ->orderBy('computer_code')
+            ->get();
     }
 
     public function saveMovement(): void
     {
+        if (! $this->movementAssetId && ! empty($this->movementAssetInput)) {
+            $this->resolveAssetFromMovementInput($this->movementAssetInput);
+        }
+
         $this->validate([
             'movementAssetId' => 'required|exists:itam_assets,id',
             'movementToOffice' => 'required|string|max:150',

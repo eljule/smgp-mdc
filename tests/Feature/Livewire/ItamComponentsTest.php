@@ -463,4 +463,29 @@ class ItamComponentsTest extends TestCase
         $this->assertNull($child->fresh()->parent_asset_id);
         $this->assertEquals($parent->id, $candidate->fresh()->parent_asset_id);
     }
+    public function test_movement_modal_uses_datalist_and_resolves_asset(): void
+    {
+        $asset = \App\Models\Itam\Asset::with(['brand', 'model'])->first();
+        $this->assertNotNull($asset);
+
+        $component = \Livewire\Livewire::test(Dashboard::class)
+            ->call('openMovementModal')
+            ->assertSet('isMovementModalOpen', true)
+            ->assertSee('movement-assets-datalist')
+            // Probar resolución por formato completo de datalist
+            ->set('movementAssetInput', "[{$asset->computer_code}] {$asset->brand?->name} {$asset->model?->name}")
+            ->assertSet('movementAssetId', $asset->id)
+            // Probar resolución por código directo
+            ->set('movementAssetInput', $asset->computer_code)
+            ->assertSet('movementAssetId', $asset->id)
+            // Probar limpiar selección
+            ->set('movementAssetInput', '')
+            ->assertSet('movementAssetId', null)
+            // Probar apertura directa con ID de activo
+            ->call('openMovementModal', $asset->id)
+            ->assertSet('movementAssetId', $asset->id);
+
+        $inputVal = $component->get('movementAssetInput');
+        $this->assertStringContainsString($asset->computer_code, $inputVal);
+    }
 }

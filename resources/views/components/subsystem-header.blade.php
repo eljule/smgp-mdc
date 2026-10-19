@@ -164,6 +164,16 @@
                 </div>
             </div>
 
+            <!-- Botón Cambiar Contraseña -->
+            <a
+                href="{{ route('password.change') }}"
+                class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-xs font-medium text-emerald-100 hover:text-white border border-emerald-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                title="Cambiar mi contraseña"
+            >
+                <span>🔑</span>
+                <span class="hidden sm:inline">Cambiar Clave</span>
+            </a>
+
             <!-- Botón Cerrar Sesión en Cabecera de Subsistema -->
             <a
                 href="{{ route('logout') }}"
