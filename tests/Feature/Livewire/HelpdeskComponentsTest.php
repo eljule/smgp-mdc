@@ -22,6 +22,10 @@ class HelpdeskComponentsTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        $admin = \App\Models\User::where('username', 'root')->first();
+        if ($admin) {
+            $this->actingAs($admin);
+        }
     }
 
     public function test_renders_helpdesk_dashboard_successfully(): void
@@ -310,5 +314,73 @@ class HelpdeskComponentsTest extends TestCase
 
         $this->assertTrue($t1->fresh()->histories()->where('action', 'like', '%TRASPASO%')->exists());
         $this->assertTrue($t2->fresh()->histories()->where('action', 'like', '%TRASPASO%')->exists());
+    }
+
+    public function test_assigning_warehouse_supply_to_ticket_persists_supply_code_and_decrements_stock(): void
+    {
+        $ticket = Ticket::create([
+            'ticket_number' => 'TCK-2026-SUPPLY-TEST',
+            'applicant_name' => 'Carlos Ramos',
+            'office_name' => 'Sistemas',
+            'category' => 'RED_INTERNET',
+            'priority' => 'MEDIA',
+            'subject' => 'Cable dañado',
+            'description' => 'Reemplazo de cable de red',
+            'status' => 'EN_ATENCION',
+        ]);
+
+        $supply = \App\Models\Itam\Supply::first();
+        $this->assertNotNull($supply);
+        $initialStock = $supply->stock;
+
+        Livewire::test(TicketsComponent::class)
+            ->call('openSuppliesModal', $ticket->id)
+            ->assertSet('isSuppliesModalOpen', true)
+            ->set('selectedSupplyId', $supply->id)
+            ->set('formSupplyQuantity', 1)
+            ->set('formSupplyNotes', 'Repuesto instalado en la dependencia solicitante.')
+            ->call('saveTicketSupply')
+            ->assertSet('isSuppliesModalOpen', false);
+
+        // Verificar persistencia en base de datos sin errores de constraint
+        $ticketSupply = \App\Models\Helpdesk\TicketSupply::where('ticket_id', $ticket->id)->first();
+        $this->assertNotNull($ticketSupply);
+        $this->assertEquals($supply->id, $ticketSupply->supply_id);
+        $this->assertEquals($supply->code, $ticketSupply->supply_code);
+        $this->assertEquals($supply->name, $ticketSupply->supply_name);
+        $this->assertEquals(1, $ticketSupply->quantity);
+
+        $this->assertEquals($initialStock - 1, $supply->fresh()->stock);
+    }
+
+    public function test_assigning_provisional_asset_to_ticket_persists_loan(): void
+    {
+        $ticket = Ticket::create([
+            'ticket_number' => 'TCK-2026-LOAN-TEST',
+            'applicant_name' => 'María Torres',
+            'office_name' => 'Contabilidad',
+            'category' => 'HARDWARE',
+            'priority' => 'ALTA',
+            'subject' => 'PC no enciende',
+            'description' => 'Falla de fuente de poder',
+            'status' => 'EN_ATENCION',
+        ]);
+
+        $asset = \App\Models\Itam\Asset::first();
+        $this->assertNotNull($asset);
+
+        Livewire::test(TicketsComponent::class)
+            ->call('openProvisionalModal', $ticket->id)
+            ->assertSet('isProvisionalModalOpen', true)
+            ->set('selectedProvisionalAssetId', $asset->id)
+            ->set('formProvisionalNotes', 'Equipo de reemplazo temporal.')
+            ->call('saveProvisionalLoan')
+            ->assertSet('isProvisionalModalOpen', false);
+
+        $ticketLoan = \App\Models\Helpdesk\TicketLoan::where('ticket_id', $ticket->id)->first();
+        $this->assertNotNull($ticketLoan);
+        $this->assertEquals($asset->id, $ticketLoan->temporary_asset_id);
+        $this->assertEquals($asset->computer_code, $ticketLoan->temporary_asset_code);
+        $this->assertEquals('PRESTADO', $asset->fresh()->status);
     }
 }

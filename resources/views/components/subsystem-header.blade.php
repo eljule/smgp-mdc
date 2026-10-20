@@ -8,10 +8,10 @@
 
 @php
     $subsystemAuthUser = auth()->user();
-    $subsystemInitials = $subsystemAuthUser?->initials ?? 'RO';
-    $subsystemTitle = $subsystemAuthUser ? ($subsystemAuthUser->display_title ?? mb_strtoupper($subsystemAuthUser->full_name)) : 'ADMINISTRADOR DEL SISTEMA SIGM';
+    $subsystemInitials = $subsystemAuthUser?->initials ?? 'US';
+    $subsystemTitle = $subsystemAuthUser ? ($subsystemAuthUser->display_title ?? mb_strtoupper($subsystemAuthUser->full_name)) : 'USUARIO NO AUTENTICADO';
     $subsystemUsername = $subsystemAuthUser?->username;
-    $subsystemRole = $subsystemAuthUser?->display_role ?? 'Administrador Central';
+    $subsystemRole = $subsystemAuthUser?->display_role ?? 'Sin Sesión';
 @endphp
 
 <header class="bg-[#046A38] text-white border-b border-emerald-800 shadow-md sticky top-0 z-40 transition-colors duration-200">

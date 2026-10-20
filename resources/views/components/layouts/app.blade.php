@@ -61,10 +61,10 @@
                     <!-- Usuario Activo Dinámico -->
                     @php
                         $activeAuthUser = auth()->user();
-                        $displayInitials = $activeAuthUser?->initials ?? ($userInfo['initials'] ?? 'RO');
-                        $displayTitle = $activeAuthUser ? ($activeAuthUser->display_title ?? mb_strtoupper($activeAuthUser->full_name)) : ($userInfo['title'] ?? 'ADMINISTRADOR DEL SISTEMA SIGM');
+                        $displayInitials = $activeAuthUser?->initials ?? ($userInfo['initials'] ?? 'US');
+                        $displayTitle = $activeAuthUser ? ($activeAuthUser->display_title ?? mb_strtoupper($activeAuthUser->full_name)) : ($userInfo['title'] ?? 'USUARIO NO AUTENTICADO');
                         $displayUsername = $activeAuthUser?->username ?? ($userInfo['name'] ?? null);
-                        $displayRole = $activeAuthUser?->display_role ?? ($userInfo['role'] ?? 'Administrador Central');
+                        $displayRole = $activeAuthUser?->display_role ?? ($userInfo['role'] ?? 'Sin Sesión');
                     @endphp
                     <div class="hidden sm:flex items-center gap-2.5 bg-emerald-900/60 border border-emerald-700/60 rounded-lg px-3 py-1.5">
                         <div class="w-7 h-7 rounded-md bg-emerald-700 text-white flex items-center justify-center font-bold text-xs uppercase shadow-sm">

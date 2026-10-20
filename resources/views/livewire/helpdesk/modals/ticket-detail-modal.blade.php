@@ -262,20 +262,168 @@
 
                     <!-- 6. Línea de Tiempo de Auditoría (RNF-04) -->
                     @if ($selectedTicketForDetail->auditLogs && $selectedTicketForDetail->auditLogs->isNotEmpty())
-                        <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-800/40">
-                            <h4 class="font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300 text-[11px] mb-2.5">
-                                HISTORIAL DE AUDITORÍA Y TRAZABILIDAD (RNF-04)
-                            </h4>
-                            <div class="space-y-2">
-                                @foreach ($selectedTicketForDetail->auditLogs as $log)
-                                    <div class="flex items-start space-x-2.5 text-[11px] border-l-2 border-emerald-500 pl-2.5 py-0.5">
-                                        <span class="font-mono text-slate-400 whitespace-nowrap">
-                                            {{ $log->timestamp ? $log->timestamp->format('H:i:s') : ($log->created_at ? $log->created_at->format('H:i:s') : '') }}
-                                        </span>
-                                        <div class="flex-1">
-                                            <span class="font-bold text-slate-800 dark:text-slate-200">{{ $log->action }}:</span>
-                                            <span class="text-slate-600 dark:text-slate-400">{{ $log->notes ?: $log->new_status }}</span>
-                                            <span class="text-slate-400 block text-[10px]">Por: {{ $log->performed_by_user_name }}</span>
+                        <div class="border border-slate-200 dark:border-slate-800 rounded-2xl p-4 sm:p-5 bg-white dark:bg-slate-900 shadow-xs space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                                <div class="flex items-center space-x-2">
+                                    <span class="p-1 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 text-xs">
+                                        📜
+                                    </span>
+                                    <h4 class="font-extrabold uppercase tracking-wider text-slate-800 dark:text-white text-xs">
+                                        HISTORIAL DE AUDITORÍA Y TRAZABILIDAD (RNF-04)
+                                    </h4>
+                                </div>
+                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono">
+                                    {{ $selectedTicketForDetail->auditLogs->count() }} interacciones registradas
+                                </span>
+                            </div>
+
+                            <div class="relative pl-4 space-y-3.5 before:content-[''] before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-slate-800">
+                                @foreach ($selectedTicketForDetail->auditLogs->sortBy('id') as $log)
+                                    @php
+                                        $actionMeta = match(strtoupper((string) $log->action)) {
+                                            'TICKET_CREADO', 'TICKET_REGISTRADO' => [
+                                                'label' => 'Registro de Incidencia',
+                                                'badgeBg' => 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border-sky-300 dark:border-sky-800',
+                                                'dotBg' => 'bg-sky-500 ring-sky-200 dark:ring-sky-950',
+                                                'icon' => '📝',
+                                            ],
+                                            'TICKET_TOMADO' => [
+                                                'label' => 'Atención Iniciada por Técnico',
+                                                'badgeBg' => 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
+                                                'dotBg' => 'bg-emerald-500 ring-emerald-200 dark:ring-emerald-950',
+                                                'icon' => '🧑‍💻',
+                                            ],
+                                            'ACTUALIZACION_TECNICA' => [
+                                                'label' => 'Intervención y Diagnóstico Técnico',
+                                                'badgeBg' => 'bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 border-indigo-300 dark:border-indigo-800',
+                                                'dotBg' => 'bg-indigo-500 ring-indigo-200 dark:ring-indigo-950',
+                                                'icon' => '🛠️',
+                                            ],
+                                            'CONSUMO_INSUMO' => [
+                                                'label' => 'Insumo / Repuesto de Almacén',
+                                                'badgeBg' => 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800',
+                                                'dotBg' => 'bg-amber-500 ring-amber-200 dark:ring-amber-950',
+                                                'icon' => '📦',
+                                            ],
+                                            'PRESTAMO_PROVISIONAL' => [
+                                                'label' => 'Asignación de Equipo Provisional',
+                                                'badgeBg' => 'bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-800',
+                                                'dotBg' => 'bg-purple-500 ring-purple-200 dark:ring-purple-950',
+                                                'icon' => '🔄',
+                                            ],
+                                            'REASIGNACION_TECNICO', 'TRASPASO_MASIVO_CARGA', 'TRASPASO_MASIVO_BALANCEADO' => [
+                                                'label' => 'Reasignación de Técnico',
+                                                'badgeBg' => 'bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 border-blue-300 dark:border-blue-800',
+                                                'dotBg' => 'bg-blue-500 ring-blue-200 dark:ring-blue-950',
+                                                'icon' => '🔁',
+                                            ],
+                                            'CONFORMIDAD_CIERRE', 'CONFORMIDAD_USUARIO' => [
+                                                'label' => 'Conformidad de Cierre (Visto Bueno)',
+                                                'badgeBg' => 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
+                                                'dotBg' => 'bg-emerald-500 ring-emerald-200 dark:ring-emerald-950',
+                                                'icon' => '⭐',
+                                            ],
+                                            'CONFORMIDAD_OBSERVADA' => [
+                                                'label' => 'Conformidad Observada',
+                                                'badgeBg' => 'bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800',
+                                                'dotBg' => 'bg-rose-500 ring-rose-200 dark:ring-rose-950',
+                                                'icon' => '⚠️',
+                                            ],
+                                            default => [
+                                                'label' => str_replace('_', ' ', $log->action),
+                                                'badgeBg' => 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-300 dark:border-slate-700',
+                                                'dotBg' => 'bg-slate-500 ring-slate-200 dark:ring-slate-800',
+                                                'icon' => '📌',
+                                            ],
+                                        };
+
+                                        $dateObj = $log->timestamp ?? $log->created_at;
+                                        $formattedDate = $dateObj ? $dateObj->format('d/m/Y') : '';
+                                        $formattedTime = $dateObj ? $dateObj->format('H:i:s') : '';
+                                    @endphp
+
+                                    <div class="relative flex items-start space-x-3 group">
+                                        <!-- Dot indicador en la línea de tiempo -->
+                                        <div class="absolute -left-[19px] top-1.5 w-2.5 h-2.5 rounded-full {{ $actionMeta['dotBg'] }} ring-4 shadow-xs"></div>
+
+                                        <div class="flex-1 bg-slate-50/70 dark:bg-slate-800/50 rounded-xl p-3 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                                            <!-- Cabecera del evento: Acción, Fecha/Hora y Transición -->
+                                            <div class="flex flex-wrap items-center justify-between gap-1.5">
+                                                <div class="flex items-center space-x-2">
+                                                    <span class="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-md border {{ $actionMeta['badgeBg'] }}">
+                                                        <span>{{ $actionMeta['icon'] }}</span>
+                                                        <span>{{ $actionMeta['label'] }}</span>
+                                                    </span>
+
+                                                    @if ($log->previous_status || $log->new_status)
+                                                        @if ($log->previous_status && $log->previous_status !== $log->new_status)
+                                                            <span class="inline-flex items-center gap-1 text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200/70 dark:bg-slate-700/60 text-slate-600 dark:text-slate-300">
+                                                                <span>{{ $log->previous_status }}</span>
+                                                                <span>→</span>
+                                                                <span class="text-emerald-600 dark:text-emerald-400 font-black">{{ $log->new_status }}</span>
+                                                            </span>
+                                                        @elseif ($log->new_status)
+                                                            <span class="inline-flex items-center text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-slate-200/60 dark:bg-slate-700/50 text-slate-600 dark:text-slate-300">
+                                                                {{ $log->new_status }}
+                                                            </span>
+                                                        @endif
+                                                    @endif
+                                                </div>
+
+                                                <div class="text-[10px] font-mono text-slate-400 flex items-center space-x-1.5 shrink-0">
+                                                    @if ($formattedDate)
+                                                        <span>📅 {{ $formattedDate }}</span>
+                                                        <span>•</span>
+                                                    @endif
+                                                    <span class="font-bold text-slate-600 dark:text-slate-300">⏰ {{ $formattedTime }}</span>
+                                                </div>
+                                            </div>
+
+                                            <!-- Contenido Detallado de lo que se realizó -->
+                                            <div class="text-xs text-slate-700 dark:text-slate-200 leading-relaxed pl-0.5">
+                                                @php
+                                                    $rawNotes = trim((string) $log->notes);
+                                                    $parts = explode(' | ', $rawNotes);
+                                                @endphp
+
+                                                @if (count($parts) > 1)
+                                                    <div class="space-y-1 my-1">
+                                                        @foreach ($parts as $part)
+                                                            @if (str_starts_with($part, 'Diagnóstico:') || str_starts_with($part, 'Diagnóstico inicial registrado:'))
+                                                                <div class="p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-[11px]">
+                                                                    <span class="font-bold text-amber-700 dark:text-amber-400">🔍 Diagnóstico:</span>
+                                                                    <span class="text-slate-800 dark:text-slate-200 ml-1">{{ trim(preg_replace('/^Diagnóstico( inicial registrado)?:/i', '', $part)) }}</span>
+                                                                </div>
+                                                            @elseif (str_starts_with($part, 'Solución:') || str_starts_with($part, 'Solución técnica implementada:') || str_starts_with($part, 'Solución propuesta:'))
+                                                                <div class="p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-[11px]">
+                                                                    <span class="font-bold text-emerald-700 dark:text-emerald-400">✅ Solución:</span>
+                                                                    <span class="text-slate-800 dark:text-slate-200 ml-1">{{ trim(preg_replace('/^Solución( (técnica implementada|propuesta))?:/i', '', $part)) }}</span>
+                                                                </div>
+                                                            @else
+                                                                <div class="text-[11px] text-slate-600 dark:text-slate-300">
+                                                                    &bull; {{ $part }}
+                                                                </div>
+                                                            @endif
+                                                        @endforeach
+                                                    </div>
+                                                @else
+                                                    <p class="text-[11px] text-slate-600 dark:text-slate-300">
+                                                        {{ $rawNotes ?: 'Acción ejecutada sobre el ticket.' }}
+                                                    </p>
+                                                @endif
+                                            </div>
+
+                                            <!-- Responsable que ejecutó la interacción -->
+                                            <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 dark:border-slate-700/60 text-[10px] text-slate-400">
+                                                <div class="flex items-center space-x-1.5">
+                                                    <span>👤</span>
+                                                    <span>Operador:</span>
+                                                    <strong class="text-slate-700 dark:text-slate-300 font-semibold">
+                                                        {{ $log->performed_by_user_name }}
+                                                    </strong>
+                                                </div>
+                                                <span class="font-mono text-[9px] text-slate-400">ID Evento #{{ $log->id }}</span>
+                                            </div>
                                         </div>
                                     </div>
                                 @endforeach

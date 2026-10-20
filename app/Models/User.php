@@ -187,13 +187,8 @@ class User extends Authenticatable
     public function isReportante(): bool
     {
         $roleName = mb_strtolower(trim((string) $this->role));
-        if (str_contains($roleName, 'reportante')) {
-            return true;
-        }
 
-        $allowed = (array) ($this->allowed_modules ?? []);
-
-        return count($allowed) === 1 && in_array('helpdesk', $allowed, true);
+        return str_contains($roleName, 'reportante') || str_contains($roleName, 'personal general');
     }
 
     public function canAccessSubsystem(string $subsystem): bool

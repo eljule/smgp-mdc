@@ -103,6 +103,23 @@ final class GetRolesCatalogAction
     ): array {
         $all = self::ROLES_DATA;
 
+        try {
+            $dbRoles = \App\Models\Role::all()->keyBy('code');
+            if ($dbRoles->isNotEmpty()) {
+                foreach ($all as &$r) {
+                    $c = $r['code'];
+                    if (isset($dbRoles[$c])) {
+                        $perms = (array) ($dbRoles[$c]->permission_codes ?? []);
+                        $count = count($perms);
+                        $r['grantedPermissions'] = $count;
+                        $r['percentage'] = (int) round(($count / 19) * 100);
+                    }
+                }
+                unset($r);
+            }
+        } catch (\Throwable) {
+        }
+
         // Filter by scope
         $filtered = array_filter($all, function (array $role) use ($scopeFilter): bool {
             if ($scopeFilter === 'TODOS') {

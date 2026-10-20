@@ -29,8 +29,8 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
+use App\Models\Permission;
+use App\Models\Role;
 
 #[Layout('components.layouts.subsystem', [
     'title' => 'Panel de Administración - SIGM Castilla',
@@ -739,7 +739,7 @@ class Dashboard extends Component
 
     public string $userFormRole = 'Técnico de Soporte e ITAM';
 
-    public array $userFormModules = ['admin', 'itam', 'helpdesk'];
+    public array $userFormModules = ['itam', 'helpdesk'];
 
     public bool $showResetPasswordModal = false;
 
@@ -771,17 +771,39 @@ class Dashboard extends Component
 
     
 
-    public function openEditPermissions(int $userId, ?GetUsersCatalogAction $action = null): void
+    public function openEditPermissions(int $userId, ?string $username = null, ?GetUsersCatalogAction $action = null): void
     {
         $this->flashMessage = '';
         $action ??= app(GetUsersCatalogAction::class);
-        $user = $action->find($userId);
+
+        $user = null;
+        if (! empty($username)) {
+            $user = $action->findByUsername($username);
+        }
+        if (! $user) {
+            $user = $action->find($userId);
+        }
 
         if ($user) {
-            $this->selectedUserId = $userId;
+            $this->selectedUserId = $user['dbId'] ?? $user['id'];
             $this->selectedUser = $user;
 
-            $role = $user['role'] ?? $user['primaryRole'] ?? 'Administrador Central';
+            $dbUser = null;
+            if (! empty($username)) {
+                $dbUser = User::where('username', $username)->first();
+            }
+            if (! $dbUser && $this->selectedUserId) {
+                $dbUser = User::find($this->selectedUserId);
+            }
+
+            if ($dbUser) {
+                $role = $dbUser->role ?: ($user['role'] ?? $user['primaryRole'] ?? 'Administrador Central');
+                $subs = (array) ($dbUser->allowed_modules ?? ($user['subsystems'] ?? []));
+            } else {
+                $role = $user['role'] ?? $user['primaryRole'] ?? 'Administrador Central';
+                $subs = $user['subsystems'] ?? [];
+            }
+
             $this->selectedUserRole = match (mb_strtoupper($role)) {
                 'ADMINISTRADOR CENTRAL' => 'Administrador Central',
                 'TÉCNICO DE SOPORTE E ITAM', 'TECNICO DE SOPORTE E ITAM' => 'Técnico de Soporte e ITAM',
@@ -790,7 +812,6 @@ class Dashboard extends Component
                 default => $role,
             };
 
-            $subs = $user['subsystems'] ?? [];
             if (in_array('all', $subs, true)) {
                 $subs = ['admin', 'transportes', 'itam', 'helpdesk'];
             }
@@ -804,7 +825,7 @@ class Dashboard extends Component
         if ($role === 'Administrador Central') {
             $this->userSubsystems = ['admin', 'transportes', 'itam', 'helpdesk'];
         } elseif ($role === 'Técnico de Soporte e ITAM') {
-            $this->userSubsystems = ['admin', 'itam', 'helpdesk'];
+            $this->userSubsystems = ['itam', 'helpdesk'];
         } elseif ($role === 'Operador de Transportes') {
             $this->userSubsystems = ['transportes', 'helpdesk'];
         } elseif ($role === 'Personal General / Reportante') {
@@ -827,16 +848,23 @@ class Dashboard extends Component
 
     public function savePermissions(): void
     {
-        if ($this->selectedUserId) {
+        $username = $this->selectedUser['username'] ?? null;
+        $dbUser = null;
+        if (! empty($username)) {
+            $dbUser = User::where('username', $username)->first();
+        }
+        if (! $dbUser && $this->selectedUserId) {
             $dbUser = User::find($this->selectedUserId);
-            if ($dbUser) {
-                $dbUser->role = $this->selectedUserRole ?: $dbUser->role;
-                $dbUser->save();
-            }
         }
 
-        $username = $this->selectedUser['username'] ?? 'usuario';
-        $this->flashMessage = "Permisos actualizados correctamente para {$username}.";
+        if ($dbUser) {
+            $dbUser->role = $this->selectedUserRole ?: $dbUser->role;
+            $dbUser->allowed_modules = array_values($this->userSubsystems);
+            $dbUser->save();
+        }
+
+        $usernameStr = $username ?? 'usuario';
+        $this->flashMessage = "Permisos actualizados correctamente para {$usernameStr}.";
         $this->showEditModal = false;
     }
 
@@ -874,7 +902,7 @@ class Dashboard extends Component
         $this->userFormUsername = '';
         $this->userFormPassword = '';
         $this->userFormRole = 'Técnico de Soporte e ITAM';
-        $this->userFormModules = ['admin', 'itam', 'helpdesk'];
+        $this->userFormModules = ['itam', 'helpdesk'];
     }
 
     public function updatedUserFormPersonName(string $value): void
@@ -951,7 +979,7 @@ class Dashboard extends Component
         $this->userFormRole = $role;
         $this->userFormModules = match ($role) {
             'Administrador Central' => ['admin', 'transportes', 'itam', 'helpdesk'],
-            'Técnico de Soporte e ITAM' => ['admin', 'itam', 'helpdesk'],
+            'Técnico de Soporte e ITAM' => ['itam', 'helpdesk'],
             'Operador de Transportes' => ['transportes', 'helpdesk'],
             'Personal General / Reportante' => ['helpdesk'],
             default => ['helpdesk'],
@@ -967,12 +995,31 @@ class Dashboard extends Component
         }
     }
 
-    public function openResetPassword(int $userId, ?GetUsersCatalogAction $action = null): void
+    public function openResetPassword(int $userId, ?string $username = null, ?GetUsersCatalogAction $action = null): void
     {
         $this->flashMessage = '';
         $this->resetPasswordError = null;
+        $action ??= app(GetUsersCatalogAction::class);
 
-        $dbUser = User::find($userId);
+        $dbUser = null;
+        if (! empty($username)) {
+            $dbUser = User::where('username', $username)->first();
+        }
+
+        if (! $dbUser) {
+            $catalogUser = $action->find($userId);
+            if (! empty($catalogUser['username'])) {
+                $dbUser = User::where('username', $catalogUser['username'])->first();
+            }
+            if (! $dbUser && ! empty($catalogUser['dbId'])) {
+                $dbUser = User::find($catalogUser['dbId']);
+            }
+        }
+
+        if (! $dbUser) {
+            $dbUser = User::find($userId);
+        }
+
         if ($dbUser) {
             $this->resetUserId = $dbUser->id;
             $this->resetUsername = $dbUser->username;
@@ -983,13 +1030,11 @@ class Dashboard extends Component
             return;
         }
 
-        $action ??= app(GetUsersCatalogAction::class);
-        $user = $action->find($userId);
-
-        if ($user) {
-            $this->resetUserId = $userId;
-            $this->resetUsername = (string) ($user['username'] ?? '');
-            $this->resetFullName = (string) ($user['fullName'] ?? $this->resetUsername);
+        $catalogUser ??= $action->find($userId);
+        if ($catalogUser) {
+            $this->resetUserId = $catalogUser['dbId'] ?? $catalogUser['id'];
+            $this->resetUsername = (string) ($catalogUser['username'] ?? '');
+            $this->resetFullName = (string) ($catalogUser['fullName'] ?? $this->resetUsername);
             $this->resetNewPassword = 'Mdc'.random_int(1000, 9999).'!';
             $this->showResetPasswordModal = true;
         }
@@ -1053,23 +1098,34 @@ class Dashboard extends Component
         }
     }
 
-    public function unlockUser(int $userId, ?GetUsersCatalogAction $action = null): void
+    public function unlockUser(int $userId, ?string $username = null, ?GetUsersCatalogAction $action = null): void
     {
-        $user = User::find($userId);
+        $action ??= app(GetUsersCatalogAction::class);
+        $user = null;
+
+        if (! empty($username)) {
+            $user = User::where('username', $username)->first();
+        }
+
         if (! $user) {
-            $action ??= app(GetUsersCatalogAction::class);
             $catalogUser = $action->find($userId);
-            $username = $catalogUser['username'] ?? null;
-            if ($username) {
-                $user = User::where('username', $username)->first();
+            if (! empty($catalogUser['username'])) {
+                $user = User::where('username', $catalogUser['username'])->first();
             }
+            if (! $user && ! empty($catalogUser['dbId'])) {
+                $user = User::find($catalogUser['dbId']);
+            }
+        }
+
+        if (! $user) {
+            $user = User::find($userId);
         }
 
         if ($user) {
             $user->unlock();
             $this->flashMessage = "La cuenta de '{$user->username}' ha sido desbloqueada correctamente.";
         } else {
-            $this->flashMessage = "Cuenta verificada y desbloqueada.";
+            $this->flashMessage = "No se pudo localizar el usuario para desbloquear.";
         }
     }
 
@@ -1907,6 +1963,29 @@ class Dashboard extends Component
      */
     public function saveMatrix(): void
     {
+        $catalogRoles = GetRolePermissionsMatrixAction::ROLES;
+
+        foreach ($this->assignments as $roleCode => $perms) {
+            $roleModel = Role::where('code', $roleCode)->first();
+            if ($roleModel) {
+                $roleModel->permission_codes = array_values(array_unique($perms));
+                $roleModel->save();
+            } else {
+                $catalogRole = $catalogRoles[$roleCode] ?? null;
+                if ($catalogRole) {
+                    Role::create([
+                        'code' => $roleCode,
+                        'name' => $catalogRole['name'],
+                        'description' => $catalogRole['description'] ?? '',
+                        'subsystem_code' => $roleCode === 'admin_central' ? 'GLOBAL' : $roleCode,
+                        'is_system' => (bool) ($catalogRole['isSystem'] ?? false),
+                        'permission_codes' => array_values(array_unique($perms)),
+                        'is_active' => true,
+                    ]);
+                }
+            }
+        }
+
         $this->hasChanges = false;
         $this->flashMessage = 'Permisos del rol actualizados correctamente.';
     }

@@ -117,7 +117,11 @@ class UserPasswordSecurityTest extends TestCase
         $user->save();
 
         Livewire::test(Dashboard::class)
-            ->call('unlockUser', $user->id);
+            ->set('activeTab', 'users')
+            ->assertSee('Desbloquear')
+            ->call('unlockUser', $user->id, $user->username)
+            ->assertDontSee('btn-unlock-user-' . $user->id)
+            ->assertSee("La cuenta de '{$user->username}' ha sido desbloqueada correctamente.");
 
         $user->refresh();
         $this->assertFalse($user->is_locked);

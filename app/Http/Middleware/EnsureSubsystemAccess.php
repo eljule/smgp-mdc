@@ -17,7 +17,7 @@ class EnsureSubsystemAccess
     public function handle(Request $request, Closure $next, string $subsystem): Response
     {
         if (! Auth::check()) {
-            return $next($request);
+            return redirect()->route('login')->with('error', 'Debe iniciar sesión para acceder al sistema.');
         }
 
         /** @var \App\Models\User $user */

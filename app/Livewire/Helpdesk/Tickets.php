@@ -541,13 +541,53 @@ class Tickets extends Component
             ]
         );
 
+        $techUserName = auth()->user()?->full_name_with_username ?? auth()->user()?->name ?? 'Técnico de Soporte';
+
+        $statusLabels = [
+            'ABIERTO' => 'Abierto',
+            'EN_ATENCION' => 'En Atención',
+            'EN_LABORATORIO' => 'En Laboratorio / Taller',
+            'PENDIENTE' => 'En Espera / Pendiente',
+            'RESUELTO' => 'Resuelto',
+            'CERRADO' => 'Cerrado Formalmente',
+        ];
+
+        $prevLabel = $statusLabels[$prevStatus] ?? $prevStatus;
+        $newLabel = $statusLabels[$this->formTechnicalStatus] ?? $this->formTechnicalStatus;
+
+        $notesParts = [];
+        if ($prevStatus !== $this->formTechnicalStatus) {
+            $notesParts[] = "Cambio de estado: {$prevLabel} → {$newLabel}";
+        } else {
+            $notesParts[] = "Estado mantenido: {$newLabel}";
+        }
+
+        if (! empty($this->formRealDiagnosis)) {
+            $notesParts[] = "Diagnóstico: " . trim($this->formRealDiagnosis);
+        }
+
+        if (! empty($this->formSolutionApplied)) {
+            $notesParts[] = "Solución: " . trim($this->formSolutionApplied);
+        }
+
+        if ($this->formIsDecommission) {
+            $notesParts[] = "⚠️ Baja Técnica Definitiva (RAEE): " . trim($this->formDecommissionReason);
+        }
+
+        if ($this->formPublishToKb && ! empty($this->formKbTitle)) {
+            $notesParts[] = '📚 Publicado en Base de Conocimientos: "' . $this->formKbTitle . '"';
+        }
+
+        $logNotes = ! empty($notesParts) ? implode(' | ', $notesParts) : "Diagnóstico y solución técnica registrados.";
+
         TicketAuditLog::create([
             'ticket_id' => $ticket->id,
             'previous_status' => $prevStatus,
             'new_status' => $this->formTechnicalStatus,
             'action' => 'ACTUALIZACION_TECNICA',
-            'performed_by_user_name' => 'Técnico ODT',
-            'notes' => 'Diagnóstico y solución técnica registrados.',
+            'performed_by_user_id' => auth()->id(),
+            'performed_by_user_name' => $techUserName,
+            'notes' => $logNotes,
         ]);
 
         if ($this->formPublishToKb && ! empty($this->formKbTitle)) {
@@ -556,9 +596,13 @@ class Tickets extends Component
                 'category' => $ticket->category,
                 'summary' => $this->formRealDiagnosis,
                 'solution_steps' => $this->formSolutionApplied,
-                'author_technician_name' => 'Área Técnica TI',
+                'author_technician_name' => $techUserName,
                 'helpful_count' => 1,
             ]);
+        }
+
+        if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $ticket->id) {
+            $this->selectedTicketForDetail = $ticket->fresh(['office', 'applicant', 'technicalDetail', 'supplies', 'loans', 'auditLogs']);
         }
 
         $this->isTechnicalModalOpen = false;
@@ -572,7 +616,7 @@ class Tickets extends Component
     public function openSuppliesModal(int $ticketId): void
     {
         $this->suppliesTicketId = $ticketId;
-        $this->selectedSupplyId = Supply::first()?->id;
+        $this->selectedSupplyId = Supply::where('stock', '>', 0)->first()?->id ?? Supply::first()?->id;
         $this->formSupplyQuantity = 1;
         $this->formSupplyNotes = 'Repuesto instalado en la dependencia solicitante.';
         $this->isSuppliesModalOpen = true;
@@ -588,13 +632,32 @@ class Tickets extends Component
         TicketSupply::create([
             'ticket_id' => $this->suppliesTicketId,
             'supply_id' => $supply->id,
+            'supply_code' => $supply->code ?? ('INS-'.str_pad((string) $supply->id, 3, '0', STR_PAD_LEFT)),
             'supply_name' => $supply->name,
-            'quantity' => $this->formSupplyQuantity,
+            'quantity' => (int) $this->formSupplyQuantity,
+            'unit' => $supply->unit ?? 'UND',
+            'unit_cost' => (float) ($supply->unit_cost ?? 0.00),
             'notes' => $this->formSupplyNotes,
         ]);
 
-        $supply->stock = max(0, $supply->stock - $this->formSupplyQuantity);
+        $supply->stock = max(0, $supply->stock - (int) $this->formSupplyQuantity);
         $supply->save();
+
+        $ticket = Ticket::find($this->suppliesTicketId);
+
+        TicketAuditLog::create([
+            'ticket_id' => $this->suppliesTicketId,
+            'previous_status' => $ticket?->status ?? 'EN_ATENCION',
+            'new_status' => $ticket?->status ?? 'EN_ATENCION',
+            'action' => 'CONSUMO_INSUMO',
+            'performed_by_user_id' => auth()->id(),
+            'performed_by_user_name' => auth()->user()?->full_name_with_username ?? auth()->user()?->name ?? 'Técnico de Soporte',
+            'notes' => 'Insumo descargado de almacén: ' . $this->formSupplyQuantity . ' ' . $supply->unit . '(s) de "' . $supply->name . '" (' . $supply->code . ') | Detalle de instalación: ' . $this->formSupplyNotes,
+        ]);
+
+        if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $this->suppliesTicketId) {
+            $this->selectedTicketForDetail = $this->selectedTicketForDetail->fresh(['office', 'applicant', 'technicalDetail', 'supplies', 'loans', 'auditLogs']);
+        }
 
         $this->isSuppliesModalOpen = false;
         $this->showAlert("Insumo {$supply->name} asignado y descontado de almacén ITAM.");
@@ -617,16 +680,36 @@ class Tickets extends Component
             return;
         }
 
+        $ticket = Ticket::find($this->provisionalTicketId);
+
         TicketLoan::create([
             'ticket_id' => $this->provisionalTicketId,
-            'provisional_asset_id' => $asset->id,
-            'provisional_computer_code' => $asset->computer_code,
+            'temporary_asset_id' => $asset->id,
+            'temporary_asset_code' => $asset->computer_code ?? ('AST-'.str_pad((string) $asset->id, 3, '0', STR_PAD_LEFT)),
+            'temporary_asset_name' => $asset->name ?? $asset->computer_code ?? 'Equipo Provisional',
+            'damaged_asset_id' => $ticket?->asset_id,
+            'damaged_asset_code' => $ticket?->asset?->computer_code,
             'status' => 'ACTIVO',
+            'loan_date' => now(),
             'notes' => $this->formProvisionalNotes,
         ]);
 
         $asset->status = 'PRESTADO';
         $asset->save();
+
+        TicketAuditLog::create([
+            'ticket_id' => $this->provisionalTicketId,
+            'previous_status' => $ticket?->status ?? 'EN_ATENCION',
+            'new_status' => $ticket?->status ?? 'EN_ATENCION',
+            'action' => 'PRESTAMO_PROVISIONAL',
+            'performed_by_user_id' => auth()->id(),
+            'performed_by_user_name' => auth()->user()?->full_name_with_username ?? auth()->user()?->name ?? 'Técnico de Soporte',
+            'notes' => "Equipo provisional asignado: {$asset->computer_code} - {$asset->name} | Observaciones: {$this->formProvisionalNotes}",
+        ]);
+
+        if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $this->provisionalTicketId) {
+            $this->selectedTicketForDetail = $this->selectedTicketForDetail->fresh(['office', 'applicant', 'technicalDetail', 'supplies', 'loans', 'auditLogs']);
+        }
 
         $this->isProvisionalModalOpen = false;
         $this->showAlert("Equipo provisional {$asset->computer_code} cedido temporalmente.");
@@ -687,11 +770,17 @@ class Tickets extends Component
 
         TicketAuditLog::create([
             'ticket_id' => $ticket->id,
+            'previous_status' => 'RESUELTO',
             'new_status' => $ticket->status,
-            'action' => 'CONFORMIDAD_USUARIO',
-            'performed_by_user_name' => $ticket->applicant_name,
-            'notes' => "Calificación: {$this->formUserRating} estrellas. {$this->formUserFeedback}",
+            'action' => $this->formUserConformity ? 'CONFORMIDAD_CIERRE' : 'CONFORMIDAD_OBSERVADA',
+            'performed_by_user_id' => auth()->id(),
+            'performed_by_user_name' => auth()->user()?->full_name_with_username ?? auth()->user()?->name ?? $ticket->applicant_name,
+            'notes' => ($this->formUserConformity ? 'Visto Bueno / Cierre Formal Aprobado' : 'Conformidad Observada (Retornado a Atención)') . " | Calificación: {$this->formUserRating}/5 estrellas. Observaciones: {$this->formUserFeedback}",
         ]);
+
+        if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $ticket->id) {
+            $this->selectedTicketForDetail = $ticket->fresh(['office', 'applicant', 'technicalDetail', 'supplies', 'loans', 'auditLogs']);
+        }
 
         $this->isConformityModalOpen = false;
         $this->showAlert($this->formUserConformity ? "Ticket {$ticket->ticket_number} cerrado formalmente." : 'Observación registrada, ticket retornado a atención técnica.');

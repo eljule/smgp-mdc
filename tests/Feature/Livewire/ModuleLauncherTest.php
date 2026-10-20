@@ -16,6 +16,28 @@ class ModuleLauncherTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $admin = \App\Models\User::firstOrCreate(
+            ['username' => 'root'],
+            [
+                'full_name' => 'ADMINISTRADOR DEL SISTEMA SIGM',
+                'email' => 'admin@castilla.gob.pe',
+                'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+                'is_active' => true,
+            ]
+        );
+        $this->actingAs($admin);
+    }
+
+    public function test_unauthenticated_user_is_redirected_to_login_from_portal(): void
+    {
+        auth()->logout();
+        $response = $this->get('/portal');
+        $response->assertRedirect(route('login'));
+    }
+
     public function test_renders_login_page_as_primary_home_route(): void
     {
         $response = $this->get('/');

@@ -27,8 +27,8 @@ final class GetUsersCatalogAction
             'title' => 'Técnico de Soporte e ITAM',
             'dotColor' => 'blue',
             'description' => 'Gestión de activos tecnológicos, marcas, modelos y atención operativa de incidencias informáticas.',
-            'modulesCount' => 3,
-            'subsystems' => ['admin', 'itam', 'helpdesk'],
+            'modulesCount' => 2,
+            'subsystems' => ['itam', 'helpdesk'],
         ],
         [
             'key' => 'transportes',
@@ -110,7 +110,7 @@ final class GetUsersCatalogAction
             'fullName' => 'JAIME HENRY SANDOVAL NIEVES',
             'email' => 'jsandoval@castilla.gob.pe',
             'primaryRole' => 'TÉCNICO DE SOPORTE E ITAM',
-            'subsystems' => ['admin', 'itam', 'helpdesk'],
+            'subsystems' => ['itam', 'helpdesk'],
             'status' => 'Activo',
             'personId' => 35,
         ],
@@ -681,12 +681,17 @@ final class GetUsersCatalogAction
             foreach ($all as &$u) {
                 if (isset($dbUsersMap[$u['username']])) {
                     $db = $dbUsersMap[$u['username']];
+                    $u['id'] = $db->id;
+                    $u['dbId'] = $db->id;
                     $u['isLocked'] = (bool) $db->is_locked;
                     $u['mustChangePassword'] = (bool) $db->must_change_password;
                     $u['failedAttempts'] = $db->failed_login_attempts ?? 0;
-                    $u['dbId'] = $db->id;
-                    if ($db->is_locked) {
-                        $u['status'] = 'Bloqueado';
+                    $u['status'] = $db->is_locked ? 'Bloqueado' : ($db->is_active ? 'Activo' : 'Inactivo');
+                    if ($db->allowed_modules !== null) {
+                        $u['subsystems'] = (array) $db->allowed_modules;
+                    }
+                    if (! empty($db->role)) {
+                        $u['primaryRole'] = $db->role;
                     }
                     if ($u['username'] !== 'root') {
                         if ($db->person_id) {
@@ -715,7 +720,7 @@ final class GetUsersCatalogAction
             foreach ($dbUsers as $dbUser) {
                 if (! in_array($dbUser->username, $existingUsernames, true)) {
                     $all[] = [
-                        'id' => $dbUser->id + 1000,
+                        'id' => $dbUser->id,
                         'username' => $dbUser->username,
                         'avatar' => $dbUser->initials,
                         'fullName' => $dbUser->display_title,
@@ -808,6 +813,23 @@ final class GetUsersCatalogAction
 
         foreach (self::USERS_DATA as $user) {
             if ($user['id'] === $id) {
+                return $user;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Find a user by username.
+     *
+     * @return array<string, mixed>|null
+     */
+    public function findByUsername(string $username): ?array
+    {
+        $res = $this->handle(search: $username, perPage: 10);
+        foreach ($res['items'] as $user) {
+            if (mb_strtolower((string) $user['username']) === mb_strtolower(trim($username))) {
                 return $user;
             }
         }

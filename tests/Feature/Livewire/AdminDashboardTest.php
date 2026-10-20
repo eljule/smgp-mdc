@@ -16,6 +16,21 @@ class AdminDashboardTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $admin = \App\Models\User::firstOrCreate(
+            ['username' => 'root'],
+            [
+                'full_name' => 'ADMINISTRADOR DEL SISTEMA SIGM',
+                'email' => 'admin@castilla.gob.pe',
+                'password' => \Illuminate\Support\Facades\Hash::make('admin123'),
+                'is_active' => true,
+            ]
+        );
+        $this->actingAs($admin);
+    }
+
     public function test_renders_admin_dashboard_page_successfully(): void
     {
         $response = $this->get('/admin');
@@ -274,6 +289,10 @@ class AdminDashboardTest extends TestCase
     {
         Livewire::test(AdminDashboard::class)->set('activeTab', 'matrix')
             ->assertSee('19 / 19 permisos')
+            ->assertSee('19 de 19')
+            ->assertSee('5 de 19')
+            ->assertSee('2 de 19')
+            ->assertSee('10 de 19')
             ->call('selectRole', 'municipal_staff')
             ->assertSee('2 / 19 permisos')
             ->call('togglePermission', 'admin.people.manage')
@@ -282,6 +301,42 @@ class AdminDashboardTest extends TestCase
             ->assertSee('2 / 19 permisos')
             ->call('saveMatrix')
             ->assertSee('Permisos del rol actualizados correctamente');
+    }
+
+    public function test_permission_matrix_persists_to_database_and_top_selector_renders_counts(): void
+    {
+        $this->seed(\Database\Seeders\RolePermissionSeeder::class);
+
+        $roleBefore = \App\Models\Role::where('code', 'transport_operator')->first();
+        $this->assertNotNull($roleBefore);
+        $this->assertContains('helpdesk.tickets.create', (array) $roleBefore->permission_codes);
+
+        // Remove permission helpdesk.tickets.create and save
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'matrix')
+            ->call('selectRole', 'transport_operator')
+            ->assertSee('5 / 19 permisos')
+            ->call('togglePermission', 'helpdesk.tickets.create')
+            ->assertSee('4 / 19 permisos')
+            ->call('saveMatrix')
+            ->assertSee('Permisos del rol actualizados correctamente');
+
+        // Verify persisted in PostgreSQL core_roles
+        $roleAfter = \App\Models\Role::where('code', 'transport_operator')->first();
+        $this->assertNotContains('helpdesk.tickets.create', (array) $roleAfter->permission_codes);
+        $this->assertCount(4, (array) $roleAfter->permission_codes);
+
+        // Verify a new component instance reads the updated permissions
+        Livewire::test(AdminDashboard::class)->set('activeTab', 'matrix')
+            ->assertSee('4 de 19')
+            ->call('selectRole', 'transport_operator')
+            ->assertSee('4 / 19 permisos')
+            // Restore it back
+            ->call('togglePermission', 'helpdesk.tickets.create')
+            ->call('saveMatrix');
+
+        $roleRestored = \App\Models\Role::where('code', 'transport_operator')->first();
+        $this->assertContains('helpdesk.tickets.create', (array) $roleRestored->permission_codes);
+        $this->assertCount(5, (array) $roleRestored->permission_codes);
     }
 
     public function test_livewire_admin_dashboard_component_renders_metrics(): void
@@ -571,5 +626,37 @@ class AdminDashboardTest extends TestCase
             ->set('formParentName', '')
             ->assertSet('formParentId', null)
             ->assertSet('formLevel', 1);
+    }
+
+    public function test_editing_user_permissions_updates_database_and_subsystem_access(): void
+    {
+        $targetUser = \App\Models\User::create([
+            'username' => 'operador_prueba',
+            'full_name' => 'Operador de Prueba',
+            'email' => 'operador@castilla.gob.pe',
+            'password' => \Illuminate\Support\Facades\Hash::make('password123'),
+            'role' => 'Técnico de Soporte e ITAM',
+            'allowed_modules' => ['itam', 'helpdesk'],
+            'is_active' => true,
+        ]);
+
+        Livewire::test(AdminDashboard::class)
+            ->set('activeTab', 'users')
+            ->call('openEditPermissions', $targetUser->id, 'operador_prueba')
+            ->assertSet('showEditModal', true)
+            ->assertSet('userSubsystems', ['itam', 'helpdesk'])
+            // Toggle itam off, toggle transportes on
+            ->call('toggleSubsystem', 'itam')
+            ->call('toggleSubsystem', 'transportes')
+            ->call('savePermissions')
+            ->assertSet('showEditModal', false)
+            ->assertSee('Permisos actualizados correctamente para operador_prueba');
+
+        $targetUser->refresh();
+        $this->assertSame(['helpdesk', 'transportes'], $targetUser->allowed_modules);
+        $this->assertFalse($targetUser->canAccessSubsystem('itam'));
+        $this->assertFalse($targetUser->canAccessSubsystem('admin'));
+        $this->assertTrue($targetUser->canAccessSubsystem('transportes'));
+        $this->assertTrue($targetUser->canAccessSubsystem('helpdesk'));
     }
 }

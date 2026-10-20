@@ -74,6 +74,12 @@ class AuthTest extends TestCase
         $response->assertSee('SO');
         $response->assertSee('JAIME HENRY SANDOVAL NIEVES');
         $response->assertSee('Técnico de Soporte e ITAM');
+        // Solo ve ITAM y Helpdesk, NO ve Dashboard Central ni Transportes
+        $response->assertSee('Inventario y Gestión Activos TI');
+        $response->assertSee('Soporte Técnico y Helpdesk');
+        $response->assertDontSee('Dashboard Central y Configuración');
+        $response->assertDontSee('Licencias de Transportes');
+        $response->assertSee('2 de 4 módulos asignados');
         // No debe mostrar las credenciales en la URL ni el administrador si es jperez
         $response->assertDontSee('user=soporte1');
         $response->assertDontSee('password=');
@@ -84,13 +90,18 @@ class AuthTest extends TestCase
         $user = User::where('username', 'soporte1')->first();
         $this->actingAs($user);
 
-        $response = $this->get('/admin');
+        $response = $this->get('/itam');
 
         $response->assertStatus(200);
         $response->assertSee('SO');
         $response->assertSee('JAIME HENRY SANDOVAL NIEVES');
         $response->assertSee('Técnico de Soporte e ITAM');
         $response->assertSee('Cerrar Sesión');
+
+        // Intento de entrar a Admin (sin permisos) debe redirigir con error al portal
+        $adminResponse = $this->get('/admin');
+        $adminResponse->assertRedirect(route('portal.launcher'));
+        $adminResponse->assertSessionHas('error');
     }
 
     public function test_logout_clears_session_and_redirects_to_login(): void
@@ -186,5 +197,80 @@ class AuthTest extends TestCase
         // Acceso permitido al registro de tickets
         $ticketResponse = $this->get('/soporte/nuevo-ticket');
         $ticketResponse->assertStatus(200);
+    }
+
+    public function test_guest_on_new_ticket_page_sees_login_link_and_cannot_access_portal_as_admin(): void
+    {
+        $response = $this->get('/soporte/nuevo-ticket?dni=02821801&oficina=ALCALD%C3%8DA');
+        $response->assertStatus(200);
+        $response->assertSee('Acceso Módulos');
+        $response->assertSee(route('login'));
+
+        // Intento de entrar a /portal sin autenticación redirige a login
+        $portalResponse = $this->get('/portal');
+        $portalResponse->assertRedirect(route('login'));
+    }
+
+    public function test_guest_cannot_access_protected_subsystems_and_is_redirected_to_login(): void
+    {
+        // Subsistema Admin
+        $this->get('/admin')->assertRedirect(route('login'));
+        $this->get('/admin/personas')->assertRedirect(route('login'));
+
+        // Subsistema ITAM
+        $this->get('/itam')->assertRedirect(route('login'));
+
+        // Subsistema Helpdesk y Soporte
+        $this->get('/helpdesk')->assertRedirect(route('login'));
+        $this->get('/soporte')->assertRedirect(route('login'));
+    }
+
+    public function test_reportante_user_is_blocked_from_portal_launcher(): void
+    {
+        $user = User::where('username', '02821801')->first();
+        $this->assertNotNull($user);
+        $this->actingAs($user);
+
+        $portalResponse = $this->get('/portal');
+        $portalResponse->assertRedirect('/?tab=helpdesk&dni=02821801');
+        $portalResponse->assertSessionHas('info');
+    }
+
+    public function test_tech_user_with_only_helpdesk_access_can_enter_portal_and_helpdesk_panel(): void
+    {
+        $techUser = User::where('username', 'soporte4')->first();
+        $this->assertNotNull($techUser);
+        $techUser->allowed_modules = ['helpdesk'];
+        $techUser->save();
+
+        $this->assertFalse($techUser->isReportante());
+
+        // 1. Iniciar sesión: redirige al portal (NO al formulario de mesa de ayuda)
+        $response = $this->post('/login', [
+            'username' => 'soporte4',
+            'password' => 'admin123',
+        ]);
+        $response->assertRedirect(route('portal.launcher'));
+
+        // 2. Acceder al portal: status 200, muestra rol y módulo Helpdesk
+        $this->actingAs($techUser);
+        $portalResponse = $this->get('/portal');
+        $portalResponse->assertStatus(200);
+        $portalResponse->assertSee('Técnico de Soporte e ITAM');
+        $portalResponse->assertSee('Soporte Técnico y Helpdesk');
+        $portalResponse->assertDontSee('Inventario y Gestión TI');
+
+        // 3. Acceder al panel técnico de helpdesk: permitido (status 200)
+        $helpdeskResponse = $this->get('/helpdesk');
+        $helpdeskResponse->assertStatus(200);
+
+        // 4. Acceder a ITAM o Admin: denegado, redirige a /portal con error
+        $itamResponse = $this->get('/itam');
+        $itamResponse->assertRedirect(route('portal.launcher'));
+        $itamResponse->assertSessionHas('error');
+
+        $adminResponse = $this->get('/admin');
+        $adminResponse->assertRedirect(route('portal.launcher'));
+        $adminResponse->assertSessionHas('error');
     }
 }

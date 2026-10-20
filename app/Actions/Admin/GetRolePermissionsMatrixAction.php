@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions\Admin;
 
+use App\Models\Role;
+
 final class GetRolePermissionsMatrixAction
 {
     /**
@@ -105,9 +107,42 @@ final class GetRolePermissionsMatrixAction
      */
     public function handle(): array
     {
+        $roles = self::ROLES;
+        $assignments = self::DEFAULT_ASSIGNMENTS;
+
+        try {
+            $dbRoles = Role::all();
+            if ($dbRoles->isNotEmpty()) {
+                foreach ($dbRoles as $dbRole) {
+                    $code = $dbRole->code;
+                    $dbPerms = (array) ($dbRole->permission_codes ?? []);
+                    $assignments[$code] = array_values($dbPerms);
+
+                    if (! isset($roles[$code])) {
+                        $roles[$code] = [
+                            'code' => $code,
+                            'name' => $dbRole->name,
+                            'isSystem' => (bool) $dbRole->is_system,
+                            'type' => $dbRole->is_system ? 'Rol del Sistema' : 'Personalizado',
+                            'icon' => '🛡️',
+                            'description' => $dbRole->description ?? '',
+                        ];
+                    } else {
+                        $roles[$code]['name'] = $dbRole->name;
+                        $roles[$code]['isSystem'] = (bool) $dbRole->is_system;
+                        if (! empty($dbRole->description)) {
+                            $roles[$code]['description'] = $dbRole->description;
+                        }
+                    }
+                }
+            }
+        } catch (\Throwable) {
+            // Fallback to static defaults
+        }
+
         return [
-            'roles' => self::ROLES,
-            'assignments' => self::DEFAULT_ASSIGNMENTS,
+            'roles' => $roles,
+            'assignments' => $assignments,
             'totalPermissions' => 19,
         ];
     }

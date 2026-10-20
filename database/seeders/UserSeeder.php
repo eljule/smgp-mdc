@@ -78,7 +78,7 @@ class UserSeeder extends Seeder
                 'full_name' => $odtBossName,
                 'email' => "soporte{$i}@castilla.gob.pe",
                 'role' => 'Técnico de Soporte e ITAM',
-                'allowed_modules' => json_encode(['admin', 'itam', 'helpdesk']),
+                'allowed_modules' => json_encode(['itam', 'helpdesk']),
                 'is_active' => true,
                 'person_id' => $odtBossId,
                 'must_change_password' => false,

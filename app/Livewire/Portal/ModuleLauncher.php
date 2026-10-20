@@ -20,8 +20,22 @@ class ModuleLauncher extends Component
 
     public ?string $activeUser = null;
 
-    public function mount(?string $user = null): void
+    public function mount(?string $user = null)
     {
+        if (! auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        $authUser = auth()->user();
+        if ($authUser->isReportante()) {
+            $dni = $authUser->person?->document_number ?: (ctype_digit($authUser->username) ? $authUser->username : '');
+
+            return redirect()->route('login', [
+                'tab' => 'helpdesk',
+                'dni' => $dni,
+            ])->with('info', 'Su cuenta tiene el rol de Personal General / Reportante y únicamente tiene acceso al módulo de Mesa de Ayuda para el registro de tickets.');
+        }
+
         if ($user !== null) {
             $this->activeUser = $user;
         }
@@ -34,7 +48,11 @@ class ModuleLauncher extends Component
     public function render(GetActiveModulesAction $action): View
     {
         $authUser = auth()->user();
-        $targetUser = $this->activeUser ?: ($authUser?->username ?? 'root');
+        if (! $authUser) {
+            return redirect()->route('login');
+        }
+
+        $targetUser = $this->activeUser ?: $authUser->username;
 
         $modules = $action->handle($this->search, $targetUser);
         $totalActiveCount = CoreModule::query()->active()->count();
@@ -63,7 +81,7 @@ class ModuleLauncher extends Component
             default => [
                 'initials' => $userModel?->initials ?? ($authUser?->initials ?? 'RO'),
                 'name' => $userModel?->username ?? $targetUser,
-                'title' => $userModel ? ($userModel->display_title ?? mb_strtoupper((string) $userModel->full_name)) : 'ADMINISTRADOR DEL SISTEMA SIGM',
+                'title' => $userModel ? ($userModel->display_title ?? mb_strtoupper((string) $userModel->full_name)) : 'PERSONAL MUNICIPAL',
                 'role' => $userModel?->display_role ?? 'Personal Municipal',
                 'description' => $userModel?->isReportante()
                     ? 'Acceso concedido exclusivamente al módulo de Mesa de Ayuda para el registro de tickets de soporte.'

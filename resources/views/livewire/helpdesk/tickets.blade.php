@@ -25,6 +25,7 @@
     @include('livewire.helpdesk.modals.ticket-detail-modal')
     @include('livewire.helpdesk.modals.ticket-resolution-modal')
     @include('livewire.helpdesk.modals.ticket-supplies-modal')
+    @include('livewire.helpdesk.modals.ticket-provisional-loan-modal')
     @include('livewire.helpdesk.modals.ticket-conformity-modal')
     @include('livewire.helpdesk.modals.ticket-reassign-modal')
     @include('livewire.helpdesk.modals.ticket-bulk-reassign-modal')

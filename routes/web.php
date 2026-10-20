@@ -36,14 +36,13 @@ Route::post('/cambiar-password', [PasswordChangeController::class, 'updatePasswo
 Route::get('/api/helpdesk/dni-lookup', [LoginController::class, 'lookupDni'])->name('helpdesk.dni.lookup');
 Route::get('/api/helpdesk/office-qr', [LoginController::class, 'officeTicketQr'])->name('helpdesk.office.qr');
 
-// Portal Lanzador Institucional de Módulos (Livewire 3)
-Route::get('/portal', ModuleLauncher::class)->name('portal.launcher');
+// Portal Lanzador Institucional de Módulos (Livewire 3 - Protegido por Autenticación)
+Route::middleware(['auth'])->group(function (): void {
+    Route::get('/portal', ModuleLauncher::class)->name('portal.launcher');
+    Route::get('/launcher', ModuleLauncher::class)->name('portal.home');
+});
 
-// Alias /launcher por conveniencia
-Route::get('/launcher', ModuleLauncher::class)->name('portal.home');
-
-// Portal de Tickets de Soporte TI
-Route::get('/soporte', HelpdeskTickets::class)->name('soporte.portal');
+// Portal Público de Registro de Tickets de Soporte TI
 Route::get('/soporte/nuevo-ticket', HelpdeskNewTicket::class)->name('soporte.nuevo');
 Route::get('/mantenimiento', ModuleMaintenance::class)->name('portal.maintenance');
 
@@ -76,6 +75,7 @@ Route::middleware(['subsystem:helpdesk'])->group(function (): void {
     Route::get('/helpdesk', HelpdeskTickets::class)->name('subsystems.helpdesk');
     Route::get('/helpdesk/tickets', HelpdeskTickets::class)->name('helpdesk.tickets');
     Route::redirect('/helpdesk/kb', '/helpdesk?tab=knowledge')->name('helpdesk.kb');
+    Route::get('/soporte', HelpdeskTickets::class)->name('soporte.portal');
 });
 
 // Rutas de Otros Subsistemas Municipales

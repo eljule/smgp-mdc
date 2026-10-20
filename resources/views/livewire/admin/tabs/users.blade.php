@@ -292,7 +292,7 @@
                                     <button
                                         id="btn-edit-permissions-{{ $user['id'] }}"
                                         type="button"
-                                        wire:click="openEditPermissions({{ $user['id'] }})"
+                                        wire:click="openEditPermissions({{ $user['id'] }}, '{{ $user['username'] }}')"
                                         class="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 text-emerald-800 dark:text-emerald-300 font-semibold text-xs hover:bg-emerald-100 transition-colors cursor-pointer"
                                         title="Modificar permisos y roles"
                                     >
@@ -302,7 +302,7 @@
                                     <button
                                         id="btn-reset-password-{{ $user['id'] }}"
                                         type="button"
-                                        wire:click="openResetPassword({{ $user['id'] }})"
+                                        wire:click="openResetPassword({{ $user['id'] }}, '{{ $user['username'] }}')"
                                         class="px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-800 text-amber-800 dark:text-amber-300 font-semibold text-xs hover:bg-amber-100 transition-colors cursor-pointer"
                                         title="Resetear contraseña provisional"
                                     >
@@ -313,7 +313,7 @@
                                         <button
                                             id="btn-unlock-user-{{ $user['id'] }}"
                                             type="button"
-                                            wire:click="unlockUser({{ $user['id'] }})"
+                                            wire:click="unlockUser({{ $user['id'] }}, '{{ $user['username'] }}')"
                                             class="px-2.5 py-1.5 rounded-lg bg-rose-50 dark:bg-rose-950/60 border border-rose-300 dark:border-rose-800 text-rose-700 dark:text-rose-300 font-bold text-xs hover:bg-rose-100 transition-colors cursor-pointer"
                                             title="Desbloquear cuenta bloqueada"
                                         >

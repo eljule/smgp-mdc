@@ -6,10 +6,15 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <!-- Izquierda: Escudo y Título Institucional -->
             <div class="flex items-center space-x-3 sm:space-x-4">
-                <a href="{{ route('soporte.portal') }}"
+                @php
+                    $helpdeskBackUrl = auth()->check() && auth()->user()->canAccessSubsystem('helpdesk')
+                        ? route('subsystems.helpdesk')
+                        : route('login', ['tab' => 'helpdesk']);
+                @endphp
+                <a href="{{ $helpdeskBackUrl }}"
                    style="background-color: #0d5c37;"
                    class="w-9 h-9 rounded-lg border border-emerald-600/50 flex items-center justify-center text-white hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
-                   title="Volver a Mesa de Ayuda">
+                   title="{{ auth()->check() && auth()->user()->canAccessSubsystem('helpdesk') ? 'Volver al Panel de Helpdesk' : 'Volver a Mesa de Ayuda' }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -31,13 +36,35 @@
                 </div>
             </div>
 
-            <!-- Derecha: Botón Módulos -->
+            <!-- Derecha: Botón Módulos / Acceso -->
             <div>
-                <a href="{{ route('portal.launcher') }}"
-                   style="background-color: #0d5c37;"
-                   class="inline-flex items-center px-4 py-1.5 rounded-full border border-emerald-500/60 text-white text-xs font-bold shadow-xs hover:opacity-90 transition-opacity cursor-pointer">
-                    Módulos
-                </a>
+                @if(auth()->check())
+                    @if(auth()->user()->isReportante())
+                        <a href="{{ route('logout') }}"
+                           style="background-color: #0d5c37;"
+                           class="inline-flex items-center px-4 py-1.5 rounded-full border border-emerald-500/60 text-white text-xs font-bold shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
+                           title="Cerrar Sesión">
+                            Cerrar Sesión
+                        </a>
+                    @else
+                        <a href="{{ route('portal.launcher') }}"
+                           style="background-color: #0d5c37;"
+                           class="inline-flex items-center px-4 py-1.5 rounded-full border border-emerald-500/60 text-white text-xs font-bold shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
+                           title="Ir a Lanzador de Módulos">
+                            Módulos
+                        </a>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}"
+                       style="background-color: #0d5c37;"
+                       class="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full border border-emerald-500/60 text-white text-xs font-bold shadow-xs hover:opacity-90 transition-opacity cursor-pointer"
+                       title="Acceso al sistema con usuario y contraseña">
+                        <svg class="w-3.5 h-3.5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                        </svg>
+                        <span>Acceso Módulos</span>
+                    </a>
+                @endif
             </div>
         </div>
     </header>

@@ -36,13 +36,13 @@
             SELECCIONE EL ROL INSTITUCIONAL A CONFIGURAR:
         </label>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-            @foreach ($roles as $code => $role)
+            @foreach ($matrixRoles as $code => $role)
                 @php
                     $isSelected = $selectedRoleCode === $code;
                     $rolePermsCount = count($assignments[$code] ?? []);
                 @endphp
                 <button
-                    key="{{ $code }}"
+                    wire:key="matrix-role-{{ $code }}"
                     type="button"
                     wire:click="selectRole('{{ $code }}')"
                     class="p-3 rounded-xl border text-left transition-all cursor-pointer {{ $isSelected

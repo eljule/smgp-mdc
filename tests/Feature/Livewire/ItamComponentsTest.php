@@ -23,6 +23,10 @@ class ItamComponentsTest extends TestCase
     {
         parent::setUp();
         $this->seed();
+        $admin = \App\Models\User::where('username', 'root')->first();
+        if ($admin) {
+            $this->actingAs($admin);
+        }
     }
 
     public function test_renders_itam_dashboard_successfully(): void
