@@ -230,7 +230,7 @@ class HelpdeskComponentsTest extends TestCase
         $fresh = $unassigned->fresh();
         $this->assertEquals('EN_ATENCION', $fresh->status);
         $this->assertNotNull($fresh->assigned_technician_name);
-        $this->assertEquals('Téc. Juan Pérez', $fresh->assigned_technician_name);
+        $this->assertEquals('JAIME HENRY SANDOVAL NIEVES (soporte4)', $fresh->assigned_technician_name);
     }
 
     public function test_reassign_ticket_modal_and_execution_creates_audit_log(): void

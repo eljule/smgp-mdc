@@ -51,7 +51,7 @@
                             <div class="flex flex-wrap items-center gap-4 text-xs text-slate-600 dark:text-slate-400 pt-1">
                                 <div>
                                     <span class="font-semibold text-slate-700 dark:text-slate-300">Técnico: </span>
-                                    <span>{{ $t->assigned_technician_name ?? 'En asignación de Sistemas' }}</span>
+                                    <span>{{ $t->assigned_technician_display ?: ($t->assigned_technician_name ?? 'En asignación de Sistemas') }}</span>
                                 </div>
                                 @if ($t->assigned_technician_phone)
                                     <div>

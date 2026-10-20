@@ -47,33 +47,41 @@ Route::get('/soporte', HelpdeskTickets::class)->name('soporte.portal');
 Route::get('/soporte/nuevo-ticket', HelpdeskNewTicket::class)->name('soporte.nuevo');
 Route::get('/mantenimiento', ModuleMaintenance::class)->name('portal.maintenance');
 
-// Rutas del Subsistema Central de Administración
-Route::get('/admin', AdminDashboard::class)->name('subsystems.central');
-Route::get('/admin/personas', AdminDashboard::class)->name('admin.people');
-Route::get('/admin/usuarios', AdminDashboard::class)->name('admin.users');
-Route::get('/admin/roles', AdminDashboard::class)->name('admin.roles');
-Route::get('/admin/permisos', AdminDashboard::class)->name('admin.permissions');
-Route::get('/admin/asignar-permisos', AdminDashboard::class)->name('admin.matrix');
-Route::get('/admin/oficinas', AdminDashboard::class)->name('admin.offices');
-Route::get('/admin/subsistemas', AdminDashboard::class)->name('admin.subsystems');
+// Rutas del Subsistema Central de Administración (Protegidas por control de subsistema)
+Route::middleware(['subsystem:admin'])->group(function (): void {
+    Route::get('/admin', AdminDashboard::class)->name('subsystems.central');
+    Route::get('/admin/personas', AdminDashboard::class)->name('admin.people');
+    Route::get('/admin/usuarios', AdminDashboard::class)->name('admin.users');
+    Route::get('/admin/roles', AdminDashboard::class)->name('admin.roles');
+    Route::get('/admin/permisos', AdminDashboard::class)->name('admin.permissions');
+    Route::get('/admin/asignar-permisos', AdminDashboard::class)->name('admin.matrix');
+    Route::get('/admin/oficinas', AdminDashboard::class)->name('admin.offices');
+    Route::get('/admin/subsistemas', AdminDashboard::class)->name('admin.subsystems');
+});
 
 // Rutas del Subsistema ITAM (Gestión de Infraestructura y Activos TI)
-Route::get('/itam', ItamDashboard::class)->name('subsystems.itam');
-Route::redirect('/itam/activos', '/itam?tab=inventory')->name('itam.assets');
-Route::redirect('/itam/insumos', '/itam?tab=supplies')->name('itam.supplies');
-Route::redirect('/itam/prestamos', '/itam?tab=loans')->name('itam.loans');
-Route::redirect('/itam/mantenimiento', '/itam?tab=maintenance')->name('itam.maintenance');
-Route::redirect('/itam/movimientos', '/itam?tab=movements')->name('itam.movements');
-Route::redirect('/itam/software', '/itam?tab=software')->name('itam.software');
-Route::redirect('/itam/auditoria', '/itam?tab=audits')->name('itam.audits');
+Route::middleware(['subsystem:itam'])->group(function (): void {
+    Route::get('/itam', ItamDashboard::class)->name('subsystems.itam');
+    Route::redirect('/itam/activos', '/itam?tab=inventory')->name('itam.assets');
+    Route::redirect('/itam/insumos', '/itam?tab=supplies')->name('itam.supplies');
+    Route::redirect('/itam/prestamos', '/itam?tab=loans')->name('itam.loans');
+    Route::redirect('/itam/mantenimiento', '/itam?tab=maintenance')->name('itam.maintenance');
+    Route::redirect('/itam/movimientos', '/itam?tab=movements')->name('itam.movements');
+    Route::redirect('/itam/software', '/itam?tab=software')->name('itam.software');
+    Route::redirect('/itam/auditoria', '/itam?tab=audits')->name('itam.audits');
+});
 
 // Rutas del Subsistema Helpdesk (Mesa de Ayuda y Soporte TI)
-Route::get('/helpdesk', HelpdeskTickets::class)->name('subsystems.helpdesk');
-Route::get('/helpdesk/tickets', HelpdeskTickets::class)->name('helpdesk.tickets');
-Route::redirect('/helpdesk/kb', '/helpdesk?tab=knowledge')->name('helpdesk.kb');
+Route::middleware(['subsystem:helpdesk'])->group(function (): void {
+    Route::get('/helpdesk', HelpdeskTickets::class)->name('subsystems.helpdesk');
+    Route::get('/helpdesk/tickets', HelpdeskTickets::class)->name('helpdesk.tickets');
+    Route::redirect('/helpdesk/kb', '/helpdesk?tab=knowledge')->name('helpdesk.kb');
+});
 
 // Rutas de Otros Subsistemas Municipales
-Route::get('/transportes', TransportesDashboard::class)->name('subsystems.transportes');
+Route::middleware(['subsystem:transportes'])->group(function (): void {
+    Route::get('/transportes', TransportesDashboard::class)->name('subsystems.transportes');
+});
 
 // Ficha Pública Móvil del Activo Tecnológico (Escaneo QR)
 Route::get('/scan/activo/{code}', function (string $code) {

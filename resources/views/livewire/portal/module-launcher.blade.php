@@ -6,7 +6,7 @@
             <!-- Badge Sesión Activa -->
             <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-700/60 text-xs font-medium text-emerald-100 shadow-sm backdrop-blur-xs">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Sesión Activa: {{ $userInfo['name'] }} ({{ $userInfo['role'] }})</span>
+                <span>Sesión Activa: {{ $userInfo['title'] }}@if(!empty($userInfo['name']) && strtolower($userInfo['name']) !== 'root' && strtolower($userInfo['name']) !== strtolower($userInfo['title'])) ({{$userInfo['name']}})@endif &bull; {{ $userInfo['role'] }}</span>
             </div>
 
             <!-- Título Principal Institucional -->

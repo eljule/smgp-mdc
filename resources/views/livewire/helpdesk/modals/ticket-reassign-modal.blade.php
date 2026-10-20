@@ -31,7 +31,7 @@
                         </div>
                         <p class="text-slate-800 dark:text-slate-200 font-medium truncate">{{ $currTicket->subject }}</p>
                         <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/50 dark:border-slate-700/50">
-                            <span>Técnico actual: <strong class="text-slate-700 dark:text-slate-300">{{ $currTicket->assigned_technician_name ?: 'Sin asignar' }}</strong></span>
+                            <span>Técnico actual: <strong class="text-slate-700 dark:text-slate-300">{{ $currTicket->assigned_technician_display ?: ($currTicket->assigned_technician_name ?: 'Sin asignar') }}</strong></span>
                             <span>Oficina: <strong>{{ $currTicket->office?->name ?? 'MDC' }}</strong></span>
                         </div>
                     </div>

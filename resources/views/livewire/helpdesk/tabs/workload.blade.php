@@ -110,18 +110,28 @@
                                              @click.outside="open = false"
                                              x-cloak
                                              :class="dropUp ? 'bottom-full mb-1.5' : 'top-full mt-1.5'"
-                                             class="absolute right-0 w-64 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 p-1.5 z-50 text-xs">
+                                             class="absolute right-0 w-56 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 p-1.5 z-50 text-xs">
                                             <span class="block px-2.5 py-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 mb-1">
                                                 Asignar a:
                                             </span>
                                             <div class="space-y-0.5">
                                                 @foreach($metrics['techniciansWorkload'] ?? [] as $tech)
+                                                    @php
+                                                        $techDisplayUser = $tech['username'] ?? null;
+                                                        if (!$techDisplayUser && preg_match('/\(([^)]+)\)$/', (string)$tech['technicianName'], $m)) {
+                                                            $techDisplayUser = trim($m[1]);
+                                                        }
+                                                        $techDisplayUser = $techDisplayUser ?: $tech['technicianName'];
+                                                    @endphp
                                                     <button type="button"
                                                             wire:click="assignTicketToTechnician({{ $t->id }}, '{{ addslashes($tech['technicianName']) }}')"
                                                             @click="open = false"
-                                                            class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between cursor-pointer transition-colors">
-                                                        <span class="truncate font-medium text-slate-800 dark:text-slate-200">{{ $tech['technicianName'] }}</span>
-                                                        <span class="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 rounded">
+                                                            class="w-full text-left px-2.5 py-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-between cursor-pointer transition-colors"
+                                                            title="{{ $tech['technicianName'] }}">
+                                                        <span class="truncate font-mono font-semibold text-slate-800 dark:text-slate-200">
+                                                            {{ $techDisplayUser }}
+                                                        </span>
+                                                        <span class="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 px-1.5 py-0.5 rounded ml-2 shrink-0">
                                                             {{ $tech['inProgressCount'] }} activos
                                                         </span>
                                                     </button>

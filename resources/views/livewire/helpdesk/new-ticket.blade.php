@@ -766,7 +766,7 @@
                                             <div class="flex items-center gap-1.5">
                                                 <span class="text-sm">👨‍🔧</span>
                                                 <strong class="text-slate-900 dark:text-white text-xs font-bold">
-                                                    {{ $ticket->assigned_technician_name }}
+                                                    {{ $ticket->assigned_technician_display ?: $ticket->assigned_technician_name }}
                                                 </strong>
                                             </div>
                                             <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 font-bold border border-emerald-200">
@@ -887,7 +887,7 @@
                             </div>
                             <div>
                                 <span class="text-slate-400">Técnico que atendió:</span>
-                                <strong class="text-emerald-700 dark:text-emerald-400">{{ $conformityTicket->assigned_technician_name ?? 'Personal Soporte ODT' }}</strong>
+                                <strong class="text-emerald-700 dark:text-emerald-400">{{ $conformityTicket->assigned_technician_display ?: ($conformityTicket->assigned_technician_name ?? 'Personal Soporte ODT') }}</strong>
                             </div>
                         </div>
                     </div>

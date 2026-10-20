@@ -91,7 +91,7 @@
                             </div>
                             <div>
                                 <span class="text-slate-500 block">Técnico Dictaminante:</span>
-                                <span class="font-semibold text-slate-800">{{ $decommissionTicket->assigned_technician_name ?? 'Ing. Carlos Mendoza (Soporte TI)' }}</span>
+                                <span class="font-semibold text-slate-800">{{ $decommissionTicket->assigned_technician_display ?: ($decommissionTicket->assigned_technician_name ?? 'Ing. Carlos Mendoza (Soporte TI)') }}</span>
                             </div>
                         </div>
                     </div>
@@ -177,7 +177,7 @@
                     <!-- Bloque de Firmas Cuádruple -->
                     <div class="grid grid-cols-3 gap-8 pt-8 font-sans text-center text-xs">
                         <div class="border-t border-slate-800 pt-2">
-                            <div class="font-bold text-slate-900">{{ $decommissionTicket->assigned_technician_name ?? 'Ing. Carlos Mendoza (Soporte TI)' }}</div>
+                            <div class="font-bold text-slate-900">{{ $decommissionTicket->assigned_technician_display ?: ($decommissionTicket->assigned_technician_name ?? 'Ing. Carlos Mendoza (Soporte TI)') }}</div>
                             <div class="text-[10px] text-slate-600">Técnico de Soporte TI</div>
                             <div class="text-[10px] text-slate-400">Oficina de Informática y Sistemas</div>
                         </div>

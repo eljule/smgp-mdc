@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions\Admin;
 
 use App\Models\Person;
+use Illuminate\Support\Facades\DB;
 
 final class GetPeopleCatalogAction
 {
@@ -656,6 +657,17 @@ final class GetPeopleCatalogAction
     ];
 
     /**
+     * Normalize string for accent-insensitive and case-insensitive comparison.
+     */
+    public static function normalizeString(string $text): string
+    {
+        $accents = ['á', 'é', 'í', 'ó', 'ú', 'ü', 'ñ', 'Á', 'É', 'Í', 'Ó', 'Ú', 'Ü', 'Ñ'];
+        $clean   = ['a', 'e', 'i', 'o', 'u', 'u', 'n', 'a', 'e', 'i', 'o', 'u', 'u', 'n'];
+
+        return mb_strtolower(str_replace($accents, $clean, trim($text)));
+    }
+
+    /**
      * Retrieve paginated people catalog with filters.
      * Queries the database if records exist, otherwise uses built-in master dataset.
      *
@@ -677,18 +689,52 @@ final class GetPeopleCatalogAction
                 $query->where('type', 'ADMINISTRADO');
             }
 
-            $trimmedSearch = mb_strtolower(trim($search));
-            if ($trimmedSearch !== '') {
-                $query->where(function ($q) use ($trimmedSearch) {
-                    $s = "%{$trimmedSearch}%";
-                    $q->where('document_number', 'like', $s)
-                        ->orWhere('first_name', 'like', $s)
-                        ->orWhere('paternal_surname', 'like', $s)
-                        ->orWhere('maternal_surname', 'like', $s)
-                        ->orWhere('position', 'like', $s)
-                        ->orWhere('office', 'like', $s)
-                        ->orWhere('business_name', 'like', $s);
-                });
+            $driver = DB::connection()->getDriverName();
+            $isPgsql = $driver === 'pgsql';
+
+            $cleanSearch = self::normalizeString($search);
+            if ($cleanSearch !== '') {
+                $words = array_values(array_filter(preg_split('/\s+/', $cleanSearch)));
+
+                if (! empty($words)) {
+                    $query->where(function ($q) use ($words, $isPgsql) {
+                        foreach ($words as $word) {
+                            $pattern = "%{$word}%";
+                            $q->where(function ($sub) use ($pattern, $isPgsql) {
+                                if ($isPgsql) {
+                                    $colExpr = fn (string $col) => "translate(LOWER(COALESCE({$col}, '')), 'áéíóúüñ', 'aeiouun')";
+                                    $fullNameExpr = "translate(LOWER(CONCAT(COALESCE(first_name, ''), ' ', COALESCE(paternal_surname, ''), ' ', COALESCE(maternal_surname, ''))), 'áéíóúüñ', 'aeiouun')";
+                                    $reverseNameExpr = "translate(LOWER(CONCAT(COALESCE(paternal_surname, ''), ' ', COALESCE(maternal_surname, ''), ' ', COALESCE(first_name, ''))), 'áéíóúüñ', 'aeiouun')";
+
+                                    $sub->whereRaw("{$colExpr('document_number')} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$colExpr('document_type')} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$colExpr('first_name')} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$colExpr('paternal_surname')} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$colExpr('maternal_surname')} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$colExpr('business_name')} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$colExpr('position')} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$colExpr('office')} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$fullNameExpr} LIKE ?", [$pattern])
+                                        ->orWhereRaw("{$reverseNameExpr} LIKE ?", [$pattern]);
+                                } else {
+                                    $fullNameExpr = "COALESCE(first_name, '') || ' ' || COALESCE(paternal_surname, '') || ' ' || COALESCE(maternal_surname, '')";
+                                    $reverseNameExpr = "COALESCE(paternal_surname, '') || ' ' || COALESCE(maternal_surname, '') || ' ' || COALESCE(first_name, '')";
+
+                                    $sub->where('document_number', 'like', $pattern)
+                                        ->orWhere('document_type', 'like', $pattern)
+                                        ->orWhere('first_name', 'like', $pattern)
+                                        ->orWhere('paternal_surname', 'like', $pattern)
+                                        ->orWhere('maternal_surname', 'like', $pattern)
+                                        ->orWhere('business_name', 'like', $pattern)
+                                        ->orWhere('position', 'like', $pattern)
+                                        ->orWhere('office', 'like', $pattern)
+                                        ->orWhereRaw("({$fullNameExpr}) LIKE ?", [$pattern])
+                                        ->orWhereRaw("({$reverseNameExpr}) LIKE ?", [$pattern]);
+                                }
+                            });
+                        }
+                    });
+                }
             }
 
             $trimmedOffice = trim($office);
@@ -696,13 +742,29 @@ final class GetPeopleCatalogAction
                 if (preg_match('/^\[(.*?)\]\s*(.*)$/', $trimmedOffice, $matches)) {
                     $acronym = trim($matches[1]);
                     $name = trim($matches[2]);
-                    $query->where(function ($q) use ($trimmedOffice, $acronym, $name) {
-                        $q->where('office', 'like', "%{$trimmedOffice}%")
-                            ->orWhere('office', 'like', "%[{$acronym}]%")
-                            ->orWhere('office', 'like', "%{$name}%");
+                    $query->where(function ($q) use ($trimmedOffice, $acronym, $name, $isPgsql) {
+                        if ($isPgsql) {
+                            $expr = "translate(LOWER(COALESCE(office, '')), 'áéíóúüñ', 'aeiouun')";
+                            $cleanOffice = '%' . self::normalizeString($trimmedOffice) . '%';
+                            $cleanAcronym = '%[' . self::normalizeString($acronym) . ']%';
+                            $cleanName = '%' . self::normalizeString($name) . '%';
+                            $q->whereRaw("{$expr} LIKE ?", [$cleanOffice])
+                                ->orWhereRaw("{$expr} LIKE ?", [$cleanAcronym])
+                                ->orWhereRaw("{$expr} LIKE ?", [$cleanName]);
+                        } else {
+                            $q->where('office', 'like', "%{$trimmedOffice}%")
+                                ->orWhere('office', 'like', "%[{$acronym}]%")
+                                ->orWhere('office', 'like', "%{$name}%");
+                        }
                     });
                 } else {
-                    $query->where('office', 'like', "%{$trimmedOffice}%");
+                    if ($isPgsql) {
+                        $expr = "translate(LOWER(COALESCE(office, '')), 'áéíóúüñ', 'aeiouun')";
+                        $cleanOffice = '%' . self::normalizeString($trimmedOffice) . '%';
+                        $query->whereRaw("{$expr} LIKE ?", [$cleanOffice]);
+                    } else {
+                        $query->where('office', 'like', "%{$trimmedOffice}%");
+                    }
                 }
             }
 
@@ -729,6 +791,7 @@ final class GetPeopleCatalogAction
                     'firstName' => $p->first_name ?? '',
                     'paternalSurname' => $p->paternal_surname ?? '',
                     'maternalSurname' => $p->maternal_surname ?? '',
+                    'businessName' => $p->business_name ?? '',
                     'fullName' => $fullName,
                     'email' => $p->email,
                     'phone' => $p->phone,
@@ -771,31 +834,47 @@ final class GetPeopleCatalogAction
             return true;
         });
 
-        $trimmedSearch = mb_strtolower(trim($search));
-        if ($trimmedSearch !== '') {
-            $filtered = array_filter($filtered, function (array $person) use ($trimmedSearch): bool {
-                return str_contains(mb_strtolower($person['fullName']), $trimmedSearch)
-                    || str_contains(mb_strtolower($person['documentNumber']), $trimmedSearch)
-                    || str_contains(mb_strtolower($person['position'] ?? ''), $trimmedSearch)
-                    || str_contains(mb_strtolower($person['office'] ?? ''), $trimmedSearch);
-            });
+        $cleanSearch = self::normalizeString($search);
+        if ($cleanSearch !== '') {
+            $words = array_values(array_filter(preg_split('/\s+/', $cleanSearch)));
+            if (! empty($words)) {
+                $filtered = array_filter($filtered, function (array $person) use ($words): bool {
+                    $haystack = self::normalizeString(
+                        ($person['documentNumber'] ?? '') . ' ' .
+                        ($person['documentType'] ?? '') . ' ' .
+                        ($person['fullName'] ?? '') . ' ' .
+                        ($person['businessName'] ?? '') . ' ' .
+                        ($person['position'] ?? '') . ' ' .
+                        ($person['office'] ?? '')
+                    );
+
+                    foreach ($words as $w) {
+                        if (! str_contains($haystack, $w)) {
+                            return false;
+                        }
+                    }
+
+                    return true;
+                });
+            }
         }
 
-        $trimmedOffice = mb_strtolower(trim($office));
+        $trimmedOffice = trim($office);
         if ($trimmedOffice !== '') {
+            $cleanOffice = self::normalizeString($trimmedOffice);
             if (preg_match('/^\[(.*?)\]\s*(.*)$/', $trimmedOffice, $matches)) {
-                $acronym = mb_strtolower(trim($matches[1]));
-                $name = mb_strtolower(trim($matches[2]));
-                $filtered = array_filter($filtered, function (array $person) use ($trimmedOffice, $acronym, $name): bool {
-                    $po = mb_strtolower($person['office'] ?? '');
+                $cleanAcronym = self::normalizeString($matches[1]);
+                $cleanName = self::normalizeString($matches[2]);
+                $filtered = array_filter($filtered, function (array $person) use ($cleanOffice, $cleanAcronym, $cleanName): bool {
+                    $po = self::normalizeString($person['office'] ?? '');
 
-                    return str_contains($po, $trimmedOffice) || str_contains($po, "[{$acronym}]") || str_contains($po, $name);
+                    return str_contains($po, $cleanOffice) || str_contains($po, "[{$cleanAcronym}]") || str_contains($po, $cleanName);
                 });
             } else {
-                $filtered = array_filter($filtered, function (array $person) use ($trimmedOffice): bool {
-                    $po = mb_strtolower($person['office'] ?? '');
+                $filtered = array_filter($filtered, function (array $person) use ($cleanOffice): bool {
+                    $po = self::normalizeString($person['office'] ?? '');
 
-                    return str_contains($po, $trimmedOffice);
+                    return str_contains($po, $cleanOffice);
                 });
             }
         }

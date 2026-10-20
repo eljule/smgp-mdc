@@ -116,7 +116,7 @@
                     activeTab: new URLSearchParams(window.location.search).get('tab') === 'helpdesk' ? 'helpdesk' : 'auth',
                     showPass: false,
                     user: 'root',
-                    dniInput: '',
+                    dniInput: new URLSearchParams(window.location.search).get('dni') || '',
                     dniLoading: false,
                     dniError: null,
                     qrResult: null,
@@ -213,6 +213,12 @@
                         this.dniInput = '';
                         this.dniError = null;
                         this.selectedOfficeManual = '';
+                    },
+
+                    init() {
+                        if (this.activeTab === 'helpdesk' && this.dniInput && !this.qrResult) {
+                            this.$nextTick(() => this.lookupDni());
+                        }
                     }
                  }">
 
@@ -235,6 +241,25 @@
                         Reporte de incidencias y soporte técnico para su puesto de trabajo
                     </p>
                 </div>
+
+                @if (session('info'))
+                    <div class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/80 text-amber-950 dark:text-amber-200 text-xs font-medium flex items-start gap-2.5 shadow-xs animate-in fade-in duration-200">
+                        <span class="text-lg leading-none shrink-0 mt-0.5">ℹ️</span>
+                        <div class="space-y-0.5">
+                            <span class="font-bold text-amber-900 dark:text-amber-100 text-xs block">Acceso a Mesa de Ayuda</span>
+                            <span class="text-[11px] leading-relaxed text-amber-800 dark:text-amber-300 block">{{ session('info') }}</span>
+                        </div>
+                    </div>
+                @endif
+                @if (session('warning'))
+                    <div class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-700/80 text-amber-950 dark:text-amber-200 text-xs font-medium flex items-start gap-2.5 shadow-xs animate-in fade-in duration-200">
+                        <span class="text-lg leading-none shrink-0 mt-0.5">⚠️</span>
+                        <div class="space-y-0.5">
+                            <span class="font-bold text-amber-900 dark:text-amber-100 text-xs block">Aviso Institucional</span>
+                            <span class="text-[11px] leading-relaxed text-amber-800 dark:text-amber-300 block">{{ session('warning') }}</span>
+                        </div>
+                    </div>
+                @endif
 
                 <!-- SELECTOR DE PESTAÑAS (DUAL TABS) -->
                 <div class="grid grid-cols-2 p-1 bg-gray-100 dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700 text-xs font-bold">

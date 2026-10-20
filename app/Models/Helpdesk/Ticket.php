@@ -75,6 +75,45 @@ class Ticket extends Model
         return $this->belongsTo(Asset::class, 'asset_id');
     }
 
+    public function getAssignedTechnicianDisplayAttribute(): string
+    {
+        if ($this->relationLoaded('assignedTechnician') && $this->assignedTechnician) {
+            return $this->assignedTechnician->full_name_with_username;
+        }
+
+        if ($this->assigned_technician_id) {
+            static $userCache = [];
+            if (! array_key_exists($this->assigned_technician_id, $userCache)) {
+                $userCache[$this->assigned_technician_id] = User::find($this->assigned_technician_id);
+            }
+            if ($userCache[$this->assigned_technician_id]) {
+                return $userCache[$this->assigned_technician_id]->full_name_with_username;
+            }
+        }
+
+        $rawName = trim((string) ($this->assigned_technician_name ?? ''));
+        if ($rawName !== '') {
+            if (str_contains($rawName, '(') && str_contains($rawName, ')')) {
+                return $rawName;
+            }
+
+            static $nameCache = [];
+            if (! array_key_exists($rawName, $nameCache)) {
+                $nameCache[$rawName] = User::where('full_name', $rawName)
+                    ->orWhere('username', $rawName)
+                    ->first();
+            }
+
+            if ($nameCache[$rawName]) {
+                return $nameCache[$rawName]->full_name_with_username;
+            }
+
+            return $rawName;
+        }
+
+        return '';
+    }
+
     public function assignedTechnician(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_technician_id');

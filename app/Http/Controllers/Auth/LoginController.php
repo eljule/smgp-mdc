@@ -202,6 +202,16 @@ class LoginController
             return redirect()->route('password.change')->with('warning', 'Bienvenido al sistema. Por políticas de seguridad institucional, debe cambiar su contraseña provisional antes de continuar.');
         }
 
+        // Si el usuario tiene rol Personal General / Reportante, redirigir a pestaña Mesa de Ayuda con mensaje
+        if ($user->isReportante()) {
+            $dni = $user->person?->document_number ?: (ctype_digit($user->username) ? $user->username : '');
+
+            return redirect()->route('login', [
+                'tab' => 'helpdesk',
+                'dni' => $dni,
+            ])->with('info', 'Su cuenta tiene el rol de Personal General / Reportante y únicamente tiene acceso al módulo de Mesa de Ayuda para el registro de tickets.');
+        }
+
         return redirect()->route('portal.launcher');
     }
 

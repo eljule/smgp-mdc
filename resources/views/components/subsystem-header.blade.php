@@ -10,6 +10,7 @@
     $subsystemAuthUser = auth()->user();
     $subsystemInitials = $subsystemAuthUser?->initials ?? 'RO';
     $subsystemTitle = $subsystemAuthUser ? ($subsystemAuthUser->display_title ?? mb_strtoupper($subsystemAuthUser->full_name)) : 'ADMINISTRADOR DEL SISTEMA SIGM';
+    $subsystemUsername = $subsystemAuthUser?->username;
     $subsystemRole = $subsystemAuthUser?->display_role ?? 'Administrador Central';
 @endphp
 
@@ -121,7 +122,8 @@
                 <span class="hidden sm:inline">Lanzador</span>
             </a>
 
-            <!-- Botón Central -->
+            <!-- Botón Central (solo si tiene permisos sobre Admin) -->
+            @if (!auth()->check() || auth()->user()->canAccessSubsystem('admin'))
             <a
                 href="{{ route('subsystems.central') }}"
                 class="hidden lg:inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-emerald-100 text-xs font-semibold shadow-xs border border-emerald-700/50 transition-all cursor-pointer"
@@ -130,6 +132,7 @@
                 <span>⚙️</span>
                 <span class="hidden sm:inline">Central</span>
             </a>
+            @endif
 
             <!-- Selector de Tema (Alpine.js puro) -->
             <div x-data="themeSwitcher">
@@ -155,8 +158,13 @@
                     {{ $subsystemInitials }}
                 </div>
                 <div class="flex flex-col text-left">
-                    <span class="font-bold text-white leading-tight uppercase">
+                    <span class="font-bold text-white leading-tight uppercase flex items-center gap-1.5">
                         {{ $subsystemTitle }}
+                        @if(!empty($subsystemUsername) && strtolower($subsystemUsername) !== 'root')
+                            <span class="text-[10px] lowercase font-mono bg-emerald-700/80 dark:bg-slate-700 px-1.5 py-0.5 rounded text-emerald-200 border border-emerald-500/30">
+                                ({{ $subsystemUsername }})
+                            </span>
+                        @endif
                     </span>
                     <span class="text-[10px] text-emerald-300 font-medium">
                         {{ $subsystemRole }}

@@ -24,7 +24,7 @@
                 <form wire:submit.prevent="saveUserConformity" class="p-6 space-y-4 text-xs">
                     <!-- Resumen Técnico -->
                     <div class="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs text-slate-700 dark:text-slate-300 space-y-1.5">
-                        <p><span class="font-semibold text-slate-900 dark:text-slate-100">Técnico que atendió:</span> {{ $conformityTicket->assigned_technician_name ?: 'Ing. Carlos Mendoza (Soporte TI)' }}</p>
+                        <p><span class="font-semibold text-slate-900 dark:text-slate-100">Técnico que atendió:</span> {{ $conformityTicket->assigned_technician_display ?: ($conformityTicket->assigned_technician_name ?: 'Ing. Carlos Mendoza (Soporte TI)') }}</p>
                         <p><span class="font-semibold text-slate-900 dark:text-slate-100">Diagnóstico:</span> {{ $conformityTicket->technicalDetail?->real_diagnosis ?: 'Cortocircuito irreversible en etapa de regulación VRM de placa madre e integrado puente sur calcinado.' }}</p>
                         <p><span class="font-semibold text-slate-900 dark:text-slate-100">Solución aplicada:</span> {{ $conformityTicket->technicalDetail?->solution_applied ?: 'Equipo tecnológicamente obsoleto sin disponibilidad de placas socket compatibles. Se emite baja técnica.' }}</p>
                     </div>

@@ -179,10 +179,10 @@
 
                                     <!-- 6. Técnico Asignado -->
                                     <td class="p-3 whitespace-nowrap">
-                                        @if ($t->assigned_technician_name)
+                                        @if ($t->assigned_technician_display ?: $t->assigned_technician_name)
                                             <div>
                                                 <div class="font-semibold text-slate-800 dark:text-slate-200">
-                                                    {{ $t->assigned_technician_name }}
+                                                    {{ $t->assigned_technician_display ?: $t->assigned_technician_name }}
                                                 </div>
                                                 <div class="text-[10px] text-slate-400 font-mono">
                                                     {{ $t->assigned_technician_phone ?? 'Anexo 104' }}

@@ -29,6 +29,22 @@ class GetActiveModulesAction
         } elseif ($role === 'mgomez') {
             // 2 módulos autorizados conforme a la captura: Central, Helpdesk
             $query->whereIn('code', ['central', 'helpdesk']);
+        } else {
+            $user = \App\Models\User::whereRaw('LOWER(username) = ?', [$role])->first() ?? auth()->user();
+            if ($user && strtolower(trim((string) $user->username)) !== 'root') {
+                if ($user->isReportante()) {
+                    $query->where('code', 'helpdesk');
+                } else {
+                    $allowed = (array) ($user->allowed_modules ?? []);
+                    if (in_array('admin', $allowed, true) && ! in_array('central', $allowed, true)) {
+                        $allowed[] = 'central';
+                    }
+                    if (in_array('central', $allowed, true) && ! in_array('admin', $allowed, true)) {
+                        $allowed[] = 'admin';
+                    }
+                    $query->whereIn('code', $allowed);
+                }
+            }
         }
 
         $term = trim((string) $search);

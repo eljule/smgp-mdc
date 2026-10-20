@@ -70,8 +70,15 @@
                             </label>
                             <select wire:model="bulkTargetTechnician" class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-slate-200" required>
                                 @foreach ($this->getOperationalTechnicians($bulkOriginTechnician) as $tech)
+                                    @php
+                                        $optUser = null;
+                                        if (preg_match('/\(([^)]+)\)$/', (string)$tech['name'], $m)) {
+                                            $optUser = trim($m[1]);
+                                        }
+                                        $optLabel = $optUser ? "{$optUser} ({$tech['activeTickets']} activos • {$tech['status']}) — {$tech['name']}" : "{$tech['name']} ({$tech['activeTickets']} activos • {$tech['status']})";
+                                    @endphp
                                     <option value="{{ $tech['name'] }}">
-                                        {{ $tech['name'] }} ({{ $tech['activeTickets'] }} tickets activos • {{ $tech['status'] }})
+                                        {{ $optLabel }}
                                     </option>
                                 @endforeach
                             </select>

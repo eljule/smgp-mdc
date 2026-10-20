@@ -33,6 +33,40 @@ use Livewire\WithPagination;
 #[Title('Mesa de Ayuda Informática - SIGM Castilla')]
 class Tickets extends Component
 {
+    protected function resolveTechnicianUser(?string $name): ?User
+    {
+        if (empty($name)) {
+            return null;
+        }
+
+        if (preg_match('/\(([^)]+)\)$/', $name, $matches)) {
+            $user = User::where('username', trim($matches[1]))->first();
+            if ($user) {
+                return $user;
+            }
+        }
+
+        return User::where('username', $name)->orWhere('full_name', $name)->first();
+    }
+
+    protected function getActiveTicketsQueryForTechnician(string $technicianName)
+    {
+        $user = $this->resolveTechnicianUser($technicianName);
+
+        $query = Ticket::query()->whereNotIn('status', ['RESUELTO', 'CERRADO']);
+
+        if ($user) {
+            $query->where(function ($q) use ($user, $technicianName) {
+                $q->where('assigned_technician_id', $user->id)
+                  ->orWhere('assigned_technician_name', $technicianName)
+                  ->orWhere('assigned_technician_name', $user->full_name);
+            });
+        } else {
+            $query->where('assigned_technician_name', $technicianName);
+        }
+
+        return $query;
+    }
     use WithFileUploads;
     use WithPagination;
 
@@ -431,7 +465,7 @@ class Tickets extends Component
     // ==========================================
     public function openDetailModal(int $ticketId): void
     {
-        $this->selectedTicketForDetail = Ticket::with(['technicalDetail', 'supplies', 'loans', 'auditLogs', 'office'])->find($ticketId);
+        $this->selectedTicketForDetail = Ticket::with(['technicalDetail', 'supplies', 'loans', 'auditLogs', 'office', 'assignedTechnician'])->find($ticketId);
         $this->isDetailModalOpen = true;
     }
 
@@ -444,9 +478,10 @@ class Tickets extends Component
         if ($ticket) {
             $ticket->status = 'EN_ATENCION';
             $ticket->started_at = now();
-            if (! $ticket->assigned_technician_name) {
+            if (! $ticket->assigned_technician_name && ! $ticket->assigned_technician_id) {
                 $user = auth()->user();
-                $ticket->assigned_technician_name = $user ? ($user->full_name ?? $user->name) : 'Ing. Carlos Mendoza (Soporte TI)';
+                $ticket->assigned_technician_id = $user?->id;
+                $ticket->assigned_technician_name = $user ? $user->full_name_with_username : 'Ing. Carlos Mendoza (Soporte TI)';
                 $ticket->assigned_technician_phone = 'Anexo 104';
             }
             $ticket->save();
@@ -456,7 +491,7 @@ class Tickets extends Component
                 'previous_status' => 'ABIERTO',
                 'new_status' => 'EN_ATENCION',
                 'action' => 'TICKET_TOMADO',
-                'performed_by_user_name' => auth()->user()?->name ?? 'Ing. Carlos Mendoza (Soporte TI)',
+                'performed_by_user_name' => auth()->user()?->full_name_with_username ?? auth()->user()?->name ?? 'Ing. Carlos Mendoza (Soporte TI)',
                 'notes' => 'El técnico ha tomado la atención del ticket.',
             ]);
 
@@ -602,7 +637,7 @@ class Tickets extends Component
     // ==========================================
     public function openDecommissionModal(int $ticketId): void
     {
-        $this->decommissionTicket = Ticket::with(['technicalDetail', 'office'])->find($ticketId);
+        $this->decommissionTicket = Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])->find($ticketId);
         $this->isDecommissionModalOpen = true;
     }
 
@@ -612,7 +647,7 @@ class Tickets extends Component
     public function openConformityModal(int $ticketId): void
     {
         $this->conformityTicketId = $ticketId;
-        $this->conformityTicket = Ticket::with(['technicalDetail', 'office'])->find($ticketId);
+        $this->conformityTicket = Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])->find($ticketId);
         $this->formUserRating = 5;
         $this->formUserConformity = true;
         $this->formUserFeedback = 'Solución verificada satisfactoriamente.';
@@ -690,13 +725,15 @@ class Tickets extends Component
         // Also check User table for any technician not yet in workload map
         $users = User::where('role', 'like', '%Soporte%')->orWhere('role', 'like', '%Administrador%')->get();
         foreach ($users as $u) {
-            $name = $u->full_name ?: $u->name;
+            $name = $u->full_name_with_username;
             $normalized = strtolower(trim($name));
             if ($excludeName && $normalized === strtolower(trim($excludeName))) {
                 continue;
             }
             if (! isset($seen[$normalized])) {
-                $count = Ticket::where('assigned_technician_name', $name)
+                $count = Ticket::where('assigned_technician_id', $u->id)
+                    ->orWhere('assigned_technician_name', $name)
+                    ->orWhere('assigned_technician_name', $u->full_name)
                     ->whereNotIn('status', ['RESUELTO', 'CERRADO'])
                     ->count();
 
@@ -717,14 +754,14 @@ class Tickets extends Component
     public function openReassignModal(int $ticketId): void
     {
         $this->reassignTicketId = $ticketId;
-        $ticket = Ticket::find($ticketId);
+        $ticket = Ticket::with('assignedTechnician')->find($ticketId);
 
-        $currentTech = $ticket?->assigned_technician_name;
+        $currentTech = $ticket?->assigned_technician_display ?: $ticket?->assigned_technician_name;
         $available = $this->getOperationalTechnicians($currentTech);
 
         $this->reassignTechnicianName = ! empty($available) ? $available[0]['name'] : '';
         $this->reassignTargetTechnician = $this->reassignTechnicianName;
-        $matchedUser = User::where('full_name', $this->reassignTechnicianName)->orWhere('username', $this->reassignTechnicianName)->first();
+        $matchedUser = $this->resolveTechnicianUser($this->reassignTechnicianName);
         $this->reassignUserId = $matchedUser?->id ?? User::first()?->id;
         $this->reassignNotes = 'Reasignación por especialidad técnica.';
         $this->reassignReason = $this->reassignNotes;
@@ -749,7 +786,7 @@ class Tickets extends Component
             return;
         }
 
-        $user = User::where('full_name', $targetName)->orWhere('username', $targetName)->first();
+        $user = $this->resolveTechnicianUser($targetName);
         if (! $user && ! empty($this->reassignUserId)) {
             $user = User::find($this->reassignUserId);
         }
@@ -790,9 +827,7 @@ class Tickets extends Component
     public function openBulkTransferModal(string $originTechnicianName): void
     {
         $this->bulkOriginTechnician = $originTechnicianName;
-        $activeTickets = Ticket::where('assigned_technician_name', $originTechnicianName)
-            ->whereNotIn('status', ['RESUELTO', 'CERRADO'])
-            ->get();
+        $activeTickets = $this->getActiveTicketsQueryForTechnician($originTechnicianName)->get();
 
         $this->bulkTicketsCount = $activeTickets->count();
 
@@ -811,8 +846,7 @@ class Tickets extends Component
 
     public function executeBulkTransfer(): void
     {
-        $activeTickets = Ticket::where('assigned_technician_name', $this->bulkOriginTechnician)
-            ->whereNotIn('status', ['RESUELTO', 'CERRADO'])
+        $activeTickets = $this->getActiveTicketsQueryForTechnician($this->bulkOriginTechnician)
             ->orderBy('priority', 'asc')
             ->get();
 
@@ -840,7 +874,7 @@ class Tickets extends Component
                 return;
             }
 
-            $targetUser = User::where('full_name', $targetName)->orWhere('username', $targetName)->first();
+            $targetUser = $this->resolveTechnicianUser($targetName);
             foreach ($activeTickets as $ticket) {
                 $prevStatus = $ticket->status;
                 if ($targetUser) {
@@ -873,7 +907,7 @@ class Tickets extends Component
             foreach ($activeTickets as $ticket) {
                 asort($workloadMap);
                 $targetName = array_key_first($workloadMap);
-                $targetUser = User::where('full_name', $targetName)->orWhere('username', $targetName)->first();
+                $targetUser = $this->resolveTechnicianUser($targetName);
 
                 $prevStatus = $ticket->status;
                 if ($targetUser) {
@@ -934,6 +968,10 @@ class Tickets extends Component
             return;
         }
 
+        $targetUser = $this->resolveTechnicianUser($technicianName);
+        if ($targetUser) {
+            $ticket->assigned_technician_id = $targetUser->id;
+        }
         $ticket->assigned_technician_name = $technicianName;
         $ticket->assigned_technician_phone = 'Anexo 104';
         $ticket->status = 'EN_ATENCION';
@@ -1071,7 +1109,7 @@ class Tickets extends Component
     public function render(GetHelpdeskDashboardMetricsAction $metricsAction): View
     {
         // 1. Tickets filtrados
-        $ticketsQuery = Ticket::with(['office', 'technicalDetail'])
+        $ticketsQuery = Ticket::with(['office', 'technicalDetail', 'assignedTechnician'])
             ->when($this->search, function ($q) {
                 $s = '%'.trim($this->search).'%';
                 $q->where(function ($sub) use ($s) {
@@ -1096,7 +1134,7 @@ class Tickets extends Component
         $tickets = $ticketsQuery->paginate($this->perPage);
 
         // 2. Mis Tickets (Portal Solicitante / Seguimiento)
-        $myTickets = Ticket::with(['office', 'technicalDetail'])
+        $myTickets = Ticket::with(['office', 'technicalDetail', 'assignedTechnician'])
             ->orderBy('ticket_number', 'asc')
             ->get();
 

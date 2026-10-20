@@ -142,4 +142,49 @@ class AuthTest extends TestCase
         ]);
         $this->assertStringContainsString('soporte/nuevo-ticket', $officeQrResponse->json('ticket_url'));
     }
+    public function test_reportante_user_login_redirects_to_helpdesk_tab_with_notice(): void
+    {
+        $user = User::where('username', '02821801')->first();
+        $this->assertNotNull($user);
+        $this->assertTrue($user->isReportante());
+
+        $response = $this->post('/login', [
+            'username' => '02821801',
+            'password' => 'admin123',
+        ]);
+
+        $response->assertRedirect('/?tab=helpdesk&dni=02821801');
+        $response->assertSessionHas('info');
+
+        // Follow redirect to login page and check tab and banner
+        $pageResponse = $this->get('/login?tab=helpdesk&dni=02821801');
+        $pageResponse->assertStatus(200);
+        $pageResponse->assertSee('Mesa de Ayuda TI');
+        $pageResponse->assertSee('02821801');
+    }
+
+    public function test_reportante_user_is_blocked_from_admin_and_itam_subsystems(): void
+    {
+        $user = User::where('username', '02821801')->first();
+        $this->assertNotNull($user);
+        $this->actingAs($user);
+
+        // Intento de entrar al panel admin
+        $adminResponse = $this->get('/admin');
+        $adminResponse->assertRedirect('/?tab=helpdesk&dni=02821801');
+        $adminResponse->assertSessionHas('info');
+
+        // Intento de entrar a ITAM
+        $itamResponse = $this->get('/itam');
+        $itamResponse->assertRedirect('/?tab=helpdesk&dni=02821801');
+        $itamResponse->assertSessionHas('info');
+
+        // Intento de entrar a la cola técnica de helpdesk -> redirige a la pestaña de mesa de ayuda
+        $helpdeskResponse = $this->get('/helpdesk');
+        $helpdeskResponse->assertRedirect('/?tab=helpdesk&dni=02821801');
+
+        // Acceso permitido al registro de tickets
+        $ticketResponse = $this->get('/soporte/nuevo-ticket');
+        $ticketResponse->assertStatus(200);
+    }
 }

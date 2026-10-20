@@ -38,13 +38,18 @@ final class GetHelpdeskDashboardMetricsAction
 
         // Cargas de Trabajo (RF-13)
         $techMap = [];
-        $allTickets = Ticket::orderBy('ticket_number', 'asc')->get();
+        $allTickets = Ticket::with('assignedTechnician')->orderBy('ticket_number', 'asc')->get();
 
         foreach ($allTickets as $t) {
-            if ($t->assigned_technician_name) {
-                $techName = $t->assigned_technician_name;
+            $techName = $t->assigned_technician_display ?: $t->assigned_technician_name;
+            if ($techName) {
                 if (! isset($techMap[$techName])) {
+                    $uName = $t->assignedTechnician?->username;
+                    if (! $uName && preg_match('/\(([^)]+)\)$/', (string) $techName, $m)) {
+                        $uName = trim($m[1]);
+                    }
                     $techMap[$techName] = [
+                        'username' => $uName ?: $techName,
                         'inProgress' => 0,
                         'resolved' => 0,
                         'total' => 0,
@@ -80,6 +85,7 @@ final class GetHelpdeskDashboardMetricsAction
 
             $techniciansWorkload[] = [
                 'technicianName' => $techName,
+                'username' => $d['username'] ?? $techName,
                 'inProgressCount' => $d['inProgress'],
                 'resolvedCount' => $d['resolved'],
                 'totalAssigned' => $d['total'],

@@ -63,6 +63,7 @@
                         $activeAuthUser = auth()->user();
                         $displayInitials = $activeAuthUser?->initials ?? ($userInfo['initials'] ?? 'RO');
                         $displayTitle = $activeAuthUser ? ($activeAuthUser->display_title ?? mb_strtoupper($activeAuthUser->full_name)) : ($userInfo['title'] ?? 'ADMINISTRADOR DEL SISTEMA SIGM');
+                        $displayUsername = $activeAuthUser?->username ?? ($userInfo['name'] ?? null);
                         $displayRole = $activeAuthUser?->display_role ?? ($userInfo['role'] ?? 'Administrador Central');
                     @endphp
                     <div class="hidden sm:flex items-center gap-2.5 bg-emerald-900/60 border border-emerald-700/60 rounded-lg px-3 py-1.5">
@@ -70,7 +71,14 @@
                             {{ $displayInitials }}
                         </div>
                         <div class="flex flex-col text-left">
-                            <span class="text-xs font-semibold leading-tight text-white">{{ $displayTitle }}</span>
+                            <span class="text-xs font-semibold leading-tight text-white flex items-center gap-1.5">
+                                {{ $displayTitle }}
+                                @if(!empty($displayUsername) && strtolower($displayUsername) !== 'root')
+                                    <span class="text-[10px] lowercase font-mono bg-emerald-800/80 px-1.5 py-0.5 rounded text-emerald-200 border border-emerald-600/40">
+                                        ({{ $displayUsername }})
+                                    </span>
+                                @endif
+                            </span>
                             <span class="text-[10px] text-emerald-200 leading-tight">{{ $displayRole }}</span>
                         </div>
                     </div>

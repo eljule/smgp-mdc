@@ -21,6 +21,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             \App\Http\Middleware\EnsurePasswordIsChanged::class,
         ]);
+        $middleware->alias([
+            'subsystem' => \App\Http\Middleware\EnsureSubsystemAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

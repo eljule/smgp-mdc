@@ -60,8 +60,8 @@
                 <div class="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-800 px-6 py-3 flex flex-wrap items-center justify-between gap-2 text-xs shrink-0">
                     <div class="flex items-center space-x-2">
                         <span class="text-slate-500 dark:text-slate-400 font-medium">Técnico Asignado:</span>
-                        @if ($selectedTicketForDetail->assigned_technician_name)
-                            <strong class="font-bold text-slate-800 dark:text-slate-100">{{ $selectedTicketForDetail->assigned_technician_name }}</strong>
+                        @if ($selectedTicketForDetail->assigned_technician_display ?: $selectedTicketForDetail->assigned_technician_name)
+                            <strong class="font-bold text-slate-800 dark:text-slate-100">{{ $selectedTicketForDetail->assigned_technician_display ?: $selectedTicketForDetail->assigned_technician_name }}</strong>
                             <span class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-[11px] font-mono">
                                 {{ $selectedTicketForDetail->assigned_technician_phone ?? 'Anexo 104' }}
                             </span>

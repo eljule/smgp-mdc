@@ -41,6 +41,8 @@ class ModuleLauncher extends Component
 
         $normalized = strtolower(trim($targetUser));
 
+        $userModel = \App\Models\User::whereRaw('LOWER(username) = ?', [$normalized])->first() ?? $authUser;
+
         $userInfo = match ($normalized) {
             'jperez' => [
                 'initials' => 'JP',
@@ -59,12 +61,16 @@ class ModuleLauncher extends Component
                 'assignedCount' => 2,
             ],
             default => [
-                'initials' => $authUser?->initials ?? 'RO',
-                'name' => $authUser?->username ?? $targetUser,
-                'title' => $authUser ? ($authUser->display_title ?? mb_strtoupper($authUser->full_name)) : 'ADMINISTRADOR DEL SISTEMA SIGM',
-                'role' => $authUser?->display_role ?? 'Administrador Central',
-                'description' => 'Cuenta con privilegios totales de administración. Todos los subsistemas distritales se encuentran habilitados.',
-                'assignedCount' => 4,
+                'initials' => $userModel?->initials ?? ($authUser?->initials ?? 'RO'),
+                'name' => $userModel?->username ?? $targetUser,
+                'title' => $userModel ? ($userModel->display_title ?? mb_strtoupper((string) $userModel->full_name)) : 'ADMINISTRADOR DEL SISTEMA SIGM',
+                'role' => $userModel?->display_role ?? 'Personal Municipal',
+                'description' => $userModel?->isReportante()
+                    ? 'Acceso concedido exclusivamente al módulo de Mesa de Ayuda para el registro de tickets de soporte.'
+                    : ($userModel && strtolower(trim((string) $userModel->username)) === 'root'
+                        ? 'Cuenta con privilegios totales de administración. Todos los subsistemas distritales se encuentran habilitados.'
+                        : 'Acceso autorizado a sus subsistemas municipales asignados.'),
+                'assignedCount' => $userModel ? ($userModel->isReportante() ? 1 : count((array) ($userModel->allowed_modules ?? []))) : 4,
             ],
         };
 

@@ -57,6 +57,14 @@ class MaintenanceOrder extends Model
 
     public function getAssignedTechnicianNameAttribute(): ?string
     {
-        return $this->technician_name ?? ($this->attributes['assigned_technician_name'] ?? 'Equipo Técnico ODT');
+        $raw = $this->technician_name ?? ($this->attributes['assigned_technician_name'] ?? 'Equipo Técnico ODT');
+        if (! empty($raw) && ! str_contains($raw, '(')) {
+            $user = \App\Models\User::where('full_name', $raw)->orWhere('username', $raw)->first();
+            if ($user) {
+                return $user->full_name_with_username;
+            }
+        }
+
+        return $raw;
     }
 }

@@ -85,6 +85,18 @@ class User extends Authenticatable
         return mb_strtoupper(mb_substr((string) $this->username, 0, 2));
     }
 
+    public function getFullNameWithUsernameAttribute(): string
+    {
+        $name = trim((string) ($this->full_name ?: $this->username));
+        $username = trim((string) $this->username);
+
+        if ($username !== '' && strtolower($username) !== strtolower($name)) {
+            return "{$name} ({$username})";
+        }
+
+        return $name;
+    }
+
     public function getDisplayTitleAttribute(): string
     {
         if (strtolower(trim((string) $this->username)) === 'root') {
@@ -170,5 +182,44 @@ class User extends Authenticatable
         $this->password_changed_at = now();
         $this->failed_login_attempts = 0;
         $this->save();
+    }
+
+    public function isReportante(): bool
+    {
+        $roleName = mb_strtolower(trim((string) $this->role));
+        if (str_contains($roleName, 'reportante')) {
+            return true;
+        }
+
+        $allowed = (array) ($this->allowed_modules ?? []);
+
+        return count($allowed) === 1 && in_array('helpdesk', $allowed, true);
+    }
+
+    public function canAccessSubsystem(string $subsystem): bool
+    {
+        if (strtolower(trim((string) $this->username)) === 'root') {
+            return true;
+        }
+
+        $roleName = mb_strtolower(trim((string) $this->role));
+        if ($roleName === 'administrador central') {
+            return true;
+        }
+
+        // Si es reportante, no accede a paneles técnicos ni administrativos
+        if ($this->isReportante()) {
+            return false;
+        }
+
+        $allowed = (array) ($this->allowed_modules ?? []);
+        if (in_array('admin', $allowed, true) && ! in_array('central', $allowed, true)) {
+            $allowed[] = 'central';
+        }
+        if (in_array('central', $allowed, true) && ! in_array('admin', $allowed, true)) {
+            $allowed[] = 'admin';
+        }
+
+        return in_array($subsystem, $allowed, true);
     }
 }

@@ -463,7 +463,7 @@ class NewTicket extends Component
     public function openConformityModal(int $ticketId): void
     {
         $this->conformityTicketId = $ticketId;
-        $this->conformityTicket = Ticket::with(['technicalDetail', 'office'])->find($ticketId);
+        $this->conformityTicket = Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])->find($ticketId);
         $this->formUserConformity = true;
         $this->formUserRating = 5;
         $this->formUserFeedback = 'Solución verificada satisfactoriamente en mi puesto de trabajo.';
@@ -542,7 +542,7 @@ class NewTicket extends Component
 
         // Consulta de tickets del área especificada en officeName
         $cleanOffice = trim($this->officeName);
-        $baseQuery = Ticket::with(['technicalDetail', 'office'])
+        $baseQuery = Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])
             ->when(! empty($cleanOffice), function ($q) use ($cleanOffice) {
                 $q->where(function ($sub) use ($cleanOffice) {
                     $sub->where('office_name', $cleanOffice)
