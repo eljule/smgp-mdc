@@ -42,7 +42,7 @@
 
             $custodianName = $actaMovement?->new_custodian_name
                 ?? ($actaLoan?->requesting_name
-                ?? ($effAsset?->assignedPerson ? trim($effAsset->assignedPerson->first_name . ' ' . $effAsset->assignedPerson->last_name) : 'CARLOS ENRIQUE MENDOZA CHUNGA'));
+                ?? ($effAsset?->assignedPerson ? $effAsset->assignedPerson->full_name : 'CARLOS ENRIQUE MENDOZA CHUNGA'));
 
             $specs = is_array($effAsset?->specifications)
                 ? $effAsset->specifications
@@ -253,7 +253,7 @@
                                         <td class="border border-slate-300 p-2 font-semibold">Ubicación / Oficina</td>
                                         <td class="border border-slate-300 p-2">{{ $effAsset->office ?: 'Oficina TI' }}</td>
                                         <td class="border border-slate-300 p-2 font-semibold">Custodio / Responsable</td>
-                                        <td class="border border-slate-300 p-2">{{ $effAsset->assignedPerson ? trim($effAsset->assignedPerson->first_name . ' ' . $effAsset->assignedPerson->last_name) : 'Sin asignar' }}</td>
+                                        <td class="border border-slate-300 p-2">{{ $effAsset->assignedPerson ? $effAsset->assignedPerson->full_name : 'Sin asignar' }}</td>
                                     </tr>
                                 </tbody>
                             </table>

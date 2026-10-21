@@ -357,7 +357,7 @@ class NewTicket extends Component
             $this->selectedAssetName = "{$asset->computer_code} - {$this->selectedAssetCategory}";
 
             if ($asset->assignedPerson) {
-                $this->applicantName = $asset->assignedPerson->first_name.' '.$asset->assignedPerson->last_name;
+                $this->applicantName = $asset->assignedPerson->full_name;
                 $this->resolveOfficesForApplicant($this->applicantName, $asset->office);
             } elseif (! empty($asset->office)) {
                 $this->officeName = $asset->office;
@@ -460,10 +460,55 @@ class NewTicket extends Component
         $this->trackingStatusFilter = $filter;
     }
 
+    public function canApproveConformity(?Ticket $ticket = null): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+        if ($ticket) {
+            return $ticket->canUserGiveConformity(auth()->user());
+        }
+        return auth()->user()->canApproveTicketConformity();
+    }
+
+    public function getPendingConformityTickets(): \Illuminate\Support\Collection
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return collect();
+        }
+
+        return Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])
+            ->whereIn('status', ['RESUELTO', 'CERRADO'])
+            ->where(function ($q) {
+                $q->whereNull('user_conformity')->orWhere('user_conformity', false);
+            })
+            ->get()
+            ->filter(fn ($t) => $t->isApplicantUser($user));
+    }
+
     public function openConformityModal(int $ticketId): void
     {
+        $ticket = Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])->find($ticketId);
+        if (! $ticket) {
+            $this->errorMessage = 'Ticket no encontrado.';
+            return;
+        }
+
+        if (! $ticket->canUserGiveConformity(auth()->user())) {
+            if (! $ticket->canReceiveUserConformity()) {
+                $this->flashMessage = $ticket->user_conformity
+                    ? "El ticket {$ticket->ticket_number} ya cuenta con visto bueno registrado."
+                    : "El visto bueno solo puede otorgarse a tickets resueltos o cerrados pendientes de conformidad.";
+            } else {
+                $this->flashMessage = "Acceso restringido: El visto bueno solo puede ser otorgado por el usuario solicitante, el Jefe de Oficina de ODT, el usuario root o personal de soporte técnico autorizado.";
+            }
+            $this->flashType = 'warning';
+            return;
+        }
+
         $this->conformityTicketId = $ticketId;
-        $this->conformityTicket = Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])->find($ticketId);
+        $this->conformityTicket = $ticket;
         $this->formUserConformity = true;
         $this->formUserRating = 5;
         $this->formUserFeedback = 'Solución verificada satisfactoriamente en mi puesto de trabajo.';
@@ -502,6 +547,13 @@ class NewTicket extends Component
         if (! $ticket) {
             $this->closeConformityModal();
 
+            return;
+        }
+
+        if (! $ticket->canUserGiveConformity(auth()->user())) {
+            $this->closeConformityModal();
+            $this->flashMessage = 'Acción no permitida: No cuenta con autorización para otorgar visto bueno a este ticket.';
+            $this->flashType = 'warning';
             return;
         }
 

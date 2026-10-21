@@ -23,6 +23,14 @@ final class GetUsersCatalogAction
             'subsystems' => ['admin', 'itam', 'transportes', 'helpdesk'],
         ],
         [
+            'key' => 'leader',
+            'title' => 'Jefe de Oficina / Soporte TI',
+            'dotColor' => 'indigo',
+            'description' => 'Jefatura de mesa de ayuda: supervisión operativa, coordinación, delegación y transferencia de tickets.',
+            'modulesCount' => 2,
+            'subsystems' => ['itam', 'helpdesk'],
+        ],
+        [
             'key' => 'itam',
             'title' => 'Técnico de Soporte e ITAM',
             'dotColor' => 'blue',

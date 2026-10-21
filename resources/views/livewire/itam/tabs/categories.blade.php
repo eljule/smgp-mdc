@@ -37,12 +37,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 line-clamp-2 pb-4 border-b border-slate-100 dark:border-slate-800">
                                 {{ $cat->description ?: 'Categoría estándar para inventario tecnológico municipal.' }}
                             </p>
+                            @php
+                                $customFieldsCount = is_array($cat->custom_fields) ? count($cat->custom_fields) : 0;
+                            @endphp
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                                    Parámetros Técnicos ({{ $customFieldsCount }})
+                                </span>
+                            </div>
 
                             <!-- Campos Dinámicos en Tag -->
-                            @if (!empty($cat->custom_fields))
+                            @if ($customFieldsCount > 0)
                                 <div class="flex flex-wrap gap-1.5 pt-1">
                                     @foreach ($cat->custom_fields as $cf)
                                         <span class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-semibold">
@@ -50,6 +58,10 @@
                                         </span>
                                     @endforeach
                                 </div>
+                            @else
+                                <p class="text-[11px] text-slate-400 italic pt-0.5">
+                                    Sin parámetros configurados
+                                </p>
                             @endif
                         </div>
 

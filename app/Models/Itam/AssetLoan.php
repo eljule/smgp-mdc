@@ -62,4 +62,14 @@ class AssetLoan extends Model
     {
         return $this->start_date;
     }
+
+    public function getRequestingNameAttribute(): ?string
+    {
+        return $this->applicant_person_name;
+    }
+
+    public function getDepartmentAttribute(): ?string
+    {
+        return $this->applicant_office_name;
+    }
 }

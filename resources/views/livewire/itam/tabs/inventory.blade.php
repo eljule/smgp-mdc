@@ -235,7 +235,7 @@
                                             {{ $asset->office ?: 'Almacén TI' }}
                                         </span>
                                         <span class="text-[10px] text-slate-400 block">
-                                            👤 {{ $asset->assignedPerson ? $asset->assignedPerson->first_name . ' ' . $asset->assignedPerson->last_name : 'Sin custodio' }}
+                                            👤 {{ $asset->assignedPerson ? $asset->assignedPerson->full_name : 'Sin custodio' }}
                                         </span>
                                     </td>
 

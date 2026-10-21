@@ -23,6 +23,7 @@
     {{-- ========================================================================= --}}
     @include('livewire.helpdesk.modals.create-ticket-modal')
     @include('livewire.helpdesk.modals.ticket-detail-modal')
+    @include('livewire.helpdesk.modals.ticket-pause-modal')
     @include('livewire.helpdesk.modals.ticket-resolution-modal')
     @include('livewire.helpdesk.modals.ticket-supplies-modal')
     @include('livewire.helpdesk.modals.ticket-provisional-loan-modal')

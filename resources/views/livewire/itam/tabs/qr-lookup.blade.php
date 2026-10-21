@@ -44,7 +44,7 @@
                                 {{ $lookupResult->brand?->name }} {{ $lookupResult->model?->name }} ({{ $lookupResult->category?->name }})
                             </h4>
                             <p class="text-xs text-emerald-200/80">
-                                📍 {{ $lookupResult->office ?: 'Almacén ODT' }} &bull; Custodio: {{ $lookupResult->assignedPerson ? $lookupResult->assignedPerson->first_name . ' ' . $lookupResult->assignedPerson->last_name : 'Sin asignar' }}
+                                📍 {{ $lookupResult->office ?: 'Almacén ODT' }} &bull; Custodio: {{ $lookupResult->assignedPerson ? $lookupResult->assignedPerson->full_name : 'Sin asignar' }}
                             </p>
                         </div>
                         <button type="button"

@@ -217,4 +217,100 @@ class User extends Authenticatable
 
         return in_array($subsystem, $allowed, true);
     }
+    public function hasPermission(string $permissionCode): bool
+    {
+        if (strtolower(trim((string) $this->username)) === 'root') {
+            return true;
+        }
+
+        $roleName = mb_strtolower(trim((string) $this->role));
+        if ($roleName === 'administrador central' || str_contains($roleName, 'jefe') || str_contains($roleName, 'coordinador')) {
+            return true;
+        }
+
+        static $rolePermsCache = [];
+        $roleKey = (string) $this->role;
+        if (! array_key_exists($roleKey, $rolePermsCache)) {
+            $roleModel = \App\Models\Role::where('name', $this->role)
+                ->orWhere('code', $this->role)
+                ->first();
+
+            $perms = [];
+            if ($roleModel) {
+                $raw = $roleModel->permission_codes;
+                if (is_array($raw)) {
+                    $perms = $raw;
+                } elseif (is_string($raw)) {
+                    $perms = json_decode($raw, true) ?: [];
+                }
+            }
+            $rolePermsCache[$roleKey] = $perms;
+        }
+
+        return in_array($permissionCode, $rolePermsCache[$roleKey] ?? [], true);
+    }
+
+    public function canReassignTickets(): bool
+    {
+        if (strtolower(trim((string) $this->username)) === 'root') {
+            return true;
+        }
+
+        $roleName = mb_strtolower(trim((string) $this->role));
+        if ($roleName === 'administrador central' || str_contains($roleName, 'jefe') || str_contains($roleName, 'coordinador')) {
+            return true;
+        }
+
+        return $this->hasPermission('helpdesk.tickets.assign');
+    }
+
+    public function canApproveTicketConformity(): bool
+    {
+        // 1. El usuario root siempre tiene autoridad absoluta
+        if (strtolower(trim((string) $this->username)) === 'root') {
+            return true;
+        }
+
+        // 2. El Jefe de Oficina de ODT (o Administrador Central / Jefatura Soporte TI)
+        $roleName = mb_strtolower(trim((string) $this->role));
+        if ($roleName === 'administrador central'
+            || $roleName === 'jefe de oficina / soporte ti'
+            || str_contains($roleName, 'jefe')
+            || str_contains($roleName, 'coordinador')) {
+            return true;
+        }
+
+        // 3. Algún usuario de soporte que se le asigne esa autoridad
+        return $this->hasPermission('helpdesk.tickets.approve')
+            || in_array('helpdesk.tickets.approve', (array) ($this->allowed_modules ?? []), true)
+            || in_array('helpdesk.approve', (array) ($this->allowed_modules ?? []), true);
+    }
+
+    public function canManageTicket(\App\Models\Helpdesk\Ticket $ticket): bool
+    {
+        // Administrador central, jefe o quien tenga facultad de asignación/supervisión
+        if ($this->canReassignTickets()) {
+            return true;
+        }
+
+        // Ticket abierto sin asignar puede ser tomado por cualquier técnico
+        if (! $ticket->assigned_technician_id && empty($ticket->assigned_technician_name)) {
+            return true;
+        }
+
+        // Si tiene ID de técnico asignado, la validación es estricta por ID
+        if ($ticket->assigned_technician_id) {
+            return (int) $ticket->assigned_technician_id === (int) $this->id;
+        }
+
+        // En caso de no tener ID pero sí nombre (datos legados), validar por username
+        $techName = mb_strtolower(trim((string) $ticket->assigned_technician_name));
+        $userU = mb_strtolower(trim((string) $this->username));
+
+        if ($techName !== '' && $userU !== '' && str_contains($techName, "({$userU})")) {
+            return true;
+        }
+
+        return false;
+    }
 }

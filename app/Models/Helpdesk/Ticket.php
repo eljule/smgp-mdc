@@ -139,6 +139,74 @@ class Ticket extends Model
         return $this->hasMany(TicketAuditLog::class, 'ticket_id');
     }
 
+    public function canReceiveUserConformity(): bool
+    {
+        return in_array(strtoupper((string) $this->status), ['RESUELTO', 'CERRADO'], true)
+            && ! (bool) $this->user_conformity;
+    }
+
+    public function isApplicantUser(?User $user = null): bool
+    {
+        if (! $user) {
+            $user = auth()->user();
+        }
+        if (! $user) {
+            return false;
+        }
+
+        // 1. Por ID de persona vinculada al solicitante
+        if ($this->applicant_id && $user->person_id && (int) $this->applicant_id === (int) $user->person_id) {
+            return true;
+        }
+
+        // 2. Por correo electrónico del solicitante
+        if (! empty($this->applicant_email) && ! empty($user->email) && strtolower(trim((string) $this->applicant_email)) === strtolower(trim((string) $user->email))) {
+            return true;
+        }
+
+        // 3. Por nombre completo de usuario
+        $appliName = mb_strtolower(trim((string) $this->applicant_name));
+        $userName = mb_strtolower(trim((string) $user->full_name));
+        if ($appliName !== '' && $userName !== '') {
+            if ($appliName === $userName || str_contains($userName, $appliName) || str_contains($appliName, $userName)) {
+                return true;
+            }
+        }
+
+        // 4. Por persona vinculada al usuario
+        if ($user->person) {
+            $personName = mb_strtolower(trim((string) $user->person->full_name));
+            if ($personName !== '' && ($appliName === $personName || str_contains($personName, $appliName) || str_contains($appliName, $personName))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function canUserGiveConformity(?User $user = null): bool
+    {
+        if (! $this->canReceiveUserConformity()) {
+            return false;
+        }
+
+        if (! $user) {
+            $user = auth()->user();
+        }
+
+        if (! $user) {
+            return false;
+        }
+
+        // 1. Autoridad institucional: root, jefe de ODT o técnico con autoridad delegada
+        if ($user->canApproveTicketConformity()) {
+            return true;
+        }
+
+        // 2. Usuario reportante / solicitante del ticket
+        return $this->isApplicantUser($user);
+    }
+
     public function histories(): HasMany
     {
         return $this->auditLogs();

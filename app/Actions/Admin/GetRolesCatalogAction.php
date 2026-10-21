@@ -81,6 +81,25 @@ final class GetRolesCatalogAction
             'scopeIcon' => '💻',
             'scopeColorHex' => '#2563eb',
             'description' => 'Gestión operativa de activos informáticos, marcas, modelos y atención de tickets de soporte.',
+            'grantedPermissions' => 9,
+            'totalPermissions' => 19,
+            'percentage' => 47,
+            'isSystem' => false,
+            'type' => 'Personalizado',
+            'status' => 'Activo',
+        ],
+        [
+            'id' => 5,
+            'name' => 'Jefe de Oficina / Soporte TI',
+            'code' => 'helpdesk_leader',
+            'icon' => '👔',
+            'iconBgHex' => '#4f46e520',
+            'iconColorHex' => '#4f46e5',
+            'scopeKey' => 'helpdesk',
+            'scopeLabel' => 'Soporte y Helpdesk',
+            'scopeIcon' => '🎧',
+            'scopeColorHex' => '#4f46e5',
+            'description' => 'Jefatura de mesa de ayuda: supervisión operativa, coordinación, delegación y transferencia de tickets.',
             'grantedPermissions' => 10,
             'totalPermissions' => 19,
             'percentage' => 53,
@@ -116,6 +135,39 @@ final class GetRolesCatalogAction
                     }
                 }
                 unset($r);
+
+                foreach ($dbRoles as $code => $dbRole) {
+                    $found = false;
+                    foreach ($all as $ex) {
+                        if ($ex['code'] === $code) {
+                            $found = true;
+                            break;
+                        }
+                    }
+                    if (! $found) {
+                        $perms = (array) ($dbRole->permission_codes ?? []);
+                        $count = count($perms);
+                        $all[] = [
+                            'id' => $dbRole->id,
+                            'name' => $dbRole->name,
+                            'code' => $dbRole->code,
+                            'icon' => '👔',
+                            'iconBgHex' => '#4f46e520',
+                            'iconColorHex' => '#4f46e5',
+                            'scopeKey' => $dbRole->subsystem_code === 'helpdesk_support' ? 'helpdesk' : ($dbRole->subsystem_code ?: 'global'),
+                            'scopeLabel' => 'Soporte y Helpdesk',
+                            'scopeIcon' => '🎧',
+                            'scopeColorHex' => '#4f46e5',
+                            'description' => $dbRole->description ?: 'Rol institucional configurado en el sistema.',
+                            'grantedPermissions' => $count,
+                            'totalPermissions' => 19,
+                            'percentage' => (int) round(($count / 19) * 100),
+                            'isSystem' => (bool) $dbRole->is_system,
+                            'type' => $dbRole->is_system ? 'Sistema' : 'Personalizado',
+                            'status' => 'Activo',
+                        ];
+                    }
+                }
             }
         } catch (\Throwable) {
         }
@@ -160,13 +212,13 @@ final class GetRolesCatalogAction
             'from' => $from,
             'to' => $to,
             'counts' => [
-                'total' => count(self::ROLES_DATA),
-                'system' => 1,
-                'custom' => 3,
-                'transportes' => 1,
-                'itam' => 1,
-                'helpdesk' => 1,
-                'global' => 0,
+                'total' => count($all),
+                'system' => count(array_filter($all, fn ($r) => ! empty($r['isSystem']))),
+                'custom' => count(array_filter($all, fn ($r) => empty($r['isSystem']))),
+                'transportes' => count(array_filter($all, fn ($r) => ($r['scopeKey'] ?? '') === 'transportes')),
+                'itam' => count(array_filter($all, fn ($r) => ($r['scopeKey'] ?? '') === 'itam')),
+                'helpdesk' => count(array_filter($all, fn ($r) => ($r['scopeKey'] ?? '') === 'helpdesk')),
+                'global' => count(array_filter($all, fn ($r) => ($r['scopeKey'] ?? '') === 'global')),
             ],
         ];
     }

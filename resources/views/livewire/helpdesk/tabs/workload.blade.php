@@ -168,7 +168,7 @@
                                 <p class="text-[11px] text-slate-400">Oficina de Informática y Sistemas</p>
                             </div>
                             <div class="flex items-center gap-2">
-                                @if($tech['inProgressCount'] > 0)
+                                @if($tech['inProgressCount'] > 0 && $this->canReassignTickets())
                                     <button type="button"
                                             wire:click="openBulkTransferModal('{{ addslashes($tech['technicianName']) }}')"
                                             class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer shadow-xs active:scale-95"
@@ -230,11 +230,11 @@
                                             </span> - {{ $t->subject }}
                                         </div>
                                         <div class="flex items-center gap-1.5 shrink-0">
-                                            @if(!in_array($t->status, ['RESUELTO', 'CERRADO']))
+                                            @if(!in_array($t->status, ['RESUELTO', 'CERRADO']) && $this->canReassignTickets())
                                                 <button type="button"
                                                         wire:click.stop="openReassignModal({{ $t->id }})"
                                                         class="opacity-0 group-hover:opacity-100 focus:opacity-100 px-1.5 py-0.5 rounded text-[10px] font-bold text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-300 dark:hover:bg-indigo-600 border border-indigo-200 dark:border-indigo-800 transition-all cursor-pointer flex items-center gap-0.5"
-                                                        title="Traspasar ticket {{ $t->ticket_number }} a otro técnico">
+                                                        title="Traspasar ticket {{ $t->ticket_number }} a otro técnico (Jefatura)">
                                                     <span>⇄</span>
                                                     <span>Traspasar</span>
                                                 </button>

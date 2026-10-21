@@ -18,6 +18,30 @@
                 </button>
             </div>
 
+            <!-- Alerta Preventiva: Tickets Pendientes de Visto Bueno -->
+            @php
+                $pendingMyTickets = $myTickets->filter(fn ($t) => $t->canReceiveUserConformity() && $t->canUserGiveConformity(auth()->user()));
+            @endphp
+
+            @if ($pendingMyTickets->isNotEmpty())
+                <div class="p-4 rounded-2xl bg-amber-50/90 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700 shadow-sm space-y-2 animate-fadeIn">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-xl">⭐</span>
+                            <h4 class="text-xs sm:text-sm font-bold text-amber-900 dark:text-amber-200">
+                                Tiene {{ $pendingMyTickets->count() }} ticket(s) resueltos pendientes de su Visto Bueno
+                            </h4>
+                        </div>
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100">
+                            Acción Pendiente
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-amber-800/90 dark:text-amber-300/90">
+                        La atención técnica ha finalizado. Por favor otorgue su visto bueno a sus incidencias para proceder al cierre formal.
+                    </p>
+                </div>
+            @endif
+
             <!-- Lista de Tickets del Solicitante -->
             <div class="space-y-4">
                 @forelse ($myTickets as $t)
@@ -72,15 +96,26 @@
 
                         <!-- Botón de Conformidad y Acciones -->
                         <div class="flex flex-col sm:flex-row items-end sm:items-center gap-2 self-stretch md:self-auto justify-end">
-                            @if ($t->status === 'RESUELTO')
-                                <button
-                                    type="button"
-                                    wire:click="openConformityModal({{ $t->id }})"
-                                    class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
-                                >
-                                    <span>⭐</span>
-                                    <span>Dar Visto Bueno (Conformidad)</span>
-                                </button>
+                            @if ($t->canReceiveUserConformity())
+                                @if ($t->canUserGiveConformity(auth()->user()))
+                                    <button
+                                        type="button"
+                                        wire:click="openConformityModal({{ $t->id }})"
+                                        class="w-full sm:w-auto px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-md transition-colors flex items-center justify-center space-x-1.5 cursor-pointer"
+                                    >
+                                        <span>⭐</span>
+                                        <span>Dar Visto Bueno (Conformidad)</span>
+                                    </button>
+                                @else
+                                    <span class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 rounded-xl text-xs font-semibold">
+                                        ⏳ Resuelto (Esperando Visto Bueno del Solicitante o Jefatura ODT)
+                                    </span>
+                                @endif
+                            @elseif ($t->user_conformity)
+                                <span class="px-3 py-1.5 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 rounded-xl text-xs font-bold flex items-center gap-1">
+                                    <span>✅</span>
+                                    <span>Visto Bueno Otorgado (★ {{ $t->user_rating ?? 5 }}/5)</span>
+                                </span>
                             @endif
 
                             @if ($t->technicalDetail?->is_definitive_decommission)

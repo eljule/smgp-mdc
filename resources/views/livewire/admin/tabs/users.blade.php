@@ -89,6 +89,17 @@
             </button>
             <button
                 type="button"
+                wire:click="setRoleFilter('Jefe de Oficina / Soporte TI')"
+                class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer flex items-center justify-center space-x-1.5 whitespace-nowrap {{ $roleFilter === 'Jefe de Oficina / Soporte TI'
+                    ? 'bg-white dark:bg-slate-900 text-indigo-800 dark:text-indigo-300 shadow-xs font-bold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                }}"
+            >
+                <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                <span>Jefe Soporte TI</span>
+            </button>
+            <button
+                type="button"
                 wire:click="setRoleFilter('Técnico de Soporte e ITAM')"
                 class="px-3 py-1.5 rounded-md font-semibold transition-colors flex-1 sm:flex-initial cursor-pointer flex items-center justify-center space-x-1.5 whitespace-nowrap {{ $roleFilter === 'Técnico de Soporte e ITAM'
                     ? 'bg-white dark:bg-slate-900 text-blue-800 dark:text-blue-300 shadow-xs font-bold'

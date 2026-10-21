@@ -40,15 +40,24 @@
                             </span>
                         </div>
 
-                        <div class="flex items-center justify-between p-3.5 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-xs">
+                        @php
+                            $totalVerifs = $aud->verifications?->count() ?? 0;
+                            $conciliatedVerifs = $aud->verifications ? $aud->verifications->whereIn('status', ['CONCILIADO', 'TRASLADADO_NO_AUTORIZADO'])->count() : 0;
+                            $progressPct = $totalVerifs > 0 ? (int) round(($conciliatedVerifs / $totalVerifs) * 100) : 0;
+                        @endphp
+                        <div class="grid grid-cols-3 gap-2 p-3 bg-slate-50 dark:bg-slate-800/60 rounded-xl text-xs">
                             <div>
-                                <span class="text-[11px] text-slate-400 font-medium block">Total Activos Censados</span>
-                                <span class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ $aud->verifications?->count() ?? $aud->total_assets_snapshot ?? 5 }}</span>
+                                <span class="text-[10px] text-slate-400 font-medium block">Total en Censo</span>
+                                <span class="text-sm font-bold text-slate-800 dark:text-slate-200">{{ $totalVerifs }} activos</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] text-slate-400 font-medium block">Verificados</span>
+                                <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">{{ $conciliatedVerifs }} <span class="text-[11px] text-slate-400 font-normal">({{ $progressPct }}%)</span></span>
                             </div>
                             <div class="text-right">
-                                <span class="text-[11px] text-slate-400 font-medium block">Aperturado:</span>
+                                <span class="text-[10px] text-slate-400 font-medium block">Aperturado</span>
                                 <span class="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                    {{ $aud->start_date ? \Carbon\Carbon::parse($aud->start_date)->format('d/m/Y') : '11/10/2026' }}
+                                    {{ $aud->start_date ? \Carbon\Carbon::parse($aud->start_date)->format('d/m/Y') : '-' }}
                                 </span>
                             </div>
                         </div>

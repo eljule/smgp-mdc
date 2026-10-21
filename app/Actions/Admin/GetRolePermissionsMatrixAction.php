@@ -46,6 +46,14 @@ final class GetRolePermissionsMatrixAction
             'icon' => '💻',
             'description' => 'Gestión operativa de activos informáticos, marcas, modelos y atención de tickets de soporte.',
         ],
+        'helpdesk_leader' => [
+            'code' => 'helpdesk_leader',
+            'name' => 'Jefe de Oficina / Soporte TI',
+            'isSystem' => false,
+            'type' => 'Personalizado',
+            'icon' => '👔',
+            'description' => 'Jefatura de mesa de ayuda: supervisión operativa, coordinación, delegación y transferencia de tickets.',
+        ],
     ];
 
     /**
@@ -87,6 +95,17 @@ final class GetRolePermissionsMatrixAction
             'helpdesk.tickets.view',
         ],
         'itam_tech' => [
+            'itam.assets.assign',
+            'itam.assets.manage',
+            'itam.assets.view',
+            'itam.catalogs.manage',
+            'helpdesk.kb.manage',
+            'helpdesk.tickets.create',
+            'helpdesk.tickets.resolve',
+            'helpdesk.tickets.view',
+            'admin.tables.maintain',
+        ],
+        'helpdesk_leader' => [
             'itam.assets.assign',
             'itam.assets.manage',
             'itam.assets.view',

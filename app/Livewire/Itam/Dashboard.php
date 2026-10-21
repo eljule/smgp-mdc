@@ -1300,7 +1300,7 @@ class Dashboard extends Component
             if ($assetId) {
                 $this->loanSelectedAssetIds = [$assetId];
             } else {
-                $firstLoanable = Asset::where('is_loanable', true)->first();
+                $firstLoanable = Asset::where('is_loanable', true)->where('status', 'OPERATIVO')->first();
                 $this->loanSelectedAssetIds = $firstLoanable ? [$firstLoanable->id] : [];
             }
         }
@@ -2189,7 +2189,8 @@ class Dashboard extends Component
                         ->orWhere('office', 'ILIKE', $s)
                         ->orWhereHas('assignedPerson', function ($ap) use ($s) {
                             $ap->where('first_name', 'ILIKE', $s)
-                                ->orWhere('last_name', 'ILIKE', $s);
+                                ->orWhere('paternal_surname', 'ILIKE', $s)
+                                ->orWhere('maternal_surname', 'ILIKE', $s);
                         })
                         ->orWhereHas('brand', function ($b) use ($s) {
                             $b->where('name', 'ILIKE', $s);
@@ -2283,7 +2284,7 @@ class Dashboard extends Component
 
         $loanableAssets = Asset::with(['category', 'brand', 'model'])
             ->where('is_loanable', true)
-            ->where('status', '!=', 'BAJA')
+            ->where('status', 'OPERATIVO')
             ->orderBy('computer_code')
             ->get();
 

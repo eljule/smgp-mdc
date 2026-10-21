@@ -85,8 +85,21 @@
                                 @foreach ($schemaFields as $fieldId => $field)
                                     @php $cardNum++; @endphp
                                     <div wire:key="schema-field-{{ $fieldId }}"
-                                         draggable="true"
-                                         x-on:dragstart="if ($event.target.tagName === 'INPUT' || $event.target.tagName === 'SELECT' || $event.target.tagName === 'TEXTAREA' || $event.target.closest('button')) { $event.preventDefault(); return; } draggedId = '{{ $fieldId }}'; $event.dataTransfer.effectAllowed = 'move'; $event.dataTransfer.setData('text/plain', '{{ $fieldId }}')"
+                                         x-data="{ 
+                                             canDrag: false, 
+                                             labelVal: @js($field['label'] ?? ''), 
+                                             keyVal: @js($field['key'] ?? '') 
+                                         }"
+                                         :draggable="canDrag"
+                                         x-on:dragstart="
+                                             if (!canDrag) {
+                                                 $event.preventDefault();
+                                                 return false;
+                                             }
+                                             draggedId = '{{ $fieldId }}';
+                                             $event.dataTransfer.effectAllowed = 'move';
+                                             $event.dataTransfer.setData('text/plain', '{{ $fieldId }}');
+                                         "
                                          x-on:dragover.prevent="overId = '{{ $fieldId }}'"
                                          x-on:dragleave="if (overId === '{{ $fieldId }}') overId = null"
                                          x-on:drop.prevent="
@@ -96,8 +109,10 @@
                                              }
                                              draggedId = null;
                                              overId = null;
+                                             canDrag = false;
                                          "
-                                         x-on:dragend="draggedId = null; overId = null"
+                                         x-on:dragend="draggedId = null; overId = null; canDrag = false"
+                                         x-on:mouseup.window="if (!draggedId) canDrag = false"
                                          :class="{
                                              'opacity-40 border-dashed border-emerald-500 bg-emerald-50/20 scale-[0.99]': draggedId === '{{ $fieldId }}',
                                              'border-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/30 ring-2 ring-emerald-500/30 shadow-md': overId === '{{ $fieldId }}' && draggedId !== '{{ $fieldId }}'
@@ -106,20 +121,26 @@
                                         <!-- Cabecera de la Tarjeta -->
                                         <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700/60 pb-2">
                                             <div class="flex items-center gap-2 flex-wrap">
-                                                <div class="cursor-grab active:cursor-grabbing p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors" title="Arrastra para reordenar la posición">
-                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <!-- Icono Handle de Arrastre Exclusivo -->
+                                                <div x-on:mouseenter="canDrag = true"
+                                                     x-on:mouseleave="if (!draggedId && $event.buttons !== 1) canDrag = false"
+                                                     x-on:mousedown="canDrag = true"
+                                                     class="cursor-grab active:cursor-grabbing p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded hover:bg-slate-200/60 dark:hover:bg-slate-700/60 transition-colors select-none"
+                                                     title="Arrastra desde este icono para reordenar la posición">
+                                                    <svg class="w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 8h16M4 16h16" />
                                                     </svg>
                                                 </div>
 
-                                                <span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                <span class="w-6 h-6 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-xs font-bold text-slate-700 dark:text-slate-300 shrink-0">
                                                     {{ $cardNum }}
                                                 </span>
-                                                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200">
+                                                <span class="text-xs font-semibold text-slate-800 dark:text-slate-200"
+                                                      x-text="(labelVal || '').trim() !== '' ? labelVal : 'Parámetro sin nombre'">
                                                     {{ $field['label'] ?: 'Parámetro sin nombre' }}
                                                 </span>
-                                                <code class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500">
-                                                    key: {{ $field['key'] ?? '' }}
+                                                <code class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono">
+                                                    key: <span x-text="keyVal || 'sin_clave'">{{ $field['key'] ?? '' }}</span>
                                                 </code>
                                             </div>
 
@@ -168,7 +189,8 @@
                                                 </label>
                                                 <input type="text"
                                                        wire:key="f-lbl-{{ $fieldId }}"
-                                                       wire:model="schemaFields.{{ $fieldId }}.label"
+                                                       wire:model.live.debounce.250ms="schemaFields.{{ $fieldId }}.label"
+                                                       x-model="labelVal"
                                                        placeholder="Ej. Procesador (CPU)"
                                                        class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
                                             </div>
@@ -179,7 +201,8 @@
                                                 </label>
                                                 <input type="text"
                                                        wire:key="f-key-{{ $fieldId }}"
-                                                       wire:model="schemaFields.{{ $fieldId }}.key"
+                                                       wire:model.live.debounce.250ms="schemaFields.{{ $fieldId }}.key"
+                                                       x-model="keyVal"
                                                        placeholder="Ej. processor, ram_gb"
                                                        class="w-full text-xs font-mono px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:outline-none" />
                                             </div>

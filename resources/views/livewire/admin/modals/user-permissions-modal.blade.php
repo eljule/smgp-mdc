@@ -37,6 +37,7 @@
                             class="w-full px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-900 dark:text-white font-bold text-xs"
                         >
                             <option value="Administrador Central">Administrador Central</option>
+                            <option value="Jefe de Oficina / Soporte TI">Jefe de Oficina / Soporte TI</option>
                             <option value="Técnico de Soporte e ITAM">Técnico de Soporte e ITAM</option>
                             <option value="Operador de Transportes">Operador de Transportes</option>
                             <option value="Personal General / Reportante">Personal General / Reportante</option>

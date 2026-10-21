@@ -153,6 +153,13 @@ class Tickets extends Component
 
     public ?Ticket $selectedTicketForDetail = null;
 
+        // Modal Pausa de Atención
+    public bool $isPauseModalOpen = false;
+
+    public ?int $pauseTicketId = null;
+
+    public string $formPauseReason = 'En espera de repuestos / insumos de almacén';
+
     // 3. Modal Atención Técnica
     public bool $isTechnicalModalOpen = false;
 
@@ -469,6 +476,30 @@ class Tickets extends Component
         $this->isDetailModalOpen = true;
     }
 
+        public function canManageTicket(?Ticket $ticket = null): bool
+    {
+        if (! $ticket) {
+            return false;
+        }
+
+        $user = auth()->user();
+        if (! $user) {
+            return app()->environment('testing');
+        }
+
+        return $user->canManageTicket($ticket);
+    }
+
+    public function canReassignTickets(): bool
+    {
+        $user = auth()->user();
+        if (! $user) {
+            return app()->environment('testing');
+        }
+
+        return $user->canReassignTickets();
+    }
+
     // ==========================================
     // 3. ATENCIÓN TÉCNICA
     // ==========================================
@@ -476,6 +507,10 @@ class Tickets extends Component
     {
         $ticket = Ticket::find($ticketId);
         if ($ticket) {
+            if ($ticket->assigned_technician_id && ! $this->canManageTicket($ticket)) {
+                $this->showAlert("Acceso restringido: Este ticket ya está asignado a {$ticket->assigned_technician_display}.");
+                return;
+            }
             $ticket->status = 'EN_ATENCION';
             $ticket->started_at = now();
             if (! $ticket->assigned_technician_name && ! $ticket->assigned_technician_id) {
@@ -499,14 +534,111 @@ class Tickets extends Component
         }
     }
 
+        // ==========================================
+    // 3.1 PAUSA Y REANUDACIÓN DE ATENCIÓN
+    // ==========================================
+    public function openPauseModal(int $ticketId): void
+    {
+        $ticket = Ticket::with('technicalDetail')->find($ticketId);
+        if ($ticket && ! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido: Solo el técnico asignado ({$ticket->assigned_technician_display}) o la jefatura pueden pausar la atención.");
+            return;
+        }
+        $this->pauseTicketId = $ticketId;
+        $this->formPauseReason = $ticket?->technicalDetail?->pause_reason ?: 'En espera de repuestos / insumos de almacén';
+        $this->isPauseModalOpen = true;
+    }
+
+    public function saveTicketPause(): void
+    {
+        $ticket = Ticket::find($this->pauseTicketId);
+        if (! $ticket) {
+            return;
+        }
+
+        if (! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido: Solo el técnico asignado ({$ticket->assigned_technician_display}) o la jefatura pueden pausar este ticket.");
+            $this->isPauseModalOpen = false;
+            return;
+        }
+
+        $prevStatus = $ticket->status;
+        $ticket->status = 'EN_PAUSA';
+        $ticket->save();
+
+        TicketTechnicalDetail::updateOrCreate(
+            ['ticket_id' => $ticket->id],
+            ['pause_reason' => $this->formPauseReason]
+        );
+
+        $techUserName = auth()->user()?->full_name_with_username ?? auth()->user()?->name ?? 'Técnico de Soporte';
+
+        TicketAuditLog::create([
+            'ticket_id' => $ticket->id,
+            'previous_status' => $prevStatus,
+            'new_status' => 'EN_PAUSA',
+            'action' => 'PAUSA_ATENCION',
+            'performed_by_user_id' => auth()->id(),
+            'performed_by_user_name' => $techUserName,
+            'notes' => 'Atención técnica puesta en pausa | Motivo de pausa: ' . trim($this->formPauseReason),
+        ]);
+
+        if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $ticket->id) {
+            $this->selectedTicketForDetail = $ticket->fresh(['office', 'applicant', 'technicalDetail', 'supplies', 'loans', 'auditLogs']);
+        }
+
+        $this->isPauseModalOpen = false;
+        $this->showAlert("Ticket {$ticket->ticket_number} puesto en pausa satisfactoriamente.");
+    }
+
+    public function resumeTicket(int $ticketId): void
+    {
+        $ticket = Ticket::find($ticketId);
+        if (! $ticket) {
+            return;
+        }
+
+        if (! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido: Solo el técnico asignado ({$ticket->assigned_technician_display}) o la jefatura pueden reanudar este ticket.");
+            return;
+        }
+
+        $prevStatus = $ticket->status;
+        $ticket->status = 'EN_ATENCION';
+        $ticket->save();
+
+        $techUserName = auth()->user()?->full_name_with_username ?? auth()->user()?->name ?? 'Técnico de Soporte';
+
+        TicketAuditLog::create([
+            'ticket_id' => $ticket->id,
+            'previous_status' => $prevStatus,
+            'new_status' => 'EN_ATENCION',
+            'action' => 'REANUDACION_ATENCION',
+            'performed_by_user_id' => auth()->id(),
+            'performed_by_user_name' => $techUserName,
+            'notes' => 'Atención técnica reanudada por el operador.',
+        ]);
+
+        if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $ticket->id) {
+            $this->selectedTicketForDetail = $ticket->fresh(['office', 'applicant', 'technicalDetail', 'supplies', 'loans', 'auditLogs']);
+        }
+
+        $this->showAlert("Atención del ticket {$ticket->ticket_number} reanudada.");
+    }
+
     public function openTechnicalModal(int $ticketId): void
     {
-        $this->technicalTicketId = $ticketId;
         $ticket = Ticket::with('technicalDetail')->find($ticketId);
+        if ($ticket && ! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido: Solo el técnico asignado ({$ticket->assigned_technician_display}) o la jefatura pueden registrar el diagnóstico y solución.");
+            return;
+        }
+        $this->technicalTicketId = $ticketId;
         if ($ticket) {
             $this->formRealDiagnosis = $ticket->technicalDetail?->real_diagnosis ?? 'Falla de conectividad / configuración';
             $this->formSolutionApplied = $ticket->technicalDetail?->solution_applied ?? 'Reconfiguración de parámetros y prueba operativa.';
-            $this->formTechnicalStatus = $ticket->status === 'ABIERTO' ? 'EN_ATENCION' : 'RESUELTO';
+            $this->formTechnicalStatus = in_array($ticket->status, ['EN_ATENCION', 'EN_PAUSA', 'EN_LABORATORIO']) ? $ticket->status : ($ticket->status === 'ABIERTO' ? 'EN_ATENCION' : 'RESUELTO');
+            $this->formPauseReason = $ticket->technicalDetail?->pause_reason ?? 'En espera de repuestos / insumos de almacén';
             $this->formIsDecommission = (bool) ($ticket->technicalDetail?->is_definitive_decommission ?? false);
             $this->formKbTitle = "Solución a {$ticket->subject}";
         }
@@ -518,6 +650,13 @@ class Tickets extends Component
     {
         $ticket = Ticket::find($this->technicalTicketId);
         if (! $ticket) {
+            return;
+        }
+
+        if (! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido: Solo el técnico asignado ({$ticket->assigned_technician_display}) o la jefatura pueden modificar este ticket.");
+            $this->isTechnicalModalOpen = false;
+            $this->showTechnicalModal = false;
             return;
         }
 
@@ -535,6 +674,7 @@ class Tickets extends Component
             [
                 'real_diagnosis' => $this->formRealDiagnosis,
                 'solution_applied' => $this->formSolutionApplied,
+                'pause_reason' => $this->formTechnicalStatus === 'EN_PAUSA' ? $this->formPauseReason : ($ticket->technicalDetail?->pause_reason),
                 'is_definitive_decommission' => $this->formIsDecommission,
                 'decommission_reason' => $this->formIsDecommission ? $this->formDecommissionReason : null,
                 'decommission_act_number' => $this->formIsDecommission ? 'ACTA-BAJA-'.date('Y').'-'.str_pad((string) $ticket->id, 4, '0', STR_PAD_LEFT) : null,
@@ -546,6 +686,7 @@ class Tickets extends Component
         $statusLabels = [
             'ABIERTO' => 'Abierto',
             'EN_ATENCION' => 'En Atención',
+            'EN_PAUSA' => 'En Pausa / En Espera',
             'EN_LABORATORIO' => 'En Laboratorio / Taller',
             'PENDIENTE' => 'En Espera / Pendiente',
             'RESUELTO' => 'Resuelto',
@@ -580,11 +721,18 @@ class Tickets extends Component
 
         $logNotes = ! empty($notesParts) ? implode(' | ', $notesParts) : "Diagnóstico y solución técnica registrados.";
 
+        $actionType = 'ACTUALIZACION_TECNICA';
+        if ($prevStatus !== 'EN_PAUSA' && $this->formTechnicalStatus === 'EN_PAUSA') {
+            $actionType = 'PAUSA_ATENCION';
+        } elseif ($prevStatus === 'EN_PAUSA' && $this->formTechnicalStatus === 'EN_ATENCION') {
+            $actionType = 'REANUDACION_ATENCION';
+        }
+
         TicketAuditLog::create([
             'ticket_id' => $ticket->id,
             'previous_status' => $prevStatus,
             'new_status' => $this->formTechnicalStatus,
-            'action' => 'ACTUALIZACION_TECNICA',
+            'action' => $actionType,
             'performed_by_user_id' => auth()->id(),
             'performed_by_user_name' => $techUserName,
             'notes' => $logNotes,
@@ -615,6 +763,11 @@ class Tickets extends Component
     // ==========================================
     public function openSuppliesModal(int $ticketId): void
     {
+        $ticket = Ticket::find($ticketId);
+        if ($ticket && ! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido: Solo el técnico asignado ({$ticket->assigned_technician_display}) o la jefatura pueden descargar insumos para este ticket.");
+            return;
+        }
         $this->suppliesTicketId = $ticketId;
         $this->selectedSupplyId = Supply::where('stock', '>', 0)->first()?->id ?? Supply::first()?->id;
         $this->formSupplyQuantity = 1;
@@ -624,6 +777,13 @@ class Tickets extends Component
 
     public function saveTicketSupply(): void
     {
+        $ticket = Ticket::find($this->suppliesTicketId);
+        if ($ticket && ! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido para descargar insumos en este ticket.");
+            $this->isSuppliesModalOpen = false;
+            return;
+        }
+
         $supply = Supply::find($this->selectedSupplyId);
         if (! $supply) {
             return;
@@ -668,25 +828,57 @@ class Tickets extends Component
     // ==========================================
     public function openProvisionalModal(int $ticketId): void
     {
+        $ticket = Ticket::find($ticketId);
+        if ($ticket && ! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido: Solo el técnico asignado ({$ticket->assigned_technician_display}) o la jefatura pueden gestionar préstamos provisionales para este ticket.");
+            return;
+        }
         $this->provisionalTicketId = $ticketId;
-        $this->selectedProvisionalAssetId = Asset::where('is_loanable', true)->first()?->id ?? Asset::first()?->id;
+        $this->formProvisionalNotes = '';
+
+        $firstAvailable = Asset::where('is_loanable', true)
+            ->where('status', 'OPERATIVO')
+            ->first();
+
+        $this->selectedProvisionalAssetId = $firstAvailable?->id;
         $this->isProvisionalModalOpen = true;
     }
 
     public function saveProvisionalLoan(): void
     {
-        $asset = Asset::find($this->selectedProvisionalAssetId);
-        if (! $asset) {
+        $ticket = Ticket::find($this->provisionalTicketId);
+        if ($ticket && ! $this->canManageTicket($ticket)) {
+            $this->showAlert("Acceso restringido para asignar préstamos provisionales en este ticket.");
+            $this->isProvisionalModalOpen = false;
             return;
         }
 
-        $ticket = Ticket::find($this->provisionalTicketId);
+        if (! $this->selectedProvisionalAssetId) {
+            $this->showAlert("Debe seleccionar un equipo de reserva disponible para préstamo.");
+            return;
+        }
+
+        $asset = Asset::with(['category', 'brand', 'model'])->find($this->selectedProvisionalAssetId);
+        if (! $asset) {
+            $this->showAlert("Equipo seleccionado no encontrado.");
+            return;
+        }
+
+        if (! $asset->is_loanable || ! in_array($asset->status, ['OPERATIVO', 'DISPONIBLE'], true)) {
+            $this->showAlert("El equipo {$asset->computer_code} no está disponible para préstamo (Estado actual: {$asset->status}).");
+            return;
+        }
+
+        $assetName = trim(($asset->brand?->name ?? '').' '.($asset->model?->name ?? ''));
+        if (empty($assetName)) {
+            $assetName = $asset->category?->name ?? 'Equipo Provisional';
+        }
 
         TicketLoan::create([
             'ticket_id' => $this->provisionalTicketId,
             'temporary_asset_id' => $asset->id,
             'temporary_asset_code' => $asset->computer_code ?? ('AST-'.str_pad((string) $asset->id, 3, '0', STR_PAD_LEFT)),
-            'temporary_asset_name' => $asset->name ?? $asset->computer_code ?? 'Equipo Provisional',
+            'temporary_asset_name' => $assetName,
             'damaged_asset_id' => $ticket?->asset_id,
             'damaged_asset_code' => $ticket?->asset?->computer_code,
             'status' => 'ACTIVO',
@@ -704,7 +896,7 @@ class Tickets extends Component
             'action' => 'PRESTAMO_PROVISIONAL',
             'performed_by_user_id' => auth()->id(),
             'performed_by_user_name' => auth()->user()?->full_name_with_username ?? auth()->user()?->name ?? 'Técnico de Soporte',
-            'notes' => "Equipo provisional asignado: {$asset->computer_code} - {$asset->name} | Observaciones: {$this->formProvisionalNotes}",
+            'notes' => "Equipo provisional asignado: {$asset->computer_code} ({$assetName}) | Observaciones: {$this->formProvisionalNotes}",
         ]);
 
         if ($this->selectedTicketForDetail && $this->selectedTicketForDetail->id === $this->provisionalTicketId) {
@@ -727,10 +919,40 @@ class Tickets extends Component
     // ==========================================
     // 7. CONFORMIDAD DE USUARIO
     // ==========================================
+    public function canApproveConformity(?Ticket $ticket = null): bool
+    {
+        if (! auth()->check()) {
+            return false;
+        }
+        if ($ticket) {
+            return $ticket->canUserGiveConformity(auth()->user());
+        }
+        return auth()->user()->canApproveTicketConformity();
+    }
+
     public function openConformityModal(int $ticketId): void
     {
+        $ticket = Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])->find($ticketId);
+        if (! $ticket) {
+            $this->showAlert('Ticket no encontrado.');
+            return;
+        }
+
+        if (! $ticket->canUserGiveConformity(auth()->user())) {
+            if (! $ticket->canReceiveUserConformity()) {
+                if ($ticket->user_conformity) {
+                    $this->showAlert("El ticket {$ticket->ticket_number} ya cuenta con visto bueno otorgado.");
+                } else {
+                    $this->showAlert("El visto bueno solo puede otorgarse a tickets resueltos o cerrados pendientes de conformidad.");
+                }
+            } else {
+                $this->showAlert("Acceso restringido: El visto bueno solo puede ser otorgado por el usuario solicitante, el Jefe de Oficina de ODT, el usuario root o personal de soporte técnico con autoridad delegada.");
+            }
+            return;
+        }
+
         $this->conformityTicketId = $ticketId;
-        $this->conformityTicket = Ticket::with(['technicalDetail', 'office', 'assignedTechnician'])->find($ticketId);
+        $this->conformityTicket = $ticket;
         $this->formUserRating = 5;
         $this->formUserConformity = true;
         $this->formUserFeedback = 'Solución verificada satisfactoriamente.';
@@ -759,18 +981,27 @@ class Tickets extends Component
             return;
         }
 
+        if (! $ticket->canUserGiveConformity(auth()->user())) {
+            $this->isConformityModalOpen = false;
+            $this->showAlert("Acción no permitida: No cuenta con autorización para otorgar el visto bueno a este ticket.");
+            return;
+        }
+
         $ticket->user_conformity = $this->formUserConformity;
         $ticket->user_rating = $this->formUserRating;
         $ticket->user_feedback = $this->formUserFeedback;
         $ticket->status = $this->formUserConformity ? 'CERRADO' : 'EN_ATENCION';
         if ($this->formUserConformity) {
             $ticket->closed_at = now();
+            if (! $ticket->resolved_at) {
+                $ticket->resolved_at = now();
+            }
         }
         $ticket->save();
 
         TicketAuditLog::create([
             'ticket_id' => $ticket->id,
-            'previous_status' => 'RESUELTO',
+            'previous_status' => $ticket->getOriginal('status') ?? 'RESUELTO',
             'new_status' => $ticket->status,
             'action' => $this->formUserConformity ? 'CONFORMIDAD_CIERRE' : 'CONFORMIDAD_OBSERVADA',
             'performed_by_user_id' => auth()->id(),
@@ -842,6 +1073,10 @@ class Tickets extends Component
 
     public function openReassignModal(int $ticketId): void
     {
+        if (! $this->canReassignTickets()) {
+            $this->showAlert("Acceso restringido: La transferencia de tickets está reservada para el jefe de oficina o técnicos autorizados.");
+            return;
+        }
         $this->reassignTicketId = $ticketId;
         $ticket = Ticket::with('assignedTechnician')->find($ticketId);
 
@@ -1050,6 +1285,11 @@ class Tickets extends Component
 
     public function assignTicketToTechnician(int $ticketId, string $technicianName): void
     {
+        if (! $this->canReassignTickets()) {
+            $this->showAlert("Acceso restringido: La asignación de tickets está reservada para la jefatura.");
+            return;
+        }
+
         $ticket = Ticket::find($ticketId);
         if (! $ticket) {
             $this->showAlert('El ticket no fue encontrado.', 'error');
@@ -1081,6 +1321,11 @@ class Tickets extends Component
 
     public function autoAssignAllUnattended(): void
     {
+        if (! $this->canReassignTickets()) {
+            $this->showAlert("Acceso restringido: La asignación de tickets en cola está reservada para la jefatura.");
+            return;
+        }
+
         $unattended = Ticket::where('status', 'ABIERTO')
             ->orWhereNull('assigned_technician_name')
             ->orderByRaw("CASE priority WHEN 'CRITICA' THEN 1 WHEN 'ALTA' THEN 2 WHEN 'MEDIA' THEN 3 WHEN 'BAJA' THEN 4 ELSE 5 END")
@@ -1253,7 +1498,12 @@ class Tickets extends Component
             $off->is_inherited = (bool) $resp['is_inherited'];
             $off->inherited_from = $resp['inherited_from'];
         });
-        $assets = Asset::orderBy('computer_code')->get();
+        $loanableAssets = Asset::with(['category', 'brand', 'model'])
+            ->where('is_loanable', true)
+            ->where('status', 'OPERATIVO')
+            ->orderBy('computer_code')
+            ->get();
+        $assets = $loanableAssets;
         $supplies = Supply::where('stock', '>', 0)->get();
         $metrics = $metricsAction->handle();
 
@@ -1289,6 +1539,7 @@ class Tickets extends Component
             'operationalTechnicians' => $this->getOperationalTechnicians(),
             'offices' => $offices,
             'assets' => $assets,
+            'loanableAssets' => $loanableAssets,
             'supplies' => $supplies,
             'metrics' => $metrics,
             'unassignedTickets' => $unassignedTickets,

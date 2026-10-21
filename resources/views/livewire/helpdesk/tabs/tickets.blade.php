@@ -195,12 +195,31 @@
 
                                     <!-- 7. Acciones -->
                                     <td class="p-3 text-right whitespace-nowrap space-x-1.5">
-                                        @if (strtoupper($t->status) === 'ABIERTO')
+                                        @php
+                                            $canManageRow = $this->canManageTicket($t);
+                                            $canReassignRow = $this->canReassignTickets();
+                                        @endphp
+
+                                        @if (strtoupper($t->status) === 'ABIERTO' && $canManageRow)
                                             <button type="button"
                                                     wire:click="takeTicket({{ $t->id }})"
                                                     class="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded text-[11px] font-bold shadow-xs transition-colors cursor-pointer"
                                                     title="Tomar Ticket para atención inmediata (RF-07)">
                                                 ⚡ Tomar
+                                            </button>
+                                        @elseif (strtoupper($t->status) === 'EN_PAUSA' && $canManageRow)
+                                            <button type="button"
+                                                    wire:click="resumeTicket({{ $t->id }})"
+                                                    class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[11px] font-bold shadow-xs transition-colors cursor-pointer"
+                                                    title="Reanudar atención técnica">
+                                                ▶️ Reanudar
+                                            </button>
+                                        @elseif (in_array(strtoupper($t->status), ['EN_ATENCION', 'EN_LABORATORIO']) && $canManageRow)
+                                            <button type="button"
+                                                    wire:click="openPauseModal({{ $t->id }})"
+                                                    class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300 border border-amber-200 dark:border-amber-800 rounded text-[11px] font-bold transition-colors cursor-pointer"
+                                                    title="Pausar atención técnica">
+                                                ⏸️ Pausar
                                             </button>
                                         @endif
 
@@ -213,11 +232,11 @@
                                             </button>
                                         @endif
 
-                                        @if (!in_array($t->status, ['RESUELTO', 'CERRADO']))
+                                        @if (!in_array($t->status, ['RESUELTO', 'CERRADO']) && $canReassignRow)
                                             <button type="button"
                                                     wire:click="openReassignModal({{ $t->id }})"
                                                     class="px-2 py-1 bg-indigo-50 hover:bg-indigo-600 hover:text-white text-indigo-700 dark:bg-indigo-950/60 dark:hover:bg-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded text-[11px] font-bold transition-colors cursor-pointer inline-flex items-center gap-1"
-                                                    title="Traspasar ticket a otro técnico">
+                                                    title="Traspasar ticket a otro técnico (Jefatura)">
                                                 <span>⇄</span>
                                                 <span>Traspasar</span>
                                             </button>

@@ -5,8 +5,12 @@
             'modulesCount' => 4,
         ],
         [
+            'role' => 'Jefe de Oficina / Soporte TI',
+            'modulesCount' => 2,
+        ],
+        [
             'role' => 'Técnico de Soporte e ITAM',
-            'modulesCount' => 3,
+            'modulesCount' => 2,
         ],
         [
             'role' => 'Operador de Transportes',

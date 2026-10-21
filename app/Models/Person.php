@@ -53,7 +53,12 @@ class Person extends Model
         return $this->hasMany(Asset::class, 'assigned_person_id');
     }
 
-            public function getFullNameAttribute(): string
+    public function getLastNameAttribute(): string
+    {
+        return trim("{$this->paternal_surname} {$this->maternal_surname}");
+    }
+
+    public function getFullNameAttribute(): string
     {
         $fullName = trim("{$this->first_name} {$this->paternal_surname} {$this->maternal_surname}");
         if (empty($fullName) && ! empty($this->business_name)) {

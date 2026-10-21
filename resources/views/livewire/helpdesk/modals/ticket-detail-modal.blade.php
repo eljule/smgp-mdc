@@ -1,6 +1,10 @@
 <!-- MODAL 2: DETALLE DEL TICKET                                               -->
     <!-- ========================================================================= -->
     @if ($isDetailModalOpen && $selectedTicketForDetail)
+        @php
+            $canManageDetail = $this->canManageTicket($selectedTicketForDetail);
+            $canReassignDetail = $this->canReassignTickets();
+        @endphp
         <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 overflow-y-auto">
             <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden animate-scaleUp">
                 <!-- Encabezado Institucional -->
@@ -72,45 +76,77 @@
 
                     <div class="flex items-center flex-wrap gap-2">
                         @if ($selectedTicketForDetail->status === 'ABIERTO')
-                            <button type="button"
-                                    wire:click="takeTicket({{ $selectedTicketForDetail->id }})"
-                                    class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer">
-                                ⚡ Tomar Ticket / Atender
-                            </button>
-                            <button type="button"
-                                    wire:click="openReassignModal({{ $selectedTicketForDetail->id }})"
-                                    class="px-3.5 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg font-medium transition-colors cursor-pointer">
-                                Asignar a Técnico
-                            </button>
+                            @if ($canManageDetail)
+                                <button type="button"
+                                        wire:click="takeTicket({{ $selectedTicketForDetail->id }})"
+                                        class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer">
+                                    ⚡ Tomar Ticket / Atender
+                                </button>
+                            @endif
+                            @if ($canReassignDetail)
+                                <button type="button"
+                                        wire:click="openReassignModal({{ $selectedTicketForDetail->id }})"
+                                        class="px-3.5 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 rounded-lg font-medium transition-colors cursor-pointer">
+                                    Asignar a Técnico
+                                </button>
+                            @endif
                         @elseif (in_array(strtoupper($selectedTicketForDetail->status), ['EN_ATENCION', 'EN_LABORATORIO', 'EN_TALLER', 'EN_PAUSA']))
-                            <button type="button"
-                                    wire:click="openReassignModal({{ $selectedTicketForDetail->id }})"
-                                    class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/60 dark:hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
-                                    title="Traspasar ticket a otro técnico">
-                                <span>⇄</span>
-                                <span>Traspasar Ticket</span>
-                            </button>
-                            <button type="button"
-                                    wire:click="openTechnicalModal({{ $selectedTicketForDetail->id }})"
-                                    class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer">
-                                ✓ Diagnóstico & Solución
-                            </button>
-                            <button type="button"
-                                    wire:click="openSuppliesModal({{ $selectedTicketForDetail->id }})"
-                                    class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium shadow-xs transition-colors cursor-pointer">
-                                📦 Insumos Almacén ({{ $selectedTicketForDetail->supplies->count() }})
-                            </button>
-                            <button type="button"
-                                    wire:click="openProvisionalModal({{ $selectedTicketForDetail->id }})"
-                                    class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-xs transition-colors cursor-pointer">
-                                🔄 Préstamo Provisional ({{ $selectedTicketForDetail->loans->count() }})
-                            </button>
-                        @elseif (strtoupper($selectedTicketForDetail->status) === 'RESUELTO')
-                            <button type="button"
-                                    wire:click="openConformityModal({{ $selectedTicketForDetail->id }})"
-                                    class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer">
-                                ⭐ Otorgar Visto Bueno (Cierre)
-                            </button>
+                            @if ($canReassignDetail)
+                                <button type="button"
+                                        wire:click="openReassignModal({{ $selectedTicketForDetail->id }})"
+                                        class="px-3 py-1.5 bg-indigo-50 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/60 dark:hover:bg-indigo-600 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 rounded-lg font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                                        title="Traspasar ticket a otro técnico (Jefatura)">
+                                    <span>⇄</span>
+                                    <span>Traspasar Ticket</span>
+                                </button>
+                            @endif
+
+                            @if ($canManageDetail)
+                                @if (strtoupper($selectedTicketForDetail->status) === 'EN_PAUSA')
+                                    <button type="button"
+                                            wire:click="resumeTicket({{ $selectedTicketForDetail->id }})"
+                                            class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5">
+                                        <span>▶️</span>
+                                        <span>Reanudar Atención</span>
+                                    </button>
+                                @else
+                                    <button type="button"
+                                            wire:click="openPauseModal({{ $selectedTicketForDetail->id }})"
+                                            class="px-3.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
+                                            title="Pausar atención por espera de repuestos, respuesta de usuario o terceros">
+                                        <span>⏸️</span>
+                                        <span>Pausar Atención</span>
+                                    </button>
+                                @endif
+
+                                <button type="button"
+                                        wire:click="openTechnicalModal({{ $selectedTicketForDetail->id }})"
+                                        class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer">
+                                    ✓ Diagnóstico & Solución
+                                </button>
+                                <button type="button"
+                                        wire:click="openSuppliesModal({{ $selectedTicketForDetail->id }})"
+                                        class="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-medium shadow-xs transition-colors cursor-pointer">
+                                    📦 Insumos Almacén ({{ $selectedTicketForDetail->supplies->count() }})
+                                </button>
+                                <button type="button"
+                                        wire:click="openProvisionalModal({{ $selectedTicketForDetail->id }})"
+                                        class="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium shadow-xs transition-colors cursor-pointer">
+                                    🔄 Préstamo Provisional ({{ $selectedTicketForDetail->loans->count() }})
+                                </button>
+                            @endif
+                        @elseif ($selectedTicketForDetail->canReceiveUserConformity())
+                            @if ($selectedTicketForDetail->canUserGiveConformity(auth()->user()))
+                                <button type="button"
+                                        wire:click="openConformityModal({{ $selectedTicketForDetail->id }})"
+                                        class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold shadow-xs transition-colors cursor-pointer">
+                                    ⭐ Otorgar Visto Bueno (Cierre)
+                                </button>
+                            @else
+                                <span class="px-3 py-1.5 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-200 border border-amber-200 dark:border-amber-800 rounded-lg text-xs font-semibold">
+                                    ⏳ Resuelto (Requiere Visto Bueno del Solicitante o Jefatura ODT)
+                                </span>
+                            @endif
                         @endif
 
                         @if ($selectedTicketForDetail->technicalDetail?->is_definitive_decommission)
@@ -125,6 +161,20 @@
 
                 <!-- Cuerpo del Modal con Scroll -->
                 <div class="p-6 overflow-y-auto space-y-4 text-xs text-slate-700 dark:text-slate-300 flex-1">
+                    @if (! $canManageDetail && $selectedTicketForDetail->assigned_technician_id)
+                        <div class="p-3 bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-between text-xs">
+                            <div class="flex items-center space-x-2 text-slate-700 dark:text-slate-300">
+                                <span class="text-base shrink-0">🔒</span>
+                                <div>
+                                    <span class="font-bold">Modo Solo Lectura:</span>
+                                    <span>Ticket asignado a <strong>{{ $selectedTicketForDetail->assigned_technician_display }}</strong>. Solo el técnico responsable o la jefatura de oficina pueden registrar intervenciones o diagnósticos.</span>
+                                </div>
+                            </div>
+                            <span class="px-2.5 py-1 rounded text-[10px] font-bold bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 shrink-0 ml-2">
+                                Solo Consulta
+                            </span>
+                        </div>
+                    @endif
                     <!-- 1. Datos del Solicitante y Activo Tecnológico Vinculado -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="border border-slate-200 dark:border-slate-800 rounded-xl p-4 bg-slate-50/50 dark:bg-slate-800/40 space-y-2">
@@ -202,7 +252,7 @@
                     @endif
 
                     <!-- 4. Visto Bueno de Cierre por el Solicitante (RF-05) -->
-                    @if ($selectedTicketForDetail->user_conformity !== null || $selectedTicketForDetail->status === 'CERRADO')
+                    @if ($selectedTicketForDetail->user_conformity !== null)
                         <div class="border border-blue-200 dark:border-blue-800 bg-white dark:bg-slate-900 rounded-xl p-4 space-y-2">
                             <h4 class="font-bold uppercase tracking-wider text-blue-800 dark:text-blue-300 text-[11px] border-b border-blue-100 dark:border-blue-900 pb-1.5 flex justify-between items-center">
                                 <span>VISTO BUENO DE CIERRE POR EL SOLICITANTE (RF-05)</span>
@@ -211,11 +261,32 @@
                                 </span>
                             </h4>
                             <p class="text-slate-700 dark:text-slate-300 font-medium">
-                                Conformidad: <strong class="text-emerald-600 dark:text-emerald-400">✓ Solución Aprobada y Conforme</strong>
+                                Conformidad:
+                                @if ($selectedTicketForDetail->user_conformity)
+                                    <strong class="text-emerald-600 dark:text-emerald-400">✓ Solución Aprobada y Conforme</strong>
+                                @else
+                                    <strong class="text-rose-600 dark:text-rose-400">⚠ Conformidad Observada / Disconforme</strong>
+                                @endif
                             </p>
-                            <div class="text-slate-600 dark:text-slate-300 italic bg-slate-50/60 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 leading-relaxed">
-                                “{{ $selectedTicketForDetail->user_feedback ?: 'Excelente atención. El ingeniero limpió los rodillos de arrastre y ahora jala el papel membretado con normalidad. Muy rápido.' }}”
+                            @if ($selectedTicketForDetail->user_feedback)
+                                <div class="text-slate-600 dark:text-slate-300 italic bg-slate-50/60 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 leading-relaxed">
+                                    “{{ $selectedTicketForDetail->user_feedback }}”
+                                </div>
+                            @endif
+                        </div>
+                    @elseif ($selectedTicketForDetail->canReceiveUserConformity())
+                        <div class="border border-amber-200 dark:border-amber-800 bg-amber-50/50 dark:bg-amber-950/30 rounded-xl p-4 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <h4 class="font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 text-[11px]">
+                                    VISTO BUENO PENDIENTE DE CONFORMIDAD
+                                </h4>
+                                <span class="text-amber-700 dark:text-amber-400 font-bold text-xs">
+                                    ⏳ En espera de visto bueno
+                                </span>
                             </div>
+                            <p class="text-xs text-amber-900 dark:text-amber-200">
+                                La atención técnica ha concluido. El solicitante o jefatura puede otorgar el visto bueno final para cerrar el ticket formalmente.
+                            </p>
                         </div>
                     @endif
 
@@ -292,6 +363,18 @@
                                                 'badgeBg' => 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
                                                 'dotBg' => 'bg-emerald-500 ring-emerald-200 dark:ring-emerald-950',
                                                 'icon' => '🧑‍💻',
+                                            ],
+                                            'PAUSA_ATENCION' => [
+                                                'label' => 'Atención Puesta en Pausa',
+                                                'badgeBg' => 'bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800',
+                                                'dotBg' => 'bg-amber-500 ring-amber-200 dark:ring-amber-950',
+                                                'icon' => '⏸️',
+                                            ],
+                                            'REANUDACION_ATENCION' => [
+                                                'label' => 'Atención Reanudada',
+                                                'badgeBg' => 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800',
+                                                'dotBg' => 'bg-emerald-500 ring-emerald-200 dark:ring-emerald-950',
+                                                'icon' => '▶️',
                                             ],
                                             'ACTUALIZACION_TECNICA' => [
                                                 'label' => 'Intervención y Diagnóstico Técnico',
@@ -398,6 +481,11 @@
                                                                 <div class="p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 text-[11px]">
                                                                     <span class="font-bold text-emerald-700 dark:text-emerald-400">✅ Solución:</span>
                                                                     <span class="text-slate-800 dark:text-slate-200 ml-1">{{ trim(preg_replace('/^Solución( (técnica implementada|propuesta))?:/i', '', $part)) }}</span>
+                                                                </div>
+                                                            @elseif (str_starts_with($part, 'Motivo de pausa:') || str_starts_with($part, 'Motivo:'))
+                                                                <div class="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 text-[11px]">
+                                                                    <span class="font-bold text-amber-800 dark:text-amber-400">⏸️ Motivo de Pausa:</span>
+                                                                    <span class="text-amber-900 dark:text-amber-200 ml-1">{{ trim(preg_replace('/^(Motivo de pausa|Motivo):/i', '', $part)) }}</span>
                                                                 </div>
                                                             @else
                                                                 <div class="text-[11px] text-slate-600 dark:text-slate-300">

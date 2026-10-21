@@ -150,6 +150,44 @@
                             </p>
                         </div>
 
+                        <!-- Alerta Preventiva: Tickets Resueltos Pendientes de Visto Bueno -->
+                        @php
+                            $pendingConformityTickets = $this->getPendingConformityTickets();
+                        @endphp
+
+                        @if ($pendingConformityTickets->isNotEmpty())
+                            <div class="m-6 p-4 rounded-2xl bg-amber-50/90 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700 shadow-sm space-y-2.5 animate-fadeIn">
+                                <div class="flex items-start sm:items-center justify-between gap-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xl">⭐</span>
+                                        <div>
+                                            <h4 class="text-xs sm:text-sm font-black text-amber-900 dark:text-amber-200">
+                                                Tiene {{ $pendingConformityTickets->count() }} ticket(s) resuelto(s) pendiente(s) de su Visto Bueno
+                                            </h4>
+                                            <p class="text-[11px] text-amber-800/90 dark:text-amber-300/90">
+                                                Soporte TI completó la atención de sus requerimientos. Otorgue su visto bueno para confirmar la solución o registrar si aún persiste la falla.
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 shrink-0">
+                                        Acción Requerida
+                                    </span>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2 pt-1 border-t border-amber-200 dark:border-amber-800/60">
+                                    @foreach ($pendingConformityTickets as $pTicket)
+                                        <button type="button"
+                                                wire:click="openConformityModal({{ $pTicket->id }})"
+                                                class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all shadow-xs flex items-center gap-1.5 cursor-pointer hover:scale-[1.02] active:scale-95">
+                                            <span>✅</span>
+                                            <span>Dar Visto Bueno a {{ $pTicket->ticket_number }}</span>
+                                            <span class="text-[10px] opacity-80 font-normal">({{ \Illuminate\Support\Str::limit($pTicket->subject, 25) }})</span>
+                                        </button>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
+
                         <!-- Mensaje de Error en Formulario -->
                         @if ($errorMessage)
                             <div class="m-6 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs font-semibold flex items-center justify-between">
@@ -830,16 +868,38 @@
                                                 {{ $ticket->closed_at?->format('d/m/Y') }}
                                             </span>
                                         </div>
-                                    @else
-                                        <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
-                                            <button type="button"
-                                                    wire:click="openConformityModal({{ $ticket->id }})"
-                                                    class="w-full sm:w-auto flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl font-bold text-xs shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer">
-                                                <span>✅</span>
-                                                <span>Dar Visto Bueno / Cerrar Ticket</span>
-                                            </button>
+                                    @elseif ($ticket->canReceiveUserConformity())
+                                        @if ($ticket->canUserGiveConformity(auth()->user()))
+                                            <div class="flex flex-col sm:flex-row items-center justify-between gap-2">
+                                                <button type="button"
+                                                        wire:click="openConformityModal({{ $ticket->id }})"
+                                                        class="w-full sm:w-auto flex-1 py-2 px-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl font-bold text-xs shadow-xs hover:shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer">
+                                                    <span>✅</span>
+                                                    <span>Dar Visto Bueno / Cerrar Ticket</span>
+                                                </button>
 
-                                            <span class="text-[10px] text-slate-400 text-center sm:text-right shrink-0">
+                                                <span class="text-[10px] text-slate-400 text-center sm:text-right shrink-0">
+                                                    {{ $ticket->created_at?->diffForHumans() }}
+                                                </span>
+                                            </div>
+                                        @else
+                                            <div class="p-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 text-xs flex items-center justify-between gap-2">
+                                                <div class="flex items-center gap-1.5 text-amber-900 dark:text-amber-200 text-[11px]">
+                                                    <span>⏳</span>
+                                                    <span>Atención concluida. En espera de Visto Bueno por el solicitante o Jefatura ODT.</span>
+                                                </div>
+                                                <span class="text-[10px] font-mono text-slate-400 shrink-0">
+                                                    {{ $ticket->created_at?->diffForHumans() }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                    @else
+                                        <div class="p-2 rounded-xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-xs flex items-center justify-between gap-2">
+                                            <div class="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 text-[11px]">
+                                                <span>⏳</span>
+                                                <span>Atención técnica en curso. El visto bueno estará disponible una vez concluida la atención.</span>
+                                            </div>
+                                            <span class="text-[10px] font-mono text-slate-400 shrink-0">
                                                 {{ $ticket->created_at?->diffForHumans() }}
                                             </span>
                                         </div>

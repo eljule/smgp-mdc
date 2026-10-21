@@ -192,12 +192,13 @@ class AdminDashboardTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertSee('Mantenimiento de Roles Institucionales');
-        $response->assertSee('4 roles');
+        $response->assertSee('5 roles');
         $response->assertSee('Nuevo Rol Institucional');
         $response->assertSee('TOTAL ROLES REGISTRADOS');
         $response->assertSee('ROLES BASE DEL SISTEMA');
         $response->assertSee('ROLES PERSONALIZADOS');
-        $response->assertSee('Listado de Roles (4)');
+        $response->assertSee('Listado de Roles (5)');
+        $response->assertSee('Jefe de Oficina / Soporte TI');
         $response->assertSee('Administrador Central');
         $response->assertSee('admin_central');
         $response->assertSee('Multisubsistema (Global)');

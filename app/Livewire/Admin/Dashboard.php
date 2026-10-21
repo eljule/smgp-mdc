@@ -806,6 +806,7 @@ class Dashboard extends Component
 
             $this->selectedUserRole = match (mb_strtoupper($role)) {
                 'ADMINISTRADOR CENTRAL' => 'Administrador Central',
+                'JEFE DE OFICINA / SOPORTE TI', 'JEFE DE SOPORTE TI', 'JEFE DE OFICINA' => 'Jefe de Oficina / Soporte TI',
                 'TÉCNICO DE SOPORTE E ITAM', 'TECNICO DE SOPORTE E ITAM' => 'Técnico de Soporte e ITAM',
                 'OPERADOR DE TRANSPORTES' => 'Operador de Transportes',
                 'PERSONAL GENERAL / REPORTANTE' => 'Personal General / Reportante',
@@ -824,6 +825,8 @@ class Dashboard extends Component
     {
         if ($role === 'Administrador Central') {
             $this->userSubsystems = ['admin', 'transportes', 'itam', 'helpdesk'];
+        } elseif ($role === 'Jefe de Oficina / Soporte TI') {
+            $this->userSubsystems = ['itam', 'helpdesk'];
         } elseif ($role === 'Técnico de Soporte e ITAM') {
             $this->userSubsystems = ['itam', 'helpdesk'];
         } elseif ($role === 'Operador de Transportes') {
@@ -979,6 +982,7 @@ class Dashboard extends Component
         $this->userFormRole = $role;
         $this->userFormModules = match ($role) {
             'Administrador Central' => ['admin', 'transportes', 'itam', 'helpdesk'],
+            'Jefe de Oficina / Soporte TI' => ['itam', 'helpdesk'],
             'Técnico de Soporte e ITAM' => ['itam', 'helpdesk'],
             'Operador de Transportes' => ['transportes', 'helpdesk'],
             'Personal General / Reportante' => ['helpdesk'],

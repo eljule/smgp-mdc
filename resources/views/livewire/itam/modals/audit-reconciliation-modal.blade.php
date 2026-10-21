@@ -166,7 +166,8 @@
                                                 {{ $v->asset?->patrimonial_code ?: '-' }}
                                             </td>
                                             <td class="p-2.5 text-slate-600 dark:text-slate-400">
-                                                -
+                                                <span class="font-semibold block text-slate-800 dark:text-slate-200">{{ $v->asset?->brand?->name }} {{ $v->asset?->model?->name }}</span>
+                                                <span class="text-[10px] text-slate-400">{{ $v->asset?->category?->name ?? 'Equipo TI' }}</span>
                                             </td>
                                             <td class="p-2.5 text-slate-700 dark:text-slate-300 font-medium">
                                                 {{ $v->expected_office ?: 'Sin Oficina' }}

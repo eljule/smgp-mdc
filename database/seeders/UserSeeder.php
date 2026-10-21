@@ -109,14 +109,18 @@ class UserSeeder extends Seeder
                 ? $person->email
                 : strtolower($username) . '@castilla.gob.pe';
 
+            $isBoss = ($odtBossId && (int) $person->id === (int) $odtBossId);
+            $role = $isBoss ? 'Jefe de Oficina / Soporte TI' : 'Personal General / Reportante';
+            $modules = $isBoss ? ['admin', 'itam', 'helpdesk'] : ['helpdesk'];
+
             $users[] = [
                 'id' => $nextId++,
                 'username' => $username,
                 'password' => '$2y$12$XBBRoZV5esbThWU.6ztx5.G9WnMpETb6gKfqYlPt2ZBsqZCJSBS8S',
                 'full_name' => $fullName,
                 'email' => $email,
-                'role' => 'Personal General / Reportante',
-                'allowed_modules' => json_encode(['helpdesk']),
+                'role' => $role,
+                'allowed_modules' => json_encode($modules),
                 'is_active' => true,
                 'person_id' => $person->id,
                 'must_change_password' => false,

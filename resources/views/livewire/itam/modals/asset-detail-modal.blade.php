@@ -203,7 +203,7 @@
                                 <div>
                                     <span class="text-[11px] text-slate-400 block font-normal">Custodio Responsable</span>
                                     <span class="font-bold text-slate-800 dark:text-slate-200 uppercase">
-                                        {{ $selectedAssetForDetail->assignedPerson ? trim($selectedAssetForDetail->assignedPerson->first_name . ' ' . $selectedAssetForDetail->assignedPerson->last_name) : 'SIN ASIGNAR' }}
+                                        {{ $selectedAssetForDetail->assignedPerson ? $selectedAssetForDetail->assignedPerson->full_name : 'SIN ASIGNAR' }}
                                     </span>
                                 </div>
                             </div>

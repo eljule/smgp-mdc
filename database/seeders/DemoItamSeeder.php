@@ -319,6 +319,54 @@ class DemoItamSeeder extends Seeder
                 'created_at' => '2026-10-15 02:12:58',
                 'updated_at' => '2026-10-15 02:12:58',
             ],
+            [
+                'id' => 11,
+                'computer_code' => 'MDC-TI-LAP-0002',
+                'patrimonial_code' => '7408770011',
+                'serial_number' => 'PF-490211',
+                'category_id' => 2,
+                'brand_id' => 8,
+                'model_id' => 25,
+                'parent_asset_id' => null,
+                'color' => 'Plata',
+                'status' => 'OPERATIVO',
+                'physical_condition' => 'BUENO',
+                'office' => $odtOffice,
+                'assigned_person_id' => null,
+                'acquisition_date' => '2023-08-15',
+                'supplier' => 'HP PERÚ S.A.',
+                'warranty_end_date' => '2026-08-15',
+                'is_loanable' => true,
+                'specifications' => '{"os": "Windows 11 Pro 64-bit", "ram_gb": "16 GB", "storage": "512 GB SSD", "processor": "Intel Core i5-1135G7 2.40GHz"}',
+                'notes' => 'Laptop de reserva institucional para préstamos y contingencias ODT',
+                'is_active' => true,
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ],
+            [
+                'id' => 12,
+                'computer_code' => 'MDC-TI-PC-0003',
+                'patrimonial_code' => '7408770012',
+                'serial_number' => 'DL-992104',
+                'category_id' => 1,
+                'brand_id' => 3,
+                'model_id' => 8,
+                'parent_asset_id' => null,
+                'color' => 'Negro',
+                'status' => 'OPERATIVO',
+                'physical_condition' => 'BUENO',
+                'office' => $odtOffice,
+                'assigned_person_id' => null,
+                'acquisition_date' => '2023-06-10',
+                'supplier' => 'DELL DIRECTO',
+                'warranty_end_date' => '2026-06-10',
+                'is_loanable' => true,
+                'specifications' => '{"os": "Windows 10 Pro 64-bit", "ram_gb": "16 GB", "storage_primary": "512 GB SSD", "processor": "Intel Core i7-10700 2.90GHz"}',
+                'notes' => 'PC de escritorio de backup para sustitución provisional en Helpdesk',
+                'is_active' => true,
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ],
         ];
 
         $parents = [];
@@ -500,6 +548,24 @@ class DemoItamSeeder extends Seeder
         ];
         DB::table('itam_inventory_audits')->insert($audits);
 
+        $verifications = [];
+        foreach ($assets as $idx => $ast) {
+            $vStatus = $idx < 5 ? 'CONCILIADO' : ($idx === 5 ? 'TRASLADADO_NO_AUTORIZADO' : 'PENDIENTE');
+            $verifications[] = [
+                'id' => $idx + 1,
+                'audit_id' => 1,
+                'asset_id' => $ast['id'],
+                'expected_office' => $ast['office'] ?: $odtOffice,
+                'found_office' => $idx === 5 ? $gatOffice : ($idx < 5 ? ($ast['office'] ?: $odtOffice) : null),
+                'status' => $vStatus,
+                'verified_by' => $idx <= 5 ? "Téc. {$techName} (Control Patrimonial)" : null,
+                'notes' => $idx === 5 ? 'Equipo hallado en otra gerencia sin boleta de traslado autorizada.' : null,
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ];
+        }
+        DB::table('itam_audit_verifications')->insert($verifications);
+
         $maintenanceOrders = [
             [
                 'id' => 1,
@@ -560,6 +626,7 @@ class DemoItamSeeder extends Seeder
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_asset_loan_items', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_asset_loan_items;");
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_asset_movements', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_asset_movements;");
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_inventory_audits', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_inventory_audits;");
+            DB::statement("SELECT setval(pg_get_serial_sequence('itam_audit_verifications', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_audit_verifications;");
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_maintenance_orders', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_maintenance_orders;");
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_maintenance_supplies', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_maintenance_supplies;");
             DB::statement('SET session_replication_role = DEFAULT;');
