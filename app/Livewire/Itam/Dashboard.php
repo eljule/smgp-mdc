@@ -492,7 +492,14 @@ class Dashboard extends Component
         $this->formSpecifications = [];
         if ($cat && is_array($cat->custom_fields_schema)) {
             foreach ($cat->custom_fields_schema as $f) {
-                $this->formSpecifications[$f['key']] = $f['defaultValue'] ?? ($f['type'] === 'boolean' ? ($f['defaultValue'] ?? false) : '');
+                $fType = $f['type'] ?? 'text';
+                if (in_array($fType, ['tags', 'list', 'array'])) {
+                    $this->formSpecifications[$f['key']] = [];
+                } elseif ($fType === 'boolean') {
+                    $this->formSpecifications[$f['key']] = (bool) ($f['defaultValue'] ?? false);
+                } else {
+                    $this->formSpecifications[$f['key']] = $f['defaultValue'] ?? '';
+                }
             }
         }
     }
@@ -527,7 +534,31 @@ class Dashboard extends Component
                 $this->formWarrantyEndDate = $asset->warranty_end_date ?? '';
                 $this->formIsLoanable = (bool) $asset->is_loanable;
                 $this->formNotes = $asset->notes ?? '';
-                $this->formSpecifications = is_array($asset->specifications) ? $asset->specifications : [];
+                $specs = is_array($asset->specifications) ? $asset->specifications : (json_decode($asset->specifications ?? '[]', true) ?: []);
+                $cat = $asset->category;
+                if ($cat && is_array($cat->custom_fields_schema)) {
+                    foreach ($cat->custom_fields_schema as $f) {
+                        $fKey = $f['key'] ?? '';
+                        $fType = $f['type'] ?? 'text';
+                        if (in_array($fType, ['tags', 'list', 'array'])) {
+                            if (isset($specs[$fKey])) {
+                                if (is_string($specs[$fKey])) {
+                                    $decoded = json_decode($specs[$fKey], true);
+                                    if (is_array($decoded)) {
+                                        $specs[$fKey] = array_values(array_filter(array_map('trim', $decoded)));
+                                    } else {
+                                        $specs[$fKey] = array_values(array_filter(array_map('trim', explode(',', $specs[$fKey]))));
+                                    }
+                                } elseif (!is_array($specs[$fKey])) {
+                                    $specs[$fKey] = [];
+                                }
+                            } else {
+                                $specs[$fKey] = [];
+                            }
+                        }
+                    }
+                }
+                $this->formSpecifications = $specs;
             }
         } else {
             $firstCat = AssetCategory::where('code', 'LAP')->first() ?? AssetCategory::first();
@@ -572,9 +603,10 @@ class Dashboard extends Component
         $catCode = $category?->code ?? 'PC';
 
         if (! $this->editingAssetId) {
-            $lastAsset = Asset::where('computer_code', 'like', "MDC-TI-{$catCode}-%")
-                ->orderByRaw("CAST(SUBSTRING(computer_code FROM '[0-9]+$') AS INTEGER) DESC")
-                ->first();
+            $query = Asset::where('computer_code', 'like', "MDC-TI-{$catCode}-%");
+            $lastAsset = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'pgsql'
+                ? $query->orderByRaw("CAST(SUBSTRING(computer_code FROM '[0-9]+$') AS INTEGER) DESC")->first()
+                : $query->orderByDesc('id')->first();
 
             if ($lastAsset && preg_match('/(\d+)$/', $lastAsset->computer_code, $matches)) {
                 $nextNum = (int) $matches[1] + 1;
@@ -606,7 +638,32 @@ class Dashboard extends Component
             'supplier' => $this->formSupplier ?: null,
             'warranty_end_date' => $this->formWarrantyEndDate ?: null,
             'is_loanable' => $this->formIsLoanable,
-            'specifications' => $this->formSpecifications,
+            'specifications' => (function() {
+                $clean = $this->formSpecifications;
+                $cat = AssetCategory::find($this->formCategoryId);
+                if ($cat && is_array($cat->custom_fields_schema)) {
+                    foreach ($cat->custom_fields_schema as $f) {
+                        $fKey = $f['key'] ?? '';
+                        $fType = $f['type'] ?? 'text';
+                        if (in_array($fType, ['tags', 'list', 'array'])) {
+                            $val = $clean[$fKey] ?? [];
+                            if (is_string($val)) {
+                                $decoded = json_decode($val, true);
+                                if (is_array($decoded)) {
+                                    $clean[$fKey] = array_values(array_filter(array_map('trim', $decoded)));
+                                } else {
+                                    $clean[$fKey] = array_values(array_filter(array_map('trim', explode(',', $val))));
+                                }
+                            } elseif (is_array($val)) {
+                                $clean[$fKey] = array_values(array_filter(array_map('trim', $val)));
+                            } else {
+                                $clean[$fKey] = [];
+                            }
+                        }
+                    }
+                }
+                return $clean;
+            })(),
             'notes' => $this->formNotes ?: null,
         ];
 

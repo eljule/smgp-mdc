@@ -361,26 +361,39 @@
                                         $fieldType = $field['type'] ?? 'text';
                                         $fieldLabel = $field['label'] ?? ucfirst($fieldKey);
                                         $isRequired = $field['required'] ?? false;
-                                        $placeholder = $field['placeholder'] ?? 'Ingrese ' . strtolower($fieldLabel);
-                                        $options = $field['options'] ?? [];
+                                        $placeholder = $field['placeholder'] ?? '';
+                                        $rawOpts = $field['options'] ?? [];
+                                        if (is_string($rawOpts)) {
+                                            $options = array_values(array_filter(array_map('trim', explode(',', $rawOpts))));
+                                        } elseif (!empty($field['options_str'])) {
+                                            $options = array_values(array_filter(array_map('trim', explode(',', $field['options_str']))));
+                                        } elseif (is_array($rawOpts)) {
+                                            $options = array_values($rawOpts);
+                                        } else {
+                                            $options = [];
+                                        }
+                                        $isFullWidth = in_array($fieldType, ['textarea', 'tags', 'list', 'array']);
                                     @endphp
-                                    <div class="space-y-1.5 {{ $fieldType === 'textarea' ? 'md:col-span-2' : '' }}">
+                                    <div class="space-y-1.5 {{ $isFullWidth ? 'md:col-span-2' : '' }}" wire:key="spec-field-{{ $fieldKey }}">
                                         <label class="text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
                                             <span>{{ $fieldLabel }}</span>
                                             @if ($isRequired)
                                                 <span class="text-rose-500 font-bold" title="Campo obligatorio">*</span>
+                                            @endif
+                                            @if (!empty($field['unit']))
+                                                <span class="text-slate-400 text-[10px] font-normal">({{ $field['unit'] }})</span>
                                             @endif
                                         </label>
 
                                         @if ($fieldType === 'text')
                                             <input type="text"
                                                    wire:model="formSpecifications.{{ $fieldKey }}"
-                                                   placeholder="{{ $placeholder }}"
+                                                   placeholder="{{ $placeholder ?: ('Ingrese ' . strtolower($fieldLabel)) }}"
                                                    class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 outline-none">
                                         @elseif ($fieldType === 'number')
                                             <input type="number"
                                                    wire:model="formSpecifications.{{ $fieldKey }}"
-                                                   placeholder="{{ $placeholder }}"
+                                                   placeholder="{{ $placeholder ?: '0' }}"
                                                    class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 outline-none">
                                         @elseif ($fieldType === 'select')
                                             <select wire:model="formSpecifications.{{ $fieldKey }}"
@@ -396,14 +409,114 @@
                                                        wire:model="formSpecifications.{{ $fieldKey }}"
                                                        class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-600 cursor-pointer">
                                                 <span class="text-xs font-medium text-slate-700 dark:text-slate-300">
-                                                    Sí / Habilitado
+                                                    {{ $placeholder ?: 'Sí / Habilitado' }}
                                                 </span>
                                             </label>
                                         @elseif ($fieldType === 'textarea')
                                             <textarea rows="2"
                                                       wire:model="formSpecifications.{{ $fieldKey }}"
-                                                      placeholder="{{ $placeholder }}"
+                                                      placeholder="{{ $placeholder ?: ('Ingrese ' . strtolower($fieldLabel)) }}"
                                                       class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 outline-none resize-none"></textarea>
+                                        @elseif (in_array($fieldType, ['tags', 'list', 'array']))
+                                            <div x-data="{
+                                                     items: @entangle('formSpecifications.' . $fieldKey),
+                                                     newTag: '',
+                                                     get tagList() {
+                                                         if (!this.items) return [];
+                                                         if (Array.isArray(this.items)) return this.items;
+                                                         if (typeof this.items === 'string') {
+                                                             try {
+                                                                 const parsed = JSON.parse(this.items);
+                                                                 if (Array.isArray(parsed)) return parsed;
+                                                             } catch (e) {}
+                                                             return this.items.trim() ? this.items.split(',').map(s => s.trim()).filter(Boolean) : [];
+                                                         }
+                                                         return [];
+                                                     },
+                                                     addTag(val) {
+                                                         const tag = (val !== undefined ? val : this.newTag).trim();
+                                                         if (!tag) return;
+                                                         let current = this.tagList.slice();
+                                                         if (!current.includes(tag)) {
+                                                             current.push(tag);
+                                                             this.items = current;
+                                                         }
+                                                         if (val === undefined) {
+                                                             this.newTag = '';
+                                                         }
+                                                     },
+                                                     removeTag(tagToRemove) {
+                                                         let current = this.tagList.filter(t => t !== tagToRemove);
+                                                         this.items = current;
+                                                     },
+                                                     toggleTag(val) {
+                                                         if (this.tagList.includes(val)) {
+                                                             this.removeTag(val);
+                                                         } else {
+                                                             this.addTag(val);
+                                                         }
+                                                     }
+                                                 }"
+                                                 class="space-y-2">
+                                                <!-- Box Contenedor de Elementos Agregados -->
+                                                <div class="flex flex-wrap gap-1.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 min-h-[42px] items-center">
+                                                    <template x-if="tagList.length === 0">
+                                                        <span class="text-xs text-slate-400 dark:text-slate-500 italic select-none">
+                                                            Ningún elemento agregado aún. Escriba abajo o seleccione de las sugerencias.
+                                                        </span>
+                                                    </template>
+                                                    <template x-for="(tag, index) in tagList" :key="tag">
+                                                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold shadow-2xs animate-fadeIn">
+                                                            <span x-text="tag"></span>
+                                                            <button type="button"
+                                                                    @click.stop="removeTag(tag)"
+                                                                    class="text-emerald-600 dark:text-emerald-400 hover:text-rose-500 dark:hover:text-rose-400 font-bold text-sm leading-none transition-colors ml-0.5 cursor-pointer"
+                                                                    title="Eliminar elemento">
+                                                                &times;
+                                                            </button>
+                                                        </span>
+                                                    </template>
+                                                </div>
+
+                                                <!-- Fila de Entrada de Texto + Botón Agregar -->
+                                                <div class="flex items-center gap-2">
+                                                    <input type="text"
+                                                           x-model="newTag"
+                                                           @keydown.enter.prevent="addTag()"
+                                                           placeholder="{{ $placeholder ?: ('Escriba ' . strtolower($fieldLabel) . ' y presione Enter o &quot;+ Agregar&quot;') }}"
+                                                           class="flex-1 text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 outline-none" />
+                                                    <button type="button"
+                                                            @click="addTag()"
+                                                            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-xs transition-colors shrink-0 cursor-pointer">
+                                                        <span>+ Agregar</span>
+                                                    </button>
+                                                </div>
+
+                                                <!-- Opciones Sugeridas -->
+                                                @if (!empty($options))
+                                                    <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                                        <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase shrink-0 select-none">
+                                                            SUGERIDOS:
+                                                        </span>
+                                                        @foreach ($options as $opt)
+                                                            <button type="button"
+                                                                    @click="toggleTag('{{ addslashes($opt) }}')"
+                                                                    :class="tagList.includes('{{ addslashes($opt) }}')
+                                                                        ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 font-bold shadow-2xs'
+                                                                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 dark:hover:bg-emerald-950/40'"
+                                                                    class="px-2.5 py-1 rounded-md text-[11px] border transition-colors flex items-center gap-1 cursor-pointer">
+                                                                <span x-text="tagList.includes('{{ addslashes($opt) }}') ? '✓' : '+'"></span>
+                                                                <span>{{ $opt }}</span>
+                                                            </button>
+                                                        @endforeach
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @else
+                                            <input type="text"
+                                                   wire:model="formSpecifications.{{ $fieldKey }}"
+                                                   placeholder="{{ $placeholder ?: ('Ingrese ' . strtolower($fieldLabel)) }}"
+                                                   class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 outline-none">
                                         @endif
                                     </div>
                                 @endforeach

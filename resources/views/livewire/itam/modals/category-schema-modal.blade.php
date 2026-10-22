@@ -283,41 +283,132 @@
                                 @else
                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         @foreach ($schemaFields as $pf)
-                                            <div class="{{ ($pf['type'] ?? 'text') === 'textarea' ? 'md:col-span-2' : '' }}">
+                                            @php
+                                                $pType = $pf['type'] ?? 'text';
+                                                $isFullWidth = in_array($pType, ['textarea', 'tags', 'list', 'array']);
+                                                $opts = !empty($pf['options_str']) ? array_filter(array_map('trim', explode(',', $pf['options_str']))) : ($pf['options'] ?? []);
+                                            @endphp
+                                            <div class="{{ $isFullWidth ? 'md:col-span-2' : '' }}">
                                                 <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                                                     {{ $pf['label'] }}
                                                     @if (!empty($pf['required'])) <span class="text-rose-500">*</span> @endif
                                                     @if (!empty($pf['unit'])) <span class="text-slate-400 text-[10px]">({{ $pf['unit'] }})</span> @endif
                                                 </label>
 
-                                                @if (($pf['type'] ?? 'text') === 'select')
+                                                @if ($pType === 'select')
                                                     <select wire:model.live="schemaPreviewValues.{{ $pf['key'] }}"
                                                             class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                                                         <option value="">-- Seleccionar {{ $pf['label'] }} --</option>
-                                                        @php
-                                                            $opts = !empty($pf['options_str']) ? array_filter(array_map('trim', explode(',', $pf['options_str']))) : ($pf['options'] ?? []);
-                                                        @endphp
                                                         @foreach ($opts as $opt)
                                                             <option value="{{ $opt }}">{{ $opt }}</option>
                                                         @endforeach
                                                     </select>
-                                                @elseif (($pf['type'] ?? 'text') === 'textarea')
+                                                @elseif ($pType === 'textarea')
                                                     <textarea rows="3"
                                                               wire:model.live="schemaPreviewValues.{{ $pf['key'] }}"
                                                               placeholder="{{ ($pf['placeholder'] ?? '') ?: ('Ingrese ' . ($pf['label'] ?? '')) }}"
                                                               class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white resize-none"></textarea>
-                                                @elseif (($pf['type'] ?? 'text') === 'boolean')
+                                                @elseif ($pType === 'boolean')
                                                     <div class="flex items-center gap-2 pt-2">
                                                         <input type="checkbox"
                                                                wire:model.live="schemaPreviewValues.{{ $pf['key'] }}"
                                                                class="rounded text-emerald-600 focus:ring-emerald-500" />
                                                         <span class="text-xs text-slate-700 dark:text-slate-300">{{ $pf['placeholder'] ?: 'Habilitado / Presente' }}</span>
                                                     </div>
-                                                @elseif (($pf['type'] ?? 'text') === 'number')
+                                                @elseif ($pType === 'number')
                                                     <input type="number"
                                                            wire:model.live="schemaPreviewValues.{{ $pf['key'] }}"
                                                            placeholder="{{ $pf['placeholder'] ?: '0' }}"
                                                            class="w-full text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
+                                                @elseif (in_array($pType, ['tags', 'list', 'array']))
+                                                    <div x-data="{
+                                                             items: @entangle('schemaPreviewValues.' . $pf['key']),
+                                                             newTag: '',
+                                                             get tagList() {
+                                                                 if (!this.items) return [];
+                                                                 if (Array.isArray(this.items)) return this.items;
+                                                                 if (typeof this.items === 'string') {
+                                                                     try {
+                                                                         const parsed = JSON.parse(this.items);
+                                                                         if (Array.isArray(parsed)) return parsed;
+                                                                     } catch (e) {}
+                                                                     return this.items.trim() ? this.items.split(',').map(s => s.trim()).filter(Boolean) : [];
+                                                                 }
+                                                                 return [];
+                                                             },
+                                                             addTag(val) {
+                                                                 const tag = (val !== undefined ? val : this.newTag).trim();
+                                                                 if (!tag) return;
+                                                                 let current = this.tagList.slice();
+                                                                 if (!current.includes(tag)) {
+                                                                     current.push(tag);
+                                                                     this.items = current;
+                                                                 }
+                                                                 if (val === undefined) {
+                                                                     this.newTag = '';
+                                                                 }
+                                                             },
+                                                             removeTag(tagToRemove) {
+                                                                 let current = this.tagList.filter(t => t !== tagToRemove);
+                                                                 this.items = current;
+                                                             },
+                                                             toggleTag(val) {
+                                                                 if (this.tagList.includes(val)) {
+                                                                     this.removeTag(val);
+                                                                 } else {
+                                                                     this.addTag(val);
+                                                                 }
+                                                             }
+                                                         }"
+                                                         class="space-y-2">
+                                                        <div class="flex flex-wrap gap-1.5 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/80 min-h-[42px] items-center">
+                                                            <template x-if="tagList.length === 0">
+                                                                <span class="text-xs text-slate-400 dark:text-slate-500 italic select-none">
+                                                                    Ningún elemento agregado aún. Escriba abajo o seleccione de las sugerencias.
+                                                                </span>
+                                                            </template>
+                                                            <template x-for="(tag, index) in tagList" :key="tag">
+                                                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold shadow-2xs">
+                                                                    <span x-text="tag"></span>
+                                                                    <button type="button"
+                                                                            @click.stop="removeTag(tag)"
+                                                                            class="text-emerald-600 dark:text-emerald-400 hover:text-rose-500 dark:hover:text-rose-400 font-bold text-sm leading-none transition-colors ml-0.5 cursor-pointer">&times;</button>
+                                                                </span>
+                                                            </template>
+                                                        </div>
+
+                                                        <div class="flex items-center gap-2">
+                                                            <input type="text"
+                                                                   x-model="newTag"
+                                                                   @keydown.enter.prevent="addTag()"
+                                                                   placeholder="{{ ($pf['placeholder'] ?? '') ?: ('Escriba ' . strtolower($pf['label'] ?? '') . ' y presione Enter o &quot;+ Agregar&quot;') }}"
+                                                                   class="flex-1 text-xs px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500/20 outline-none" />
+                                                            <button type="button"
+                                                                    @click="addTag()"
+                                                                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold flex items-center gap-1 shadow-xs transition-colors shrink-0 cursor-pointer">
+                                                                <span>+ Agregar</span>
+                                                            </button>
+                                                        </div>
+
+                                                        @if (!empty($opts))
+                                                            <div class="flex items-center gap-1.5 flex-wrap pt-0.5">
+                                                                <span class="text-[10px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase shrink-0 select-none">
+                                                                    SUGERIDOS:
+                                                                </span>
+                                                                @foreach ($opts as $opt)
+                                                                    <button type="button"
+                                                                            @click="toggleTag('{{ addslashes($opt) }}')"
+                                                                            :class="tagList.includes('{{ addslashes($opt) }}')
+                                                                                ? 'bg-emerald-100 dark:bg-emerald-900/60 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-700 font-bold shadow-2xs'
+                                                                                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 dark:hover:bg-emerald-950/40'"
+                                                                            class="px-2.5 py-1 rounded-md text-[11px] border transition-colors flex items-center gap-1 cursor-pointer">
+                                                                        <span x-text="tagList.includes('{{ addslashes($opt) }}') ? '✓' : '+'"></span>
+                                                                        <span>{{ $opt }}</span>
+                                                                    </button>
+                                                                @endforeach
+                                                            </div>
+                                                        @endif
+                                                    </div>
                                                 @else
                                                     <input type="text"
                                                            wire:model.live="schemaPreviewValues.{{ $pf['key'] }}"

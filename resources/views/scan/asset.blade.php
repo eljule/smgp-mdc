@@ -230,7 +230,7 @@
                                     {{ str_replace('_', ' ', $key) }}:
                                 </span>
                                 <span class="font-bold text-slate-800 dark:text-slate-200 text-right truncate">
-                                    {{ is_array($val) ? json_encode($val) : $val }}
+                                    {{ is_array($val) ? implode(', ', $val) : $val }}
                                 </span>
                             </div>
                         @endif

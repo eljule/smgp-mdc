@@ -404,6 +404,72 @@ class ItamComponentsTest extends TestCase
         $testComponent->set('formAssignedPersonName', '-- Sin Custodio Asignado (Almacén TI) --')
             ->assertSet('formAssignedPersonId', null);
     }
+
+    public function test_asset_modal_renders_dynamic_tags_specifications_and_saves_correctly(): void
+    {
+        $pcCat = AssetCategory::where('code', 'PC')->first();
+        $pcCat->custom_fields_schema = [
+            [
+                'key' => 'swls',
+                'name' => 'swls',
+                'type' => 'tags',
+                'label' => 'Software licenciado',
+                'options' => ['Antivirus ESET', 'Office 2021'],
+                'required' => false,
+            ],
+            [
+                'key' => 'snwls',
+                'name' => 'snwls',
+                'type' => 'tags',
+                'label' => 'Software no licenciado',
+                'options' => ['Office 2019', 'AutoCad 2021'],
+                'required' => false,
+            ],
+            [
+                'key' => 'sint',
+                'name' => 'sint',
+                'type' => 'tags',
+                'label' => 'Software Institucional',
+                'options' => ['SIGA', 'SIAF'],
+                'required' => false,
+            ],
+        ];
+        $pcCat->save();
+        $brand = AssetBrand::first();
+        $model = AssetModel::first();
+
+        $component = Livewire::test(Dashboard::class)
+            ->call('openAssetModal')
+            ->assertSet('isAssetModalOpen', true)
+            ->set('formCategoryId', $pcCat->id)
+            ->assertSee('Software licenciado')
+            ->assertSee('Software no licenciado')
+            ->assertSee('SUGERIDOS:')
+            ->assertSee('Antivirus ESET')
+            ->assertSee('+ Agregar')
+            ->set('formBrandId', $brand->id)
+            ->set('formModelId', $model->id)
+            ->set('formSpecifications.swls', ['Antivirus ESET', 'Office 2021'])
+            ->set('formSpecifications.snwls', ['Office 2019', 'AutoCad 2021'])
+            ->set('formSpecifications.sint', ['SIGA', 'SIAF'])
+            ->call('saveAsset')
+            ->assertSet('isAssetModalOpen', false);
+
+        $createdAsset = Asset::where('category_id', $pcCat->id)->latest('id')->first();
+        $this->assertNotNull($createdAsset);
+        $this->assertIsArray($createdAsset->specifications);
+        $this->assertEquals(['Antivirus ESET', 'Office 2021'], $createdAsset->specifications['swls']);
+        $this->assertEquals(['Office 2019', 'AutoCad 2021'], $createdAsset->specifications['snwls']);
+        $this->assertEquals(['SIGA', 'SIAF'], $createdAsset->specifications['sint']);
+
+        // Check ficha técnica modal renders chips
+        Livewire::test(Dashboard::class)
+            ->call('openDetailModal', $createdAsset->id)
+            ->assertSet('isDetailModalOpen', true)
+            ->assertSee('Antivirus ESET')
+            ->assertSee('Office 2021')
+            ->assertSee('AutoCad 2021');
+    }
     public function test_child_assets_modal_and_linking_without_lazy_loading_violation(): void
     {
         $category = \App\Models\Itam\AssetCategory::firstOrCreate(
