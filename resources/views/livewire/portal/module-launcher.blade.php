@@ -1,21 +1,21 @@
 <div>
     <!-- Banner Superior / Hero Section con textura de puntos institucional -->
-    <section class="bg-[#046A38] text-white py-10 px-4 sm:px-6 lg:px-8 border-b border-emerald-900/50 relative overflow-hidden"
+    <section class="bg-[#046A38] text-white py-6 sm:py-10 px-3 sm:px-6 lg:px-8 border-b border-emerald-900/50 relative overflow-hidden"
              style="background-image: radial-gradient(circle at 25px 25px, rgba(255, 255, 255, 0.15) 2%, transparent 0%), radial-gradient(circle at 75px 75px, rgba(255, 255, 255, 0.15) 2%, transparent 0%); background-size: 100px 100px;">
         <div class="max-w-7xl mx-auto text-center relative z-10 space-y-3">
             <!-- Badge Sesión Activa -->
-            <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-700/60 text-xs font-medium text-emerald-100 shadow-sm backdrop-blur-xs">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Sesión Activa: {{ $userInfo['title'] }}@if(!empty($userInfo['name']) && strtolower($userInfo['name']) !== 'root' && strtolower($userInfo['name']) !== strtolower($userInfo['title'])) ({{$userInfo['name']}})@endif &bull; {{ $userInfo['role'] }}</span>
+            <div class="inline-flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1 rounded-xl sm:rounded-full bg-emerald-950/60 border border-emerald-700/60 text-[11px] sm:text-xs font-medium text-emerald-100 shadow-sm backdrop-blur-xs max-w-full text-center leading-normal">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0"></span>
+                <span class="break-words">Sesión Activa: <strong class="font-bold text-white">{{ $userInfo['title'] }}</strong>@if(!empty($userInfo['name']) && strtolower($userInfo['name']) !== 'root' && strtolower($userInfo['name']) !== strtolower($userInfo['title'])) ({{$userInfo['name']}})@endif &bull; <span class="text-emerald-200">{{ $userInfo['role'] }}</span></span>
             </div>
 
             <!-- Título Principal Institucional -->
-            <h1 class="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-wide uppercase text-white drop-shadow-xs">
+            <h1 class="text-xl sm:text-3xl md:text-4xl font-extrabold tracking-tight sm:tracking-wide uppercase text-white drop-shadow-xs px-2">
                 SISTEMA INTEGRADO DE GESTIÓN MUNICIPAL
             </h1>
 
             <!-- Subtítulo -->
-            <p class="max-w-2xl mx-auto text-xs sm:text-sm md:text-base text-emerald-100/90 font-normal leading-relaxed">
+            <p class="max-w-2xl mx-auto text-xs sm:text-sm md:text-base text-emerald-100/90 font-normal leading-relaxed px-2">
                 {{ $userInfo['description'] }}
             </p>
         </div>
@@ -72,7 +72,7 @@
                     @endphp
 
                     <div wire:key="module-{{ $module->id }}"
-                         class="group bg-white dark:bg-slate-900 border {{ $cardBorderClass }} rounded-2xl shadow-xs hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-6 flex flex-col justify-between border-t-4 {{ $accentColorClass }}">
+                         class="group bg-white dark:bg-slate-900 border {{ $cardBorderClass }} rounded-2xl shadow-xs hover:shadow-lg transition-all duration-300 hover:-translate-y-1 p-5 sm:p-6 flex flex-col justify-between border-t-4 {{ $accentColorClass }}">
                         <div>
                             <!-- Header de la tarjeta / Badge de Mantenimiento si aplica -->
                             <div class="h-6 flex justify-end">

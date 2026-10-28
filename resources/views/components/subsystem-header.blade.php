@@ -15,7 +15,7 @@
 @endphp
 
 <header class="bg-[#046A38] text-white border-b border-emerald-800 shadow-md sticky top-0 z-40 transition-colors duration-200">
-    <div class="w-full px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+    <div class="w-full px-3 sm:px-6 lg:px-8 flex items-center justify-between min-h-16 py-2.5 sm:py-0 sm:h-16 gap-2">
         <!-- Lado izquierdo: Botón colapsar menú + Escudo e Identidad Distrital -->
         <div class="flex items-center space-x-3 sm:space-x-4">
             <!-- Botón Móvil: Abrir Drawer Lateral -->
@@ -45,25 +45,26 @@
             </button>
 
             <a href="{{ $subsystem === 'admin' ? route('subsystems.central') : ($subsystem === 'itam' ? url('/itam') : ($subsystem === 'helpdesk' ? url('/helpdesk') : route('portal.launcher'))) }}"
-               class="flex items-center space-x-3 cursor-pointer group">
+               class="flex items-center space-x-2 sm:space-x-3 cursor-pointer group min-w-0">
                 <img
                     src="{{ asset('images/logo.png') }}"
                     alt="Escudo Oficial del Distrito de Castilla"
-                    class="h-10 sm:h-11 w-auto object-contain drop-shadow transition-transform duration-200 group-hover:scale-105"
+                    class="h-9 sm:h-11 w-auto object-contain drop-shadow transition-transform duration-200 group-hover:scale-105 flex-shrink-0"
                 />
-                <div class="flex flex-col">
-                    <span class="text-xs sm:text-sm font-bold tracking-wider leading-tight text-white group-hover:text-emerald-200 transition-colors">
-                        MUNICIPALIDAD DISTRITAL DE CASTILLA
+                <div class="flex flex-col min-w-0 text-left">
+                    <span class="text-xs sm:text-sm font-black sm:font-bold tracking-tight sm:tracking-wider leading-snug sm:leading-tight text-white group-hover:text-emerald-200 transition-colors whitespace-nowrap sm:whitespace-normal">
+                        <span class="hidden sm:inline">MUNICIPALIDAD DISTRITAL DE CASTILLA</span>
+                        <span class="sm:hidden font-extrabold tracking-normal">MDC CASTILLA</span>
                     </span>
-                    <span class="text-[13px] font-medium text-emerald-200/90 leading-tight flex items-center gap-2">
+                    <span class="text-[11px] sm:text-[13px] font-medium text-emerald-200/90 leading-tight flex items-center gap-1.5 truncate">
                         @if ($subsystem === 'itam')
-                            <span>SIGM <span class="font-light text-emerald-200">| Activos TI (ITAM)</span><span class="sr-only">Inventario y Gestión TI</span></span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span class="truncate">SIGM <span class="font-light text-emerald-200">| Activos TI (ITAM)</span><span class="sr-only">Inventario y Gestión TI</span></span>
+                            <span class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                                 v1.0
                             </span>
                         @else
-                            <span>SIGM <span class="font-normal text-emerald-200">| {{ $moduleName }}</span></span>
-                            <span class="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                            <span class="truncate">SIGM <span class="font-normal text-emerald-200">| {{ $moduleName }}</span></span>
+                            <span class="hidden sm:inline-block text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                                 v13.19.0
                             </span>
                         @endif
@@ -73,7 +74,7 @@
         </div>
 
         <!-- Lado derecho: Acciones de cabecera y Accesos Rápidos -->
-        <div class="flex items-center space-x-2 sm:space-x-3">
+        <div class="flex items-center space-x-1.5 sm:space-x-3 flex-shrink-0">
             <!-- ITAM: Badges de Alerta Rápida -->
             @if ($subsystem === 'itam')
                 @if ($criticalSuppliesCount > 0)
@@ -115,7 +116,7 @@
             <!-- Botón de regreso al lanzador -->
             <a
                 href="{{ route('portal.launcher') }}"
-                class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-800/80 hover:bg-emerald-700 dark:bg-slate-800 text-white text-xs font-semibold shadow-xs border border-emerald-600/40 transition-all hover:-translate-y-0.5 cursor-pointer"
+                class="inline-flex items-center space-x-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-800/80 hover:bg-emerald-700 dark:bg-slate-800 text-white text-xs font-semibold shadow-xs border border-emerald-600/40 transition-all hover:-translate-y-0.5 cursor-pointer"
                 title="Ir a la cuadrícula de subsistemas"
             >
                 <span>🚀</span>
@@ -175,7 +176,7 @@
             <!-- Botón Cambiar Contraseña -->
             <a
                 href="{{ route('password.change') }}"
-                class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-xs font-medium text-emerald-100 hover:text-white border border-emerald-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                class="inline-flex items-center space-x-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 text-xs font-medium text-emerald-100 hover:text-white border border-emerald-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 title="Cambiar mi contraseña"
             >
                 <span>🔑</span>
@@ -185,7 +186,7 @@
             <!-- Botón Cerrar Sesión en Cabecera de Subsistema -->
             <a
                 href="{{ route('logout') }}"
-                class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-emerald-900/70 hover:bg-emerald-900 text-xs font-medium text-emerald-100 hover:text-white border border-emerald-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
+                class="inline-flex items-center space-x-1.5 p-2 sm:px-3 sm:py-1.5 rounded-lg bg-emerald-900/70 hover:bg-emerald-900 text-xs font-medium text-emerald-100 hover:text-white border border-emerald-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
                 title="Cerrar Sesión"
             >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -28,21 +28,22 @@
 <body class="min-h-full bg-slate-100 dark:bg-slate-950 font-sans text-slate-800 dark:text-slate-100 antialiased flex flex-col justify-between selection:bg-emerald-600 selection:text-white transition-colors duration-200">
 
     <!-- Header Institucional Superior -->
-    <header class="brand-gradient text-white py-3.5 px-6 border-b border-emerald-900 shadow-md">
-        <div class="max-w-5xl mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-3.5">
-                <img src="{{ asset('images/logo.png') }}" alt="Escudo de Castilla" class="h-10 w-auto object-contain drop-shadow-sm">
-                <div>
-                    <h1 class="text-xs sm:text-sm font-black tracking-wider leading-tight text-white uppercase">
-                        MUNICIPALIDAD DISTRITAL DE CASTILLA
+    <header class="brand-gradient text-white py-2.5 sm:py-3.5 px-3 sm:px-6 border-b border-emerald-900 shadow-md">
+        <div class="max-w-5xl mx-auto flex items-center justify-between min-h-14 sm:min-h-16 gap-2">
+            <div class="flex items-center space-x-2.5 sm:space-x-3.5 min-w-0">
+                <img src="{{ asset('images/logo.png') }}" alt="Escudo de Castilla" class="h-9 sm:h-10 w-auto object-contain drop-shadow-sm flex-shrink-0">
+                <div class="min-w-0">
+                    <h1 class="text-xs sm:text-sm font-black tracking-tight sm:tracking-wider leading-snug sm:leading-tight text-white uppercase whitespace-nowrap sm:whitespace-normal">
+                        <span class="hidden sm:inline">MUNICIPALIDAD DISTRITAL DE CASTILLA</span>
+                        <span class="sm:hidden font-extrabold tracking-normal">MDC CASTILLA</span>
                     </h1>
-                    <p class="text-[11px] text-emerald-200 font-medium">
+                    <p class="text-[10px] sm:text-[11px] text-emerald-200 font-medium truncate">
                         SIGM &bull; Seguridad de Cuentas y Control de Accesos
                     </p>
                 </div>
             </div>
 
-            <div class="flex items-center space-x-2.5">
+            <div class="flex items-center space-x-1.5 sm:space-x-2.5 flex-shrink-0">
                 <!-- Selector de Tema Claro / Oscuro -->
                 <button
                     type="button"
@@ -57,9 +58,13 @@
                 <!-- Cerrar Sesión -->
                 <a
                     href="{{ route('logout') }}"
-                    class="px-3.5 py-1.5 rounded-xl bg-emerald-950/70 hover:bg-emerald-950 text-xs font-semibold text-emerald-100 hover:text-white border border-emerald-700/70 transition-colors shadow-xs"
+                    class="p-2 sm:px-3.5 sm:py-1.5 rounded-xl bg-emerald-950/70 hover:bg-emerald-950 text-xs font-semibold text-emerald-100 hover:text-white border border-emerald-700/70 transition-colors shadow-xs flex items-center gap-1.5"
+                    title="Cerrar Sesión"
                 >
-                    Cerrar Sesión
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    <span class="hidden sm:inline">Cerrar Sesión</span>
                 </a>
             </div>
         </div>

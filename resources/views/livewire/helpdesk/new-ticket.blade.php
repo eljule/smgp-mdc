@@ -3,9 +3,9 @@
 
     <!-- Barra Superior Institucional -->
     <header style="background-color: #0b482b;" class="border-b border-emerald-900 text-white sticky top-0 z-40 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 min-h-16 py-2.5 sm:py-0 sm:h-16 flex items-center justify-between gap-2">
             <!-- Izquierda: Escudo y Título Institucional -->
-            <div class="flex items-center space-x-3 sm:space-x-4">
+            <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
                 @php
                     $helpdeskBackUrl = auth()->check() && auth()->user()->canAccessSubsystem('helpdesk')
                         ? route('subsystems.helpdesk')
@@ -13,24 +13,24 @@
                 @endphp
                 <a href="{{ $helpdeskBackUrl }}"
                    style="background-color: #0d5c37;"
-                   class="w-9 h-9 rounded-lg border border-emerald-600/50 flex items-center justify-center text-white hover:opacity-90 transition-opacity cursor-pointer shadow-xs"
+                   class="w-8 h-8 sm:w-9 sm:h-9 rounded-lg border border-emerald-600/50 flex items-center justify-center text-white hover:opacity-90 transition-opacity cursor-pointer shadow-xs flex-shrink-0"
                    title="{{ auth()->check() && auth()->user()->canAccessSubsystem('helpdesk') ? 'Volver al Panel de Helpdesk' : 'Volver a Mesa de Ayuda' }}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                 </a>
 
-                <div class="flex items-center space-x-2.5">
+                <div class="flex items-center space-x-2 min-w-0">
                     <img src="{{ asset('images/logo.png') }}"
                          alt="Escudo Oficial de Castilla"
-                         class="h-9 w-auto object-contain drop-shadow-sm" />
-                    <div class="flex flex-col">
-                        <h1 class="font-black text-xs sm:text-sm tracking-wide text-white leading-tight uppercase flex items-center gap-1.5">
-                            <span class="px-1.5 py-0.5 rounded bg-emerald-900/80 text-[10px] font-mono border border-emerald-700/60 font-bold">[MDC]</span>
-                            <span>Mesa de Ayuda y Soporte TI</span>
+                         class="h-8 sm:h-9 w-auto object-contain drop-shadow-sm flex-shrink-0" />
+                    <div class="flex flex-col min-w-0 text-left">
+                        <h1 class="font-black text-xs sm:text-sm tracking-tight sm:tracking-wide text-white leading-snug sm:leading-tight uppercase flex items-center gap-1 sm:gap-1.5 min-w-0">
+                            <span class="px-1.5 py-0.5 rounded bg-emerald-900/80 text-[10px] font-mono border border-emerald-700/60 font-bold flex-shrink-0">[MDC]</span>
+                            <span class="truncate">Mesa de Ayuda TI</span>
                         </h1>
-                        <p class="text-[11px] text-emerald-200 font-medium leading-tight">
-                            Portal Ágil de Reporte de Incidencias TI
+                        <p class="text-[10px] sm:text-[11px] text-emerald-200 font-medium leading-tight truncate">
+                            Portal Ágil de Reporte de Incidencias
                         </p>
                     </div>
                 </div>

@@ -34,6 +34,7 @@ class DemoItamSeeder extends Seeder
         }
 
         DB::table('itam_maintenance_supplies')->delete();
+        DB::table('itam_supplies')->delete();
         DB::table('itam_maintenance_orders')->delete();
         DB::table('itam_audit_verifications')->delete();
         DB::table('itam_inventory_audits')->delete();
@@ -696,6 +697,103 @@ class DemoItamSeeder extends Seeder
         ];
         DB::table('itam_audit_verifications')->insert($verifications);
 
+
+        $supplies = [
+            [
+                'id' => 1,
+                'code' => 'INS-TNR-001',
+                'name' => 'Tóner HP LaserJet 58A Negro Original (CF258A)',
+                'category' => 'TONER_TINTA',
+                'stock' => 7,
+                'min_stock' => 2,
+                'unit' => 'UNIDAD',
+                'unit_cost' => '380.00',
+                'location' => 'Almacén ODT - Estante 2',
+                'compatible_models' => 'HP LaserJet Pro M404dw, M428fdw',
+                'notes' => 'Insumo de alto rendimiento para despacho municipal',
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ],
+            [
+                'id' => 2,
+                'code' => 'INS-CAB-002',
+                'name' => 'Bobina Cable de Red UTP Categoría 6 305m Dixon',
+                'category' => 'CABLEADO_RED',
+                'stock' => 3,
+                'min_stock' => 1,
+                'unit' => 'BOBINA',
+                'unit_cost' => '450.00',
+                'location' => 'Almacén ODT - Nivel 1',
+                'compatible_models' => 'Cableado estructurado sedes',
+                'notes' => 'Para ampliaciones de puntos de red municipal',
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ],
+            [
+                'id' => 3,
+                'code' => 'INS-CON-003',
+                'name' => 'Conectores RJ-45 Cat 6 x 100 Und',
+                'category' => 'CONECTORES',
+                'stock' => 12,
+                'min_stock' => 3,
+                'unit' => 'CAJA',
+                'unit_cost' => '45.00',
+                'location' => 'Almacén ODT - Gaveta 4',
+                'compatible_models' => 'Cable Cat 6',
+                'notes' => 'Conectores con contactos dorados 50u',
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ],
+            [
+                'id' => 4,
+                'code' => 'INS-SSD-001',
+                'name' => 'Disco Estado Sólido Kingston NV2 512GB NVMe M.2',
+                'category' => 'REPUESTOS_HARDWARE',
+                'stock' => 1,
+                'min_stock' => 2,
+                'unit' => 'UNIDAD',
+                'unit_cost' => '165.00',
+                'location' => 'Almacén ODT - Gabinete Repuestos',
+                'compatible_models' => 'PCs y Laptops con zócalo M.2 NVMe',
+                'notes' => 'Stock crítico: solo 1 unidad restante.',
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ],
+            [
+                'id' => 5,
+                'code' => 'INS-RAM-001',
+                'name' => 'Memoria RAM Kingston Fury Beast 16GB DDR4 3200MHz',
+                'category' => 'REPUESTOS_HARDWARE',
+                'stock' => 0,
+                'min_stock' => 2,
+                'unit' => 'UNIDAD',
+                'unit_cost' => '155.00',
+                'location' => 'Almacén ODT - Gabinete Repuestos',
+                'compatible_models' => 'Computadoras OptiPlex y ProDesk',
+                'notes' => 'Stock agotado. Requiere adquisición urgente.',
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ],
+            [
+                'id' => 6,
+                'code' => 'INS-LIM-001',
+                'name' => 'Alcohol Isopropílico 99.9% 1 Litro + Paños Microfibra',
+                'category' => 'LIMPIEZA',
+                'stock' => 6,
+                'min_stock' => 2,
+                'unit' => 'UNIDAD',
+                'unit_cost' => '28.50',
+                'location' => 'Almacén ODT - Gabinete Químicos',
+                'compatible_models' => 'Mantenimiento preventivo general',
+                'notes' => 'Solvente dieléctrico para limpieza de placas y rodillos.',
+                'created_at' => '2026-10-15 02:12:58',
+                'updated_at' => '2026-10-15 02:12:58',
+            ],
+        ];
+        foreach (array_chunk($supplies, 50) as $chunk) {
+            DB::table('itam_supplies')->insert($chunk);
+        }
+
         $maintenanceOrders = [
             [
                 'id' => 1,
@@ -758,6 +856,7 @@ class DemoItamSeeder extends Seeder
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_inventory_audits', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_inventory_audits;");
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_audit_verifications', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_audit_verifications;");
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_maintenance_orders', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_maintenance_orders;");
+            DB::statement("SELECT setval(pg_get_serial_sequence('itam_supplies', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_supplies;");
             DB::statement("SELECT setval(pg_get_serial_sequence('itam_maintenance_supplies', 'id'), coalesce(max(id), 0) + 1, false) FROM itam_maintenance_supplies;");
             DB::statement('SET session_replication_role = DEFAULT;');
         } else {
